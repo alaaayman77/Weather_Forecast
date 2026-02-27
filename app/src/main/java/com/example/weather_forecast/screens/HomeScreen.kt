@@ -2,6 +2,10 @@ package com.example.weather_forecast.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -9,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,16 +41,24 @@ fun HomeScreen() {
 
 @Composable
 fun WeatherMainScreen() {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
-        WeatherTopBar()
-        WeatherCenterSection()
-        WeatherInfoGrid()
-        Spacer(modifier = Modifier.height(8.dp))
+
+        item {
+            WeatherTopBar()
+        }
+
+        item {
+            WeatherCenterSection()
+        }
+        item {
+            WeatherInfoGrid()
+        }
     }
 }
 
@@ -53,18 +66,18 @@ fun WeatherMainScreen() {
 
 @Composable
 fun WeatherTopBar() {
-            Column {
-                Text(
-                    text = "Good Morning",
-                    style = MaterialTheme.typography.labelSmall,
-                )
-                Text(
-                    text = "Monday, 12 June  •  10:30 AM",
-                  style = MaterialTheme.typography.labelSmall.copy(color = lightGray),
+    Column {
+        Text(
+            text = "Good Morning",
+            style = MaterialTheme.typography.labelSmall,
+        )
+        Text(
+            text = "Monday, 12 June  •  10:30 AM",
+            style = MaterialTheme.typography.labelSmall.copy(color = lightGray),
 
-                )
-            }
-        }
+            )
+    }
+}
 
 
 
@@ -78,9 +91,9 @@ fun WeatherCenterSection() {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        Text("Montreal", style = MaterialTheme.typography.headlineLarge)
+        Text("Montreal", style = MaterialTheme.typography.headlineLarge.copy(color = Color.White , letterSpacing = 0.5.sp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = "24°C",
@@ -90,14 +103,19 @@ fun WeatherCenterSection() {
 
         Text(
             text = "Partly Cloudy",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+            style = MaterialTheme.typography.labelMedium,
         )
     }
 }
 
-
+val stats = listOf(
+    WeatherStat(Icons.Default.Home, "64%", "HUMID"),
+    WeatherStat(Icons.Default.Home, "12km/h", "WIND"),
+    WeatherStat(Icons.Default.Home, "1012", "HPA"),
+    WeatherStat(Icons.Default.Home, "28%", "CLOUD"),
+    WeatherStat(Icons.Default.Home, "06:12", "SUNRISE"),
+    WeatherStat(Icons.Default.Home, "18:45", "SUNSET"),
+)
 @Composable
 fun WeatherInfoGrid() {
     val row1 = listOf(
@@ -116,7 +134,6 @@ fun WeatherInfoGrid() {
         WeatherStatRow(row2)
     }
 }
-
 @Composable
 private fun WeatherStatRow(stats: List<WeatherStat>) {
     Row(
@@ -129,10 +146,12 @@ private fun WeatherStatRow(stats: List<WeatherStat>) {
     }
 }
 
+
 @Composable
 fun WeatherInfoCard(
-    modifier: Modifier = Modifier,
-    stat: WeatherStat
+
+    stat: WeatherStat,
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
@@ -168,9 +187,8 @@ fun WeatherInfoCard(
 
             Text(
                 text = stat.value,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Black
             )
 
             Text(
