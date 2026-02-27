@@ -62,4 +62,5 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$nav_version")
 //Serialization for NavArgs
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation("com.canopas.compose-animated-navigationbar:bottombar:1.0.1")
 }

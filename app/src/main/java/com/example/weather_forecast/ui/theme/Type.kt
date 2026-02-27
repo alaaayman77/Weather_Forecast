@@ -1,11 +1,19 @@
 package com.example.weather_forecast.ui.theme
 
 import androidx.compose.material3.Typography
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-
+import com.example.weather_forecast.R
+val Poppins = FontFamily(
+    Font(R.font.poppins_extrabold, FontWeight.Bold),
+    Font(R.font.poppins_regular , FontWeight.Normal),
+    Font(R.font.poppins_semibold , FontWeight.SemiBold),
+    )
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(
@@ -14,6 +22,19 @@ val Typography = Typography(
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.Black
     )
     /* Other default text styles to override
     titleLarge = TextStyle(
@@ -31,4 +52,6 @@ val Typography = Typography(
         letterSpacing = 0.5.sp
     )
     */
+
 )
+
