@@ -11,37 +11,43 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var navController : NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            navController = rememberNavController()
             Weather_ForecastTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                Scaffold(
+                    bottomBar = {
+                        BottomNavigationBar(){item->
+                            navController.navigate(item.route)
+                        }
+                    }
+                )
+                { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = NavigationRoutes.HomeRoute,
                         modifier = Modifier.padding(innerPadding)
-                    )
+                    ) {
+                        composable<NavigationRoutes.HomeRoute> { HomeScreen() }
+                        composable<NavigationRoutes.FavouriteRoute> { FavouriteScreen() }
+                        composable<NavigationRoutes.AlertRoute> { AlertScreen() }
+                        composable<NavigationRoutes.SettingsRoute> { SettingsScreen() }
+                    }
                 }
+
+
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Weather_ForecastTheme {
-        Greeting("Android")
-    }
-}
