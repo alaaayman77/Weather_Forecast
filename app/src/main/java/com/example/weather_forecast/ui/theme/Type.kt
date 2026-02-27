@@ -1,5 +1,6 @@
 package com.example.weather_forecast.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,15 +27,25 @@ val Typography = Typography(
     headlineLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.Bold,
-        fontSize = 28.sp
+        fontSize = 28.sp,
+        color = Color.Black
     ),
+    labelMedium = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp,
+        color = Color.LightGray
+    ),
+
     labelSmall = TextStyle(
         fontFamily = Poppins,
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp,
-        color = Color.Black
+        color = PrimaryColor
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

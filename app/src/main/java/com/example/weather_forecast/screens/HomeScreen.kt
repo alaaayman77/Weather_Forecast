@@ -1,53 +1,193 @@
 package com.example.weather_forecast.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.graphics.Color
+
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.weather_forecast.R
+import androidx.compose.ui.unit.sp
+import com.example.weather_forecast.ui.theme.lightGray
 
+data class WeatherStat(
+    val icon: ImageVector,
+    val value: String,
+    val label: String
+)
 
 @Composable
-fun HomeScreen(){
-    Box (modifier = Modifier
-        .fillMaxSize(),
-
-    ){
-        WeatherDetailUpperPart()
+fun HomeScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        WeatherMainScreen()
     }
 }
 
 @Composable
-fun WeatherDetailUpperPart(){
+fun WeatherMainScreen() {
     Column(
         modifier = Modifier
-
-            .fillMaxWidth()
-            .padding(start = 10.dp),
-        verticalArrangement = Arrangement.SpaceEvenly
-
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("Good Morning", style = MaterialTheme.typography.labelSmall)
-        Text("Thu 31 Dec", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
+        WeatherTopBar()
+        WeatherCenterSection()
+        WeatherInfoGrid()
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+
+
+@Composable
+fun WeatherTopBar() {
+            Column {
+                Text(
+                    text = "Good Morning",
+                    style = MaterialTheme.typography.labelSmall,
+                )
+                Text(
+                    text = "Monday, 12 June  •  10:30 AM",
+                  style = MaterialTheme.typography.labelSmall.copy(color = lightGray),
+
+                )
+            }
+        }
+
+
+
+@Composable
+fun WeatherCenterSection() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+
+        Text("Montreal", style = MaterialTheme.typography.headlineLarge)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "24°C",
+            style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.primary , fontSize = 72.sp)
+
         )
 
+        Text(
+            text = "Partly Cloudy",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        )
+    }
+}
+
+
+@Composable
+fun WeatherInfoGrid() {
+    val row1 = listOf(
+        WeatherStat(Icons.Default.Home, "64%",    "HUMID"),
+        WeatherStat(Icons.Default.Home,       "12km/h", "WIND"),
+        WeatherStat(Icons.Default.Home,     "1012",   "HPA"),
+    )
+    val row2 = listOf(
+        WeatherStat(Icons.Default.Home,      "28%",   "CLOUD"),
+        WeatherStat(Icons.Default.Home,   "06:12",  "SUNRISE"),
+        WeatherStat(Icons.Default.Home, "18:45", "SUNSET"),
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        WeatherStatRow(row1)
+        WeatherStatRow(row2)
     }
 }
 
 @Composable
-@Preview(showSystemUi = true )
-fun WeatherDetailUpperPartPreview(){
-    WeatherDetailUpperPart()
+private fun WeatherStatRow(stats: List<WeatherStat>) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        stats.forEach { stat ->
+            WeatherInfoCard(modifier = Modifier.weight(1f), stat = stat)
+        }
+    }
+}
+
+@Composable
+fun WeatherInfoCard(
+    modifier: Modifier = Modifier,
+    stat: WeatherStat
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp, horizontal = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(12.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = stat.icon,
+                    contentDescription = stat.label,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
+            Text(
+                text = stat.value,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = stat.label,
+                fontSize = 10.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                letterSpacing = 1.2.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun HomeScreenPreview() {
+    MaterialTheme {
+        HomeScreen()
+    }
 }

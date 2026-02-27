@@ -63,6 +63,7 @@ fun BottomNavigationBar( navigate: (BottomNavigationBarItem)->Unit) {
                 label = {
                     Text(
                         text = item.title,
+                        style = MaterialTheme.typography.labelSmall,
                         color = if (index == selectedNavigationIndex.intValue)
                             Color.Black
                         else Color.Gray
