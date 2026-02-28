@@ -1,5 +1,6 @@
 package com.example.weather_forecast.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -30,10 +31,9 @@ data class WeatherStat(
 )
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
     ) {
         WeatherMainScreen()
     }
@@ -91,13 +91,13 @@ fun WeatherCenterSection() {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        Text("Montreal", style = MaterialTheme.typography.headlineLarge.copy(color = Color.White , letterSpacing = 0.5.sp))
+        Text("Montreal", style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.primary , letterSpacing = 0.5.sp))
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = "24°C",
-            style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.primary , fontSize = 72.sp)
+            style = MaterialTheme.typography.headlineLarge.copy(color = MaterialTheme.colorScheme.secondary , fontSize = 72.sp)
 
         )
 
@@ -156,10 +156,11 @@ fun WeatherInfoCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+            containerColor = Color.White.copy(alpha = 0.4f)
+        ),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
     ) {
         Column(
             modifier = Modifier
@@ -187,7 +188,7 @@ fun WeatherInfoCard(
 
             Text(
                 text = stat.value,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold , color = MaterialTheme.colorScheme.secondary ),
                 color = Color.Black
             )
 
@@ -209,3 +210,5 @@ fun HomeScreenPreview() {
         HomeScreen()
     }
 }
+
+

@@ -9,10 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun SettingsScreen(){
-    Box (modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun SettingsScreen(modifier: Modifier){
+    Box (modifier = modifier
+
     ){
         Text(
             text = "Settings Screen",

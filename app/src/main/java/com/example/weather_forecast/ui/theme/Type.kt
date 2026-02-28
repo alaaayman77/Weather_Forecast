@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.R
 val Poppins = FontFamily(
-    Font(R.font.poppins_extrabold, FontWeight.Bold),
+    Font(R.font.poppins_bold, FontWeight.Bold),
     Font(R.font.poppins_regular , FontWeight.Normal),
     Font(R.font.poppins_semibold , FontWeight.SemiBold),
     )

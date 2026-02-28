@@ -9,10 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun FavouriteScreen(){
-    Box (modifier = Modifier
-        .fillMaxSize(),
-        contentAlignment = Alignment.Center
+fun FavouriteScreen(modifier: Modifier){
+    Box (modifier = modifier
+
     ){
         Text(
             text = "Favourite Screen",

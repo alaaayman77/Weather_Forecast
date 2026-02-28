@@ -10,4 +10,6 @@ sealed class NavigationRoutes {
     object AlertRoute : NavigationRoutes()
     @Serializable
     object  SettingsRoute : NavigationRoutes()
+    @Serializable
+    object  SplashRoute : NavigationRoutes()
 }
