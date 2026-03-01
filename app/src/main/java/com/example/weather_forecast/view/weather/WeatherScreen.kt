@@ -62,7 +62,6 @@ fun WeatherScreenContent() {
 }
 
 
-
 @Composable
 fun WeatherTopBar() {
     Column {
@@ -77,9 +76,6 @@ fun WeatherTopBar() {
             )
     }
 }
-
-
-
 @Composable
 fun WeatherCenterSection() {
     Column(
@@ -168,14 +164,14 @@ fun hourlyForecastList(){
         )
     LazyRow(modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
         ){
 
         items(
             stats.size,
 
         ){item->
-            HourlyForecastItem(stats.get(item) , modifier = Modifier.padding(8.dp) )
+            HourlyForecastItem(stats.get(item))
         }
 
     }

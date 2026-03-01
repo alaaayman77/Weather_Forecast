@@ -66,5 +66,6 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$nav_version")
 //Serialization for NavArgs
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
 
 }

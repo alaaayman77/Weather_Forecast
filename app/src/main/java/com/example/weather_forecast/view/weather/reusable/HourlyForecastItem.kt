@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.models.HourlyWeatherStat
 
 @Composable
-fun HourlyForecastItem(hourlyWeatherStat: HourlyWeatherStat , modifier: Modifier = Modifier){
+fun HourlyForecastItem(hourlyWeatherStat: HourlyWeatherStat){
     Card(
-        modifier = modifier,
+
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(

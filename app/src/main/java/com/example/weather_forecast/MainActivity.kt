@@ -1,6 +1,7 @@
 package com.example.weather_forecast
 
 import android.annotation.SuppressLint
+import android.location.Location
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,7 +11,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -27,20 +31,26 @@ import com.example.weather_forecast.view.SettingsScreen
 import com.example.weather_forecast.view.SplashScreen
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 import com.example.weather_forecast.view.weather.WeatherScreen
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController : NavHostController
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+    private lateinit var fusedClient : FusedLocationProviderClient
+    lateinit var locationState: MutableState<Location>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fusedClient = LocationServices.getFusedLocationProviderClient(this)
         enableEdgeToEdge()
         setContent {
             navController = rememberNavController()
+            locationState = remember { mutableStateOf(Location("")) }
             val currentRoute = navController.currentBackStackEntryFlow
                 .collectAsState(initial = navController.currentBackStackEntry)
 
             val showBottomBar = currentRoute.value?.destination?.route
                 ?.contains("SplashRoute") == false
+
             Weather_ForecastTheme {
 
                 Box(
