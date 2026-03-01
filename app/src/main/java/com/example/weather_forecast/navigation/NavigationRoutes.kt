@@ -1,9 +1,10 @@
-package com.example.weather_forecast
+package com.example.weather_forecast.navigation
+
 import kotlinx.serialization.Serializable
 
 sealed class NavigationRoutes {
     @Serializable
-    object HomeRoute : NavigationRoutes()
+    object WeatherRoute : NavigationRoutes()
     @Serializable
     object FavouriteRoute : NavigationRoutes()
     @Serializable
