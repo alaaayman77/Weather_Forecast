@@ -1,12 +1,10 @@
 package com.example.weather_forecast
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,11 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -31,26 +26,25 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.weather_forecast.view.permission.PermissionHandler
+import com.example.weather_forecast.utils.PermissionHandler
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
-import com.example.weather_forecast.view.AlertScreen
-import com.example.weather_forecast.view.FavouriteScreen
+import com.example.weather_forecast.presentation.AlertScreen
+import com.example.weather_forecast.presentation.favourite.FavouriteScreen
 
-import com.example.weather_forecast.view.SettingsScreen
-import com.example.weather_forecast.view.SplashScreen
+import com.example.weather_forecast.presentation.SettingsScreen
+import com.example.weather_forecast.presentation.SplashScreen
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
-import com.example.weather_forecast.view.permission.LoadingScreen
-import com.example.weather_forecast.view.permission.PermissionDeniedScreen
-import com.example.weather_forecast.view.permission.PermissionRationaleScreen
-import com.example.weather_forecast.view.permission.PermissionUiState
-import com.example.weather_forecast.view.permission.PermissionViewModel
-import com.example.weather_forecast.view.weather.LocationProvider
+import com.example.weather_forecast.presentation.permission.LoadingScreen
+import com.example.weather_forecast.presentation.permission.PermissionDeniedScreen
+import com.example.weather_forecast.presentation.permission.PermissionRationaleScreen
+import com.example.weather_forecast.presentation.permission.PermissionUiState
+import com.example.weather_forecast.presentation.permission.PermissionViewModel
+import com.example.weather_forecast.utils.LocationProvider
 
-import com.example.weather_forecast.view.weather.WeatherScreen
-import com.example.weather_forecast.view.weather.WeatherViewModel
-import com.example.weather_forecast.view.weather.WeatherViewModelFactory
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.example.weather_forecast.presentation.weather.WeatherScreen
+import com.example.weather_forecast.presentation.weather.WeatherViewModel
+import com.example.weather_forecast.presentation.weather.WeatherViewModelFactory
 import com.google.android.gms.location.LocationServices
 
 class MainActivity : ComponentActivity() {

@@ -1,6 +1,5 @@
-package com.example.weather_forecast.view.weather
+package com.example.weather_forecast.presentation.weather
 
-import android.R
 import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -20,9 +19,9 @@ import com.example.weather_forecast.models.HourlyWeatherStat
 import com.example.weather_forecast.models.WeatherStat
 import com.example.weather_forecast.models.WeeklyWeatherForecast
 import com.example.weather_forecast.ui.theme.lightGray
-import com.example.weather_forecast.view.weather.components.HourlyForecastItem
-import com.example.weather_forecast.view.weather.components.WeatherInfoCard
-import com.example.weather_forecast.view.weather.components.WeeklyForecastItem
+import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
+import com.example.weather_forecast.presentation.weather.components.WeatherInfoCard
+import com.example.weather_forecast.presentation.weather.components.WeeklyForecastItem
 
 
 @Composable

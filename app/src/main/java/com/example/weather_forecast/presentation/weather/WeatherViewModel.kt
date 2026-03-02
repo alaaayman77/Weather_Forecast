@@ -1,11 +1,11 @@
-package com.example.weather_forecast.view.weather
+package com.example.weather_forecast.presentation.weather
 
 import android.location.Location
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.weather_forecast.utils.LocationProvider
 import com.google.android.gms.location.FusedLocationProviderClient
 
 class WeatherViewModel(private val locationProvider: LocationProvider) : ViewModel(){

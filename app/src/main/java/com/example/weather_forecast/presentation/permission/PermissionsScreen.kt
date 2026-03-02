@@ -1,4 +1,4 @@
-package com.example.weather_forecast.view.permission
+package com.example.weather_forecast.presentation.permission
 
 
 

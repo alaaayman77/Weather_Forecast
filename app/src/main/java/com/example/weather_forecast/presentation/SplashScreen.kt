@@ -1,4 +1,4 @@
-package com.example.weather_forecast.view
+package com.example.weather_forecast.presentation
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image

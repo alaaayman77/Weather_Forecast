@@ -1,4 +1,4 @@
-package com.example.weather_forecast.view
+package com.example.weather_forecast.presentation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
