@@ -11,7 +11,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 class WeatherViewModel(private val locationProvider: LocationProvider) : ViewModel(){
     private lateinit var fusedClient : FusedLocationProviderClient
 
-     private lateinit var _locationState: MutableLiveData<Location>
+    private val _locationState = MutableLiveData<Location>()
     val locationState : LiveData<Location>
         get() = _locationState
 

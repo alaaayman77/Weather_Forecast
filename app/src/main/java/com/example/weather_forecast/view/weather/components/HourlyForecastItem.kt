@@ -1,4 +1,4 @@
-package com.example.weather_forecast.view.weather.reusable
+package com.example.weather_forecast.view.weather.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement

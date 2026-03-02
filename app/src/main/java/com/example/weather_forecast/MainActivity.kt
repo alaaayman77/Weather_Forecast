@@ -1,8 +1,12 @@
 package com.example.weather_forecast
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,17 +15,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
+
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.weather_forecast.view.permission.PermissionHandler
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.view.AlertScreen
@@ -30,21 +40,50 @@ import com.example.weather_forecast.view.FavouriteScreen
 import com.example.weather_forecast.view.SettingsScreen
 import com.example.weather_forecast.view.SplashScreen
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
+import com.example.weather_forecast.view.permission.LoadingScreen
+import com.example.weather_forecast.view.permission.PermissionDeniedScreen
+import com.example.weather_forecast.view.permission.PermissionRationaleScreen
+import com.example.weather_forecast.view.permission.PermissionUiState
+import com.example.weather_forecast.view.permission.PermissionViewModel
+import com.example.weather_forecast.view.weather.LocationProvider
+
 import com.example.weather_forecast.view.weather.WeatherScreen
+import com.example.weather_forecast.view.weather.WeatherViewModel
+import com.example.weather_forecast.view.weather.WeatherViewModelFactory
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController : NavHostController
-    private lateinit var fusedClient : FusedLocationProviderClient
-    lateinit var locationState: MutableState<Location>
+    private lateinit var permissionHandler: PermissionHandler
+    private lateinit var permissionViewModel: PermissionViewModel
+
+    private lateinit var viewModel: WeatherViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        fusedClient = LocationServices.getFusedLocationProviderClient(this)
+        permissionViewModel = ViewModelProvider(this)
+            .get(PermissionViewModel::class.java)
+        val locationProvider = LocationProvider(
+            application,
+            LocationServices.getFusedLocationProviderClient(this)
+        )
+
+        permissionHandler = PermissionHandler(this).also {
+            it.init(permissionViewModel)
+        }
+
+
         enableEdgeToEdge()
         setContent {
             navController = rememberNavController()
-            locationState = remember { mutableStateOf(Location("")) }
+
+            val permissionState = permissionViewModel.permissionState.collectAsState()
+            viewModel = viewModel(
+                factory = WeatherViewModelFactory(locationProvider)
+            )
+
+
             val currentRoute = navController.currentBackStackEntryFlow
                 .collectAsState(initial = navController.currentBackStackEntry)
 
@@ -93,10 +132,48 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(NavigationRoutes.SplashRoute) {
                                             inclusive = true
                                         }
+                                        if (permissionHandler.checkPermissions()) {
+                                            permissionViewModel.onPermissionAlreadyGranted()
+                                            viewModel.checkLocationAndFetch()
+                                        } else {
+                                            permissionHandler.requestPermissions()
+                                        }
                                     }
                                 }
                             }
-                            composable<NavigationRoutes.WeatherRoute> { WeatherScreen(modifier = Modifier.padding(innerPadding)) }
+                            composable<NavigationRoutes.WeatherRoute> {
+                                when (permissionState.value) {
+                                    PermissionUiState.Granted -> {
+                                        LaunchedEffect(Unit) {
+                                            viewModel.checkLocationAndFetch()
+                                        }
+                                        WeatherScreen(
+                                            modifier = Modifier.padding(innerPadding),
+                                            location = viewModel.locationState.observeAsState().value?:Location("")
+                                        )
+                                    }
+                                    PermissionUiState.Denied -> {
+                                        PermissionRationaleScreen(
+                                            onRetry = { permissionHandler.requestPermissions() }
+                                        )
+                                    }
+                                    PermissionUiState.PermanentlyDenied -> {
+                                        PermissionDeniedScreen(
+                                            onOpenSettings = {
+                                                startActivity(
+                                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                                        data = Uri.fromParts("package", packageName, null)
+                                                    }
+                                                )
+                                            }
+                                        )
+                                    }
+                                    PermissionUiState.Checking -> {
+                                        LoadingScreen()
+                                    }
+                                }
+                            }
+
                             composable<NavigationRoutes.FavouriteRoute> { FavouriteScreen(modifier = Modifier.padding(innerPadding)) }
                             composable<NavigationRoutes.AlertRoute> { AlertScreen(modifier = Modifier.padding(innerPadding)) }
                             composable<NavigationRoutes.SettingsRoute> { SettingsScreen(modifier = Modifier.padding(innerPadding)) }
@@ -106,5 +183,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
 }
 

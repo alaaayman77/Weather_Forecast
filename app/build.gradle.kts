@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -67,5 +68,6 @@ dependencies {
 //Serialization for NavArgs
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
     implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
 
 }
