@@ -1,5 +1,6 @@
 package com.example.weather_forecast.view.weather
 
+import android.R
 import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -17,9 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.models.HourlyWeatherStat
 import com.example.weather_forecast.models.WeatherStat
+import com.example.weather_forecast.models.WeeklyWeatherForecast
 import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.view.weather.components.HourlyForecastItem
 import com.example.weather_forecast.view.weather.components.WeatherInfoCard
+import com.example.weather_forecast.view.weather.components.WeeklyForecastItem
 
 
 @Composable
@@ -37,7 +40,7 @@ fun WeatherScreenContent() {
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(bottom = 16.dp)
+        contentPadding = PaddingValues(8.dp)
     ) {
 
         item {
@@ -51,7 +54,18 @@ fun WeatherScreenContent() {
             WeatherInfoGrid()
         }
         item {
-            hourlyForecastList()
+            HourlyForecastList()
+        }
+        item {
+            Text(
+                text = "Weekly Forecast",
+                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary),
+
+            )
+        }
+
+        items(weeklyStats.size) { index ->
+            WeeklyForecastItem(weeklyStats[index])
         }
     }
 }
@@ -106,6 +120,16 @@ val stats  = listOf(
     HourlyWeatherStat(Icons.Default.Home, 10, 22),
     HourlyWeatherStat(Icons.Default.Home, 10, 22),
 )
+
+val weeklyStats  = listOf(
+    WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),
+    WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),
+    WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),
+    WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),
+    WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),
+    WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),
+
+)
 @Composable
 fun WeatherInfoGrid() {
     val row1 = listOf(
@@ -147,15 +171,15 @@ fun HomeScreenPreview() {
     }
 }
 @Composable
-fun hourlyForecastList(){
+fun HourlyForecastList(){
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
 
         Text(
             text = "Hourly Forecast",
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
+            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary),
+            modifier = Modifier.padding( bottom = 12.dp)
         )
     LazyRow(modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(horizontal = 16.dp),
@@ -173,14 +197,24 @@ fun hourlyForecastList(){
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun hourlyForecastPreview(){
-    hourlyForecastList()
-}
+
+
+//@Preview(showBackground = true)
+//@Composable
+//fun HourlyForecastPreview(){
+//    HourlyForecastList()
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun HourlyForecastItemPreview(){
+//HourlyForecastItem(hourlyWeatherStat = HourlyWeatherStat(Icons.Default.Home , 10 , 22))
+//}
+
+
 
 @Preview(showBackground = true)
 @Composable
-fun hourlyForecastItemPreview(){
-HourlyForecastItem(hourlyWeatherStat = HourlyWeatherStat(Icons.Default.Home , 10 , 22))
+fun WeeklyForecastItemPreview(){
+    WeeklyForecastItem(weeklyWeatherForecast =  WeeklyWeatherForecast("Sun" , Icons.Default.Home , 10 , 20),)
 }

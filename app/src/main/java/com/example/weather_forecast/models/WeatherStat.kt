@@ -12,3 +12,10 @@ data class HourlyWeatherStat(
     val time: Int,
     val temp: Int
 )
+
+data class WeeklyWeatherForecast(
+    val day : String,
+    val icon : ImageVector,
+    val highTemp : Int,
+    val lowTemp: Int
+)

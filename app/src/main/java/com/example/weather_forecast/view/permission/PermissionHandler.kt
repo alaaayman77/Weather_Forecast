@@ -1,6 +1,8 @@
 package com.example.weather_forecast.view.permission
 
 import android.Manifest
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
@@ -15,12 +17,12 @@ class PermissionHandler(private val activity: ComponentActivity) {
         permissionLauncher = activity.registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissions ->
-            val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true
-                    || permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+            val granted = permissions[ACCESS_FINE_LOCATION] == true
+                    || permissions[ACCESS_COARSE_LOCATION] == true
             when {
                 granted -> permissionViewModel.onPermissionGranted()
 
-                !activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ->
+                !activity.shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION) ->
                     permissionViewModel.onPermissionPermanentlyDenied()
 
                 else -> permissionViewModel.onPermissionDenied()
@@ -30,18 +32,18 @@ class PermissionHandler(private val activity: ComponentActivity) {
 
     fun checkPermissions(): Boolean {
         return ContextCompat.checkSelfPermission(
-            activity, Manifest.permission.ACCESS_FINE_LOCATION
+            activity, ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(
-            activity, Manifest.permission.ACCESS_COARSE_LOCATION
+            activity, ACCESS_COARSE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
     fun requestPermissions() {
         permissionLauncher.launch(
             arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+               ACCESS_FINE_LOCATION,
+                ACCESS_COARSE_LOCATION
             )
         )
     }
