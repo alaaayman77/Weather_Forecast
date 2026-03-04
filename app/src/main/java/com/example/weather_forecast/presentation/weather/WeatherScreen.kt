@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.weather_forecast.data.models.HourlyForecastResponse
+import com.example.weather_forecast.data.models.HourlyItem
 import com.example.weather_forecast.data.models.HourlyWeatherStat
 import com.example.weather_forecast.data.models.WeatherResponse
 import com.example.weather_forecast.data.models.WeatherStat
@@ -62,7 +64,8 @@ fun WeatherScreen(
             is WeatherUiState.Success -> {
                 WeatherScreenContent(
                     location = location,
-                    currentWeather = uiState.weather
+                    currentWeather = uiState.weather,
+                    hourlyList     = uiState.hourly
                 )
             }
         }
@@ -71,7 +74,7 @@ fun WeatherScreen(
 
 
 @Composable
-fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse) {
+fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, hourlyList : List<HourlyItem>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -82,7 +85,7 @@ fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse) {
         item { WeatherTopBar(currentWeather) }
         item { WeatherCenterSection(currentWeather) }
         item { WeatherInfoGrid(currentWeather) }
-        item { HourlyForecastList() }
+        item { HourlyForecastList( hourlyList = hourlyList) }
         item {
             Text(
                 text = "Weekly Forecast",
@@ -309,7 +312,7 @@ val weeklyStats = listOf(
 )
 
 @Composable
-fun HourlyForecastList() {
+fun HourlyForecastList( hourlyList : List<HourlyItem>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Hourly Forecast",
@@ -324,8 +327,8 @@ fun HourlyForecastList() {
             contentPadding = PaddingValues(horizontal = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(stats.size) { item ->
-                HourlyForecastItem(stats[item])
+            items(hourlyList.size) { item ->
+                HourlyForecastItem(hourlyList[item])
             }
         }
     }

@@ -56,7 +56,6 @@ class MainActivity : ComponentActivity() {
         super.onResume()
         if (permissionHandler.checkPermissions()) {
             permissionViewModel.onPermissionGranted()
-            weatherViewModel.checkLocationAndFetch()
         }
     }
 }

@@ -92,7 +92,7 @@ fun AppScreen(
                             }
                             if (permissionHandler.checkPermissions()) {
                                 permissionViewModel.onPermissionAlreadyGranted()
-                                weatherViewModel.checkLocationAndFetch()
+
                             } else {
                                 permissionHandler.requestPermissions()
                             }
