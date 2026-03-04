@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -68,6 +69,7 @@ fun AppScreen(
                     )
                 )
         ) {
+
             Scaffold(
                 containerColor = Color.Transparent,
                 bottomBar = {
@@ -98,14 +100,25 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.WeatherRoute> {
-                        val uiState by weatherViewModel.weatherUiState.observeAsState(WeatherUiState.Idle)
-                        val location by weatherViewModel.locationState.observeAsState()
+                        val uiState by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(WeatherUiState.Idle)
+                        val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
 
-                        when (val state = permissionState.value) {
+                        when (permissionState.value) {
                             PermissionUiState.Granted -> {
+                                LaunchedEffect(Unit) {
+                                    weatherViewModel.openLocationSettings.collect {
+                                        context.startActivity(
+                                            Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply {
+                                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                            }
+                                        )
+                                    }
+                                }
+
                                 LaunchedEffect(Unit) {
                                     weatherViewModel.checkLocationAndFetch()
                                 }
+
 
                                 WeatherScreen(
                                     modifier  = Modifier.padding(innerPadding),

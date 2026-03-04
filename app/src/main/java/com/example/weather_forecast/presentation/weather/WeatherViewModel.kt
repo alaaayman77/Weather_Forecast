@@ -14,17 +14,24 @@ import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.WeatherResponse
 import com.example.weather_forecast.utils.LocationProvider
 import com.google.android.gms.location.FusedLocationProviderClient
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 
 class WeatherViewModel(private val locationProvider: LocationProvider , private  val weatherRepository: WeatherRepository) : ViewModel() {
 
-    private val _locationState = MutableLiveData<Location>()
-    val locationState: LiveData<Location>
+    private val _locationState = MutableStateFlow<Location>(Location(""))
+    val locationState: StateFlow<Location>
         get() = _locationState
-    private val _weatherUiState = MutableLiveData<WeatherUiState>(WeatherUiState.Idle)
-    val weatherUiState: LiveData<WeatherUiState>
+    private val _openLocationSettings = MutableSharedFlow<Unit>()
+    val openLocationSettings: SharedFlow<Unit>
+        get() = _openLocationSettings
+    private val _weatherUiState = MutableStateFlow<WeatherUiState>(WeatherUiState.Idle)
+    val weatherUiState: StateFlow<WeatherUiState>
         get() = _weatherUiState
     fun checkLocationAndFetch() {
         if (locationProvider.isLocationEnabled()) {
@@ -33,7 +40,9 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
                 fetchCurrentWeather(location.latitude, location.longitude)
             }
         } else {
-            locationProvider.enableLocationServices()
+            viewModelScope.launch {
+                _openLocationSettings.emit(Unit)
+            }
         }
     }
 

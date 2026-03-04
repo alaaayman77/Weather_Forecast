@@ -51,5 +51,13 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        if (permissionHandler.checkPermissions()) {
+            permissionViewModel.onPermissionGranted()
+            weatherViewModel.checkLocationAndFetch()
+        }
+    }
 }
 

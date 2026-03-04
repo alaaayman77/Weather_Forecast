@@ -21,10 +21,10 @@ class LocationProvider(val app: Application, val fusedClient : FusedLocationProv
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    fun enableLocationServices() {
-        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-        app.startActivity(intent)
-    }
+//    fun enableLocationServices() {
+//        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+//        app.startActivity(intent)
+//    }
 
     fun getFreshLocation(onLocationReady: (Location) -> Unit){
         fusedClient.requestLocationUpdates(
