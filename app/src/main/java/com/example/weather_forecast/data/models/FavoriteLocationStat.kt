@@ -1,4 +1,4 @@
-package com.example.weather_forecast.models
+package com.example.weather_forecast.data.models
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

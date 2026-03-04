@@ -1,93 +1,56 @@
 package com.example.weather_forecast.data.models
 
 data class WeatherResponse(
-    val lat: Double,
+    val coord: Coord,
+    val weather: List<WeatherDescription>,
+    val base: String,
+    val main: Main,
+    val visibility: Int,
+    val wind: Wind,
+    val rain: Rain?,
+    val clouds: Clouds,
+    val dt: Long,
+    val sys: Sys,
+    val timezone: Int,
+    val id: Int,
+    val name: String,
+    val cod: Int
+)
+
+data class Coord(
     val lon: Double,
-    val timezone: String,
-    val timezone_offset: Int,
-    val current: CurrentWeather,
-    val minutely: List<MinutelyWeather>,
-    val hourly: List<HourlyWeather>,
-    val daily: List<DailyWeather>,
-    val alerts: List<Alert>?
+    val lat: Double
 )
-data class CurrentWeather(
-    val dt: Long,
-    val sunrise: Long,
-    val sunset: Long,
+
+data class Main(
     val temp: Double,
     val feels_like: Double,
+    val temp_min: Double,
+    val temp_max: Double,
     val pressure: Int,
     val humidity: Int,
-    val dew_point: Double,
-    val uvi: Double,
-    val clouds: Int,
-    val visibility: Int,
-    val wind_speed: Double,
-    val wind_deg: Int,
-    val wind_gust: Double?,
-    val weather: List<WeatherDescription>
+    val sea_level: Int?,
+    val grnd_level: Int?
 )
 
-data class MinutelyWeather(
-    val dt: Long,
-    val precipitation: Double
+data class Wind(
+    val speed: Double,
+    val deg: Int,
+    val gust: Double?
 )
 
-data class HourlyWeather(
-    val dt: Long,
-    val temp: Double,
-    val feels_like: Double,
-    val pressure: Int,
-    val humidity: Int,
-    val dew_point: Double,
-    val uvi: Double,
-    val clouds: Int,
-    val visibility: Int,
-    val wind_speed: Double,
-    val wind_deg: Int,
-    val wind_gust: Double?,
-    val weather: List<WeatherDescription>,
-    val pop: Double
+data class Rain(
+    val `1h`: Double?
 )
 
-data class DailyWeather(
-    val dt: Long,
+data class Clouds(
+    val all: Int
+)
+
+data class Sys(
+    val country: String?,
     val sunrise: Long,
-    val sunset: Long,
-    val moonrise: Long,
-    val moonset: Long,
-    val moon_phase: Double,
-    val summary: String?,
-    val temp: Temp,
-    val feels_like: FeelsLike,
-    val pressure: Int,
-    val humidity: Int,
-    val dew_point: Double,
-    val wind_speed: Double,
-    val wind_deg: Int,
-    val wind_gust: Double?,
-    val weather: List<WeatherDescription>,
-    val clouds: Int,
-    val pop: Double,
-    val rain: Double?,
-    val uvi: Double
-)
-
-data class Temp(
-    val day: Double,
-    val min: Double,
-    val max: Double,
-    val night: Double,
-    val eve: Double,
-    val morn: Double
-)
-
-data class FeelsLike(
-    val day: Double,
-    val night: Double,
-    val eve: Double,
-    val morn: Double
+    val sunset: Long
 )
 
 data class WeatherDescription(
@@ -95,13 +58,7 @@ data class WeatherDescription(
     val main: String,
     val description: String,
     val icon: String
-)
+) {
 
-data class Alert(
-    val sender_name: String,
-    val event: String,
-    val start: Long,
-    val end: Long,
-    val description: String,
-    val tags: List<String>
-)
+    fun iconUrl(): String = "https://openweathermap.org/img/wn/${icon}@2x.png"
+}

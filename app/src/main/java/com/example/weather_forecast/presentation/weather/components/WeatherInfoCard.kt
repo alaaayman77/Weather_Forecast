@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weather_forecast.models.WeatherStat
+import com.example.weather_forecast.data.models.WeatherStat
 
 @Composable
 fun WeatherInfoCard(

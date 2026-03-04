@@ -34,7 +34,8 @@ class LocationProvider(val app: Application, val fusedClient : FusedLocationProv
             object : LocationCallback(){
                 override fun onLocationResult(locationResult: LocationResult) {
                     super.onLocationResult(locationResult)
-                    locationResult.lastLocation?.let {location-> onLocationReady(location) }
+                    locationResult.lastLocation?.let {location-> onLocationReady(location)
+                        fusedClient.removeLocationUpdates(this)}
 
 
                 }
