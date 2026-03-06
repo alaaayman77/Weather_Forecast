@@ -31,22 +31,17 @@ import com.google.maps.android.compose.*
 
 @Composable
 fun MapPickerScreen(
+    pickedLatLng:     LatLng?,
+    pickedName:       String,
+    cameraState:      CameraPositionState,
+    onMapTapped:      (LatLng) -> Unit,
+    onPlacePicked:    (LatLng, String) -> Unit,
+    onClearPin:       () -> Unit,
     onLocationPicked: (lat: Double, lng: Double, name: String) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss:        () -> Unit
 ) {
     val context = LocalContext.current
 
-    var pickedLatLng  by remember { mutableStateOf<LatLng?>(null) }
-    var pickedName    by remember { mutableStateOf("") }
-    val cameraState   = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(30.0444, 31.2357), 5f)
-    }
-
-    LaunchedEffect(Unit) {
-        if (!Places.isInitialized()) {
-            Places.initialize(context, "AIzaSyCJLsLgqW_MrzD7861dn16hNxVpfxCqxfU")
-        }
-    }
 
     val placesLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -54,9 +49,7 @@ fun MapPickerScreen(
         result.data?.let { data ->
             val place = Autocomplete.getPlaceFromIntent(data)
             place.latLng?.let { latLng ->
-                pickedLatLng = latLng
-                pickedName   = place.name ?: ""
-                cameraState.move(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
+                onPlacePicked(latLng, place.name ?: "")
             }
         }
     }
@@ -70,10 +63,7 @@ fun MapPickerScreen(
                 myLocationButtonEnabled = false,
                 mapToolbarEnabled      = false
             ),
-            onMapClick = { latLng ->
-                pickedLatLng = latLng
-                pickedName   = "Pinned Location"
-            }
+            onMapClick = {  latLng -> onMapTapped(latLng) }
         ) {
             pickedLatLng?.let { latLng ->
                 Marker(
@@ -241,10 +231,7 @@ fun MapPickerScreen(
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 OutlinedButton(
-                                    onClick = {
-                                        pickedLatLng = null
-                                        pickedName   = ""
-                                    },
+                                    onClick = onClearPin,
                                     modifier = Modifier.weight(1f),
                                     shape = RoundedCornerShape(50),
                                     colors = ButtonDefaults.outlinedButtonColors(

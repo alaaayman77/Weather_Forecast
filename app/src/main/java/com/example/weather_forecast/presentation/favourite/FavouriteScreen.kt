@@ -31,7 +31,6 @@ import androidx.compose.material3.CircularProgressIndicator
 @Composable
 fun FavouriteScreen(
     modifier: Modifier,
-    viewModel: FavouriteViewModel,
     uiState: UiState<FavouriteState>,
     onAddLocation: () -> Unit
 ) {

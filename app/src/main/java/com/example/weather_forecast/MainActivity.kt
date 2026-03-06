@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModelFactory
+import com.example.weather_forecast.presentation.map.MapPickerViewModel
+import com.example.weather_forecast.presentation.map.MapPickerViewModelFactory
 import com.example.weather_forecast.utils.PermissionHandler
 import com.example.weather_forecast.presentation.permission.PermissionViewModel
 import com.example.weather_forecast.utils.LocationProvider
@@ -24,6 +26,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var permissionViewModel: PermissionViewModel
     private lateinit var weatherViewModel: WeatherViewModel
     private lateinit var favouriteViewModel: FavouriteViewModel
+    private lateinit var mapPickerViewModel: MapPickerViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +46,10 @@ class MainActivity : ComponentActivity() {
             this,
             FavouriteViewModelFactory()
         ).get(FavouriteViewModel::class.java)
+        mapPickerViewModel = ViewModelProvider(
+            this,
+            MapPickerViewModelFactory(application)
+        ).get(MapPickerViewModel::class.java)
 
 
         permissionHandler = PermissionHandler(this).also {
@@ -56,6 +63,7 @@ class MainActivity : ComponentActivity() {
                 permissionViewModel = permissionViewModel,
                 permissionHandler   = permissionHandler,
                 favouriteViewModel  = favouriteViewModel,
+                mapPickerViewModel = mapPickerViewModel
             )
         }
     }

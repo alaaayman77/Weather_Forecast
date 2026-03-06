@@ -5,7 +5,9 @@ import com.example.weather_forecast.presentation.weather.FavouriteState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavHostController
 import com.example.weather_forecast.data.models.FavoriteLocationStat
+import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.presentation.weather.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,6 +60,20 @@ class FavouriteViewModel : ViewModel() {
         }
     }
 
+    fun navigateToMapPicker(navController : NavHostController){
+        navController.navigate(NavigationRoutes.MapPickerRoute)
+    }
+    fun addFavourite(item: FavoriteLocationStat) {
+        val current = _uiState.value
+        if (current is UiState.Success) {
+            val alreadyExists = current.data.favourites.any { it.cityName == item.cityName }
+            if (!alreadyExists) {
+                _uiState.value = UiState.Success(
+                    current.data.copy(favourites = current.data.favourites + item)
+                )
+            }
+        }
+    }
 }
 
 class FavouriteViewModelFactory : ViewModelProvider.Factory {

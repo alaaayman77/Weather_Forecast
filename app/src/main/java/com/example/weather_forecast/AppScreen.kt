@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
@@ -22,19 +23,25 @@ import com.example.weather_forecast.presentation.SplashScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.MapPickerScreen
+import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.permission.*
 import com.example.weather_forecast.presentation.weather.*
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 import com.example.weather_forecast.utils.PermissionHandler
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun AppScreen(
     weatherViewModel: WeatherViewModel,
     permissionViewModel: PermissionViewModel,
     permissionHandler: PermissionHandler,
-    favouriteViewModel: FavouriteViewModel
+    favouriteViewModel: FavouriteViewModel,
+    mapPickerViewModel : MapPickerViewModel
 ) {
-    val navController   = rememberNavController()
+    val navController : NavHostController  = rememberNavController()
     val context         = LocalContext.current
     val permissionState = permissionViewModel.permissionState.collectAsState()
 
@@ -45,6 +52,10 @@ fun AppScreen(
     val showBottomBar = currentRoute != null
             && !currentRoute.contains("SplashRoute")
             && !currentRoute.contains("MapPickerRoute")
+
+
+    val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
+
 
     Weather_ForecastTheme {
         Box(
@@ -149,21 +160,56 @@ fun AppScreen(
                         val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle(UiState.Idle)
                         FavouriteScreen(
                             modifier      = Modifier.padding(innerPadding),
-                            viewModel     = favouriteViewModel,
                             uiState       = uiState,
                             onAddLocation = {
-                                navController.navigate(NavigationRoutes.MapPickerRoute)
+                                favouriteViewModel.navigateToMapPicker(navController)
                             }
                         )
                     }
 
 
                     composable<NavigationRoutes.MapPickerRoute> {
-                        MapPickerScreen(
-                            onLocationPicked = { lat, lng, name ->
+                        val pickedLatLng by mapPickerViewModel.pickedLatLng.collectAsStateWithLifecycle()
+                        val pickedName   by mapPickerViewModel.pickedName.collectAsStateWithLifecycle()
 
+
+                        val userLatLng = remember(location) {
+                            LatLng(
+                                location?.latitude  ?: 30.0444,
+                                location?.longitude ?: 31.2357
+                            )
+                        }
+
+                        val cameraState = rememberCameraPositionState {
+                            // position cam at user loc
+                            position = CameraPosition.fromLatLngZoom(userLatLng, 12f)
+                        }
+
+                        //open map at user loc
+                        LaunchedEffect(Unit) {
+                            mapPickerViewModel.onMapTapped(userLatLng)
+                        }
+
+                        // when user picks somewhere else, take cam there
+                        LaunchedEffect(pickedLatLng) {
+                            pickedLatLng?.let { latLng ->
+                                cameraState.animate(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
+                            }
+                        }
+
+                        MapPickerScreen(
+                            pickedLatLng     = pickedLatLng,
+                            pickedName       = pickedName,
+                            cameraState      = cameraState,
+                            onMapTapped      = { mapPickerViewModel.onMapTapped(it) },
+                            onPlacePicked    = { latLng, name -> mapPickerViewModel.onPlacePicked(latLng, name) },
+                            onClearPin       = { mapPickerViewModel.clearPin() },
+                            onLocationPicked = { lat, lng, name ->
+                                mapPickerViewModel.onLocationPicked(lat, lng, name, favouriteViewModel)
+                                navController.popBackStack()
                             },
                             onDismiss = {
+                                mapPickerViewModel.clearPin()
                                 navController.popBackStack()
                             }
                         )
