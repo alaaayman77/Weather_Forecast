@@ -12,9 +12,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weather_forecast.R
 import com.example.weather_forecast.ui.theme.Poppins
 
 @Composable
@@ -105,9 +107,11 @@ fun SunTimesCard(
                     modifier = Modifier.align(Alignment.BottomStart),
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Text(
-                        text = "🌅",
-                        fontSize = 28.sp
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sunrise),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+
                     )
                     Text(
                         text = "SUNRISE",
@@ -127,15 +131,17 @@ fun SunTimesCard(
                     )
                 }
 
-                // Sunset label
+
                 Column(
                     modifier = Modifier.align(Alignment.BottomEnd),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Text(
-                        text = "🌇",
-                        fontSize = 28.sp
-                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sunset),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+
+                        )
                     Text(
                         text = "SUNSET",
                         style = MaterialTheme.typography.labelSmall.copy(
