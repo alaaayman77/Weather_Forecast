@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.data.models.HourlyItem
+import com.example.weather_forecast.presentation.weather.toCelsius
 
 @Composable
 fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false) {
@@ -75,7 +76,7 @@ fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false) {
             }
 
             Text(
-                text = "${hourlyItem.main.temp.toInt()}°",
+                text = "${hourlyItem.temp.toCelsius()}°",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = textColor,
                     fontWeight = FontWeight.SemiBold

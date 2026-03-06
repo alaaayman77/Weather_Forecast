@@ -16,8 +16,19 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 
+
+
+
 @Composable
-fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast) {
+fun WeeklyForecastItem(
+    weeklyWeatherForecast: WeeklyWeatherForecast,
+    globalMin: Int = 0,
+    globalMax: Int = 40
+) {
+    val range        = (globalMax - globalMin).coerceAtLeast(1)
+    val lowFraction  = ((weeklyWeatherForecast.lowTemp  - globalMin).toFloat() / range).coerceIn(0f, 1f)
+    val highFraction = ((weeklyWeatherForecast.highTemp - globalMin).toFloat() / range).coerceIn(0f, 1f)
+
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -29,7 +40,6 @@ fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-
                 .padding(vertical = 14.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -40,11 +50,9 @@ fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast) {
                 modifier = Modifier.width(48.dp),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.SemiBold,
-
+                    fontWeight = FontWeight.SemiBold
                 )
             )
-
 
             weeklyWeatherForecast.iconUrl?.let { url ->
                 AsyncImage(
@@ -62,37 +70,50 @@ fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast) {
 
             Text(
                 text = weeklyWeatherForecast.condition,
-                modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 10.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
-
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
                 )
             )
+
 
             Text(
                 text = "${weeklyWeatherForecast.lowTemp}°",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                 )
             )
 
-
             Spacer(modifier = Modifier.width(6.dp))
+
+
             Box(
                 modifier = Modifier
                     .width(64.dp)
                     .height(6.dp)
                     .clip(RoundedCornerShape(50))
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                                MaterialTheme.colorScheme.primary
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
+            ) {
+                val barColor = MaterialTheme.colorScheme.primary
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(highFraction)
+                        .padding(start = 64.dp * lowFraction)
+                        .clip(RoundedCornerShape(50))
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color(0xFF90CAF9),
+                                    barColor
+                                )
                             )
                         )
-                    )
-            )
+                )
+            }
+
             Spacer(modifier = Modifier.width(6.dp))
 
 
@@ -100,8 +121,7 @@ fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast) {
                 text = "${weeklyWeatherForecast.highTemp}°",
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.SemiBold,
-
+                    fontWeight = FontWeight.SemiBold
                 )
             )
         }

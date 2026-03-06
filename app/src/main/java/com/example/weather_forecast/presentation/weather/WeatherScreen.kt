@@ -17,10 +17,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.weather_forecast.data.models.HourlyForecastResponse
+import com.example.weather_forecast.data.models.CurrentWeather
+import com.example.weather_forecast.data.models.DailyItem
 import com.example.weather_forecast.data.models.HourlyItem
 import com.example.weather_forecast.data.models.HourlyWeatherStat
-import com.example.weather_forecast.data.models.WeatherResponse
+
 import com.example.weather_forecast.data.models.WeatherStat
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
@@ -68,8 +69,10 @@ fun WeatherScreen(
             is WeatherUiState.Success -> {
                 WeatherScreenContent(
                     location = location,
-                    currentWeather = uiState.weather,
-                    hourlyList     = uiState.hourly
+                    currentWeather     = uiState.data.current,
+                    hourlyList  = uiState.data.hourly,
+                    dailyList   = uiState.data.daily,
+                    timezone      = uiState.data.timezone
                 )
             }
         }
@@ -78,7 +81,7 @@ fun WeatherScreen(
 
 
 @Composable
-fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, hourlyList : List<HourlyItem>) {
+fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  timezone: String) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +89,7 @@ fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, h
         verticalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp)
     ) {
-        item { WeatherTopBar(currentWeather) }
+        item { WeatherTopBar(currentWeather , timezone) }
         item { WeatherCenterSection(currentWeather) }
         item { WeatherInfoGrid(currentWeather) }
         item {
@@ -96,17 +99,22 @@ fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, h
         }
         item {
             SunTimesCard(
-                sunriseText = formatTime(currentWeather.sys.sunrise),
-                sunsetText  = formatTime(currentWeather.sys.sunset),
-                progress    = 0.6f
+                sunriseText = formatTime(currentWeather.sunrise),
+                sunsetText  = formatTime(currentWeather.sunset),
+                progress    = run {
+                    val now = System.currentTimeMillis() / 1000
+                    ((now - currentWeather.sunrise).toFloat() /
+                            (currentWeather.sunset - currentWeather.sunrise))
+                        .coerceIn(0f, 1f)
+                }
             )
         }
         item {
-            UvIndexCard(uvi = 9.76)
+            UvIndexCard(uvi = currentWeather.uvi)
         }
         item {
             SectionCard {
-              WeeklyList()
+              WeeklyList(dailyList = dailyList)
             }
         }
 
@@ -116,26 +124,40 @@ fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, h
     }
 }
 @Composable
-fun WeeklyList(){
+fun WeeklyList(dailyList: List<DailyItem>) {
+    val days      = dailyList.take(7)
+    val globalMin = days.minOfOrNull { it.temp.min.toCelsius() } ?: 0
+    val globalMax = days.maxOfOrNull { it.temp.max.toCelsius() } ?: 40
+
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = "5-DAY FORECAST",
+            text = "7-DAY FORECAST",
             style = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
-                letterSpacing = 1.5.sp,
-
-                ),
+                letterSpacing = 1.5.sp
+            ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        weeklyStats.forEachIndexed { _, stat ->
-            WeeklyForecastItem(stat )
-
+        days.forEachIndexed { index, day ->
+            WeeklyForecastItem(
+                weeklyWeatherForecast = WeeklyWeatherForecast(
+                    day       = if (index == 0) "Today" else day.dayName(),
+                    icon      = Icons.Default.Home,
+                    lowTemp   = day.temp.min.toCelsius(),
+                    highTemp  = day.temp.max.toCelsius(),
+                    condition = day.weather.firstOrNull()?.description
+                        ?.replaceFirstChar { it.uppercase() } ?: "",
+                    iconUrl   = day.weather.firstOrNull()?.iconUrl()
+                ),
+                globalMin = globalMin,
+                globalMax = globalMax
+            )
         }
     }
 }
 @Composable
-fun WeatherTopBar(currentWeather: WeatherResponse) {
+fun WeatherTopBar(currentWeather: CurrentWeather , timezone: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -158,8 +180,9 @@ fun WeatherTopBar(currentWeather: WeatherResponse) {
             shape = RoundedCornerShape(20.dp),
             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
         ) {
+            val locationLabel = timezone.substringAfterLast("/").replace("_", " ")
             Text(
-                text = "📍 ${currentWeather.sys.country}",
+                text = "📍 ${locationLabel}",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.primary,
@@ -171,7 +194,7 @@ fun WeatherTopBar(currentWeather: WeatherResponse) {
 }
 
 @Composable
-fun WeatherCenterSection(currentWeather: WeatherResponse) {
+fun WeatherCenterSection(currentWeather: CurrentWeather) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -180,10 +203,9 @@ fun WeatherCenterSection(currentWeather: WeatherResponse) {
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = currentWeather.name,
+            text = currentWeather.weather.firstOrNull()?.main ?: "",
             style = MaterialTheme.typography.headlineMedium.copy(
-                color = MaterialTheme.colorScheme.primary,
-
+                color = MaterialTheme.colorScheme.primary
             )
         )
         currentWeather.weather.firstOrNull()?.iconUrl()?.let { iconUrl ->
@@ -195,7 +217,7 @@ fun WeatherCenterSection(currentWeather: WeatherResponse) {
         }
 
         Text(
-            text = "${currentWeather.main.temp.toInt()}°",
+            text = "${currentWeather.temp.toCelsius()}°",
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
@@ -216,12 +238,12 @@ fun WeatherCenterSection(currentWeather: WeatherResponse) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TempPill(
                 label = "H",
-                value = "${currentWeather.main.temp_max.toInt()}°",
+                value = "${currentWeather.temp.toCelsius()}°",
                 isHigh = true
             )
             TempPill(
                 label = "L",
-                value = "${currentWeather.main.temp_min.toInt()}°",
+                value = "${currentWeather.dew_point.toCelsius()}°",
                 isHigh = false
             )
         }
@@ -232,23 +254,15 @@ fun WeatherCenterSection(currentWeather: WeatherResponse) {
             horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            WeatherDetailChip(
-                icon = Icons.Default.Person,
-                text = "Feels like ${currentWeather.main.feels_like.toInt()}°"
-            )
+
             WeatherDetailChip(
                 icon = Icons.Default.Home,
-                text = "${currentWeather.visibility / 1000} km"
+                text = "Feels like ${currentWeather.feels_like.toCelsius()}°"
             )
-            currentWeather.rain?.`1h`?.let { rain ->
-                WeatherDetailChip(
-                    icon = Icons.Default.Home,
-                    text = "${rain}mm/h"
-                )
             }
         }
     }
-}
+
 
 @Composable
 fun TempPill(label: String, value: String, isHigh: Boolean) {
@@ -299,16 +313,16 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
 }
 
 @Composable
-fun WeatherInfoGrid(currentWeather: WeatherResponse) {
+fun WeatherInfoGrid(currentWeather: CurrentWeather) {
     val row1 = listOf(
-        WeatherStat(Icons.Default.Home, "${currentWeather.main.humidity}%", "HUMID"),
-        WeatherStat(Icons.Default.Home, "${currentWeather.wind.speed} m/s", "WIND"),
-        WeatherStat(Icons.Default.Home, "${currentWeather.main.pressure}", "HPA"),
+        WeatherStat(Icons.Default.Home, "${currentWeather.humidity}%",          "HUMID"),
+        WeatherStat(Icons.Default.Home,       "${currentWeather.wind_speed} m/s",     "WIND"),
+        WeatherStat(Icons.Default.Home,     "${currentWeather.pressure} hPa",       "PRESSURE"),
     )
     val row2 = listOf(
-        WeatherStat(Icons.Default.Home, "${currentWeather.clouds.all}%", "CLOUD"),
-        WeatherStat(Icons.Default.Home, formatTime(currentWeather.sys.sunrise), "SUNRISE"),
-        WeatherStat(Icons.Default.Home, formatTime(currentWeather.sys.sunset), "SUNSET"),
+        WeatherStat(Icons.Default.Home,     "${currentWeather.clouds}%",            "CLOUD"),
+        WeatherStat(Icons.Default.Home,   formatTime(currentWeather.sunrise),     "SUNRISE"),
+        WeatherStat(Icons.Default.Home, formatTime(currentWeather.sunset),     "SUNSET"),
     )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         WeatherStatRow(row1)
@@ -352,8 +366,7 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>) {
             style = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
-                letterSpacing = 1.5.sp,
-
+                letterSpacing = 1.5.sp
             ),
             modifier = Modifier.padding(bottom = 12.dp)
         )
@@ -365,7 +378,7 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>) {
             items(hourlyList.size) { index ->
                 HourlyForecastItem(
                     hourlyItem = hourlyList[index],
-                    isNow = index == 0
+                    isNow      = index == 0
                 )
             }
         }
@@ -399,3 +412,5 @@ fun getGreeting(timestamp: Long?): String {
         else      -> "Good Night 🌙"
     }
 }
+
+fun Double.toCelsius() = (this - 273.15).toInt()

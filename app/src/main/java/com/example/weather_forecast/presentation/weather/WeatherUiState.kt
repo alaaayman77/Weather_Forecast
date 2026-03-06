@@ -1,12 +1,12 @@
 package com.example.weather_forecast.presentation.weather
 
-import com.example.weather_forecast.data.models.HourlyItem
-import com.example.weather_forecast.data.models.WeatherResponse
+import com.example.weather_forecast.data.models.OneCallResponse
 
 
-    sealed class WeatherUiState {
-        object Idle : WeatherUiState()
-        object Loading : WeatherUiState()
-        data class Success(val weather: WeatherResponse, val hourly: List<HourlyItem>) : WeatherUiState()
-        data class Error(val message: String) : WeatherUiState()
-    }
+
+sealed class WeatherUiState {
+    object Idle    : WeatherUiState()
+    object Loading : WeatherUiState()
+    data class Success(val data: OneCallResponse) : WeatherUiState()
+    data class Error(val message: String) : WeatherUiState()
+}

@@ -1,26 +1,17 @@
 package com.example.weather_forecast.presentation.weather
 
 import android.location.Location
-import android.util.Log
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
-
-import com.example.weather_forecast.data.models.WeatherResponse
 import com.example.weather_forecast.utils.LocationProvider
-import com.google.android.gms.location.FusedLocationProviderClient
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Response
+
 
 
 class WeatherViewModel(private val locationProvider: LocationProvider , private  val weatherRepository: WeatherRepository) : ViewModel() {
@@ -47,30 +38,27 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
         }
     }
 
-    private fun fetchWeather(lat: Double, lon: Double, apiKey: String = "3ec08632a7a945e6408e9414cd1fab66") {
+
+    private fun fetchWeather(
+        lat: Double,
+        lon: Double,
+        apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
+    ) {
         viewModelScope.launch {
             _weatherUiState.value = WeatherUiState.Loading
             try {
-
-                val currentDeferred = async { weatherRepository.getCurrentWeather(lat, lon, apiKey) }
-                val hourlyDeferred  = async { weatherRepository.getHourlyForecast(lat, lon, apiKey) }
-
-                val currentResponse = currentDeferred.await()
-                val hourlyResponse  = hourlyDeferred.await()
-
-                if (currentResponse.isSuccessful && hourlyResponse.isSuccessful) {
-                    val current = currentResponse.body()
-                    val hourly  = hourlyResponse.body()
-                    if (current != null && hourly != null) {
-                        _weatherUiState.value = WeatherUiState.Success(
-                            weather = current,
-                            hourly  = hourly.list
-                        )
+                val response = weatherRepository.getOneCallResponse(lat, lon, apiKey)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        _weatherUiState.value = WeatherUiState.Success(data = body)
                     } else {
                         _weatherUiState.value = WeatherUiState.Error("Empty response")
                     }
                 } else {
-                    _weatherUiState.value = WeatherUiState.Error("Error fetching weather")
+                    _weatherUiState.value = WeatherUiState.Error(
+                        "Error ${response.code()}: ${response.message()}"
+                    )
                 }
             } catch (ex: Exception) {
                 _weatherUiState.value = WeatherUiState.Error(ex.message ?: "Unknown error")
