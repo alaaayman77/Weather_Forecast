@@ -29,6 +29,8 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
     private val _weatherUiState = MutableStateFlow<UiState<WeatherState>>(UiState.Idle)
     val weatherUiState: StateFlow<UiState<WeatherState>>
         get() = _weatherUiState
+
+
     fun checkLocationAndFetch() {
         if (locationProvider.isLocationEnabled()) {
             locationProvider.getFreshLocation { location ->

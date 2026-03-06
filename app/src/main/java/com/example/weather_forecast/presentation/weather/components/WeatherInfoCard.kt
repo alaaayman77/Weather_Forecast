@@ -18,14 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weather_forecast.data.models.WeatherStat
+import com.example.weather_forecast.data.models.WeatherInfoItem
+
 
 @Composable
 fun WeatherInfoCard(
-    stat: WeatherStat,
+    stat: WeatherInfoItem,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -54,7 +56,7 @@ fun WeatherInfoCard(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = stat.icon,
+                    painter =  painterResource(id = stat.icon) ,
                     contentDescription = stat.label,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)

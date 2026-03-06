@@ -1,7 +1,5 @@
 package com.example.weather_forecast.presentation.weather
 
-import android.content.Context
-import android.location.Geocoder
 import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,10 +20,10 @@ import coil.compose.AsyncImage
 import com.example.weather_forecast.data.models.CurrentWeather
 import com.example.weather_forecast.data.models.DailyItem
 import com.example.weather_forecast.data.models.HourlyItem
-import com.example.weather_forecast.data.models.HourlyWeatherStat
-
-import com.example.weather_forecast.data.models.WeatherStat
+import com.example.weather_forecast.data.models.WeatherInfoItem
+import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
+
 import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
 import com.example.weather_forecast.presentation.weather.components.SectionCard
 import com.example.weather_forecast.presentation.weather.components.SunTimesCard
@@ -320,14 +317,14 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
 @Composable
 fun WeatherInfoGrid(currentWeather: CurrentWeather) {
     val row1 = listOf(
-        WeatherStat(Icons.Default.Home, "${currentWeather.humidity}%",          "HUMID"),
-        WeatherStat(Icons.Default.Home,       "${currentWeather.wind_speed} m/s",     "WIND"),
-        WeatherStat(Icons.Default.Home,     "${currentWeather.pressure} hPa",       "PRESSURE"),
+        WeatherInfoItem(R.drawable.ic_humid,    "${currentWeather.humidity}%",      "HUMID"),
+        WeatherInfoItem(R.drawable.ic_wind,     "${currentWeather.wind_speed} m/s", "WIND"),
+        WeatherInfoItem(R.drawable.ic_pressure, "${currentWeather.pressure} hPa",   "PRESSURE"),
     )
     val row2 = listOf(
-        WeatherStat(Icons.Default.Home,     "${currentWeather.clouds}%",            "CLOUD"),
-        WeatherStat(Icons.Default.Home,   formatTime(currentWeather.sunrise),     "SUNRISE"),
-        WeatherStat(Icons.Default.Home, formatTime(currentWeather.sunset),     "SUNSET"),
+        WeatherInfoItem(R.drawable.ic_cloud,   "${currentWeather.clouds}%",             "CLOUD"),
+        WeatherInfoItem(R.drawable.ic_sunrise, formatTime(currentWeather.sunrise),      "SUNRISE"),
+        WeatherInfoItem(R.drawable.ic_sunset,  formatTime(currentWeather.sunset),       "SUNSET"),
     )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         WeatherStatRow(row1)
@@ -335,8 +332,9 @@ fun WeatherInfoGrid(currentWeather: CurrentWeather) {
     }
 }
 
+
 @Composable
-private fun WeatherStatRow(stats: List<WeatherStat>) {
+private fun WeatherStatRow(stats: List<WeatherInfoItem>) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -347,21 +345,6 @@ private fun WeatherStatRow(stats: List<WeatherStat>) {
     }
 }
 
-val stats = listOf(
-    HourlyWeatherStat(Icons.Default.Home, 10, 22),
-    HourlyWeatherStat(Icons.Default.Home, 11, 21),
-    HourlyWeatherStat(Icons.Default.Home, 12, 20),
-    HourlyWeatherStat(Icons.Default.Home, 13, 23),
-    HourlyWeatherStat(Icons.Default.Home, 14, 22),
-)
-
-val weeklyStats = listOf(
-    WeeklyWeatherForecast("Today", Icons.Default.Home,  16, 28, "Clear Sky"),
-    WeeklyWeatherForecast("Sat",   Icons.Default.Home,    14, 26, "Partly Cloudy"),
-    WeeklyWeatherForecast("Sun",   Icons.Default.Home,    13, 21, "Light Rain"),
-    WeeklyWeatherForecast("Mon",   Icons.Default.Home, 12, 18, "Thunderstorm"),
-    WeeklyWeatherForecast("Tue",   Icons.Default.Home,    14, 23, "Cloudy"),
-)
 
 @Composable
 fun HourlyForecastList(hourlyList: List<HourlyItem>) {
