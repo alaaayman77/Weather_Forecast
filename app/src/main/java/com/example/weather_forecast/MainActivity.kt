@@ -8,6 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.ViewModelProvider
 
 import com.example.weather_forecast.data.WeatherRepository
+import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
+import com.example.weather_forecast.presentation.favourite.FavouriteViewModelFactory
 import com.example.weather_forecast.utils.PermissionHandler
 import com.example.weather_forecast.presentation.permission.PermissionViewModel
 import com.example.weather_forecast.utils.LocationProvider
@@ -21,6 +23,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var permissionHandler: PermissionHandler
     private lateinit var permissionViewModel: PermissionViewModel
     private lateinit var weatherViewModel: WeatherViewModel
+    private lateinit var favouriteViewModel: FavouriteViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +39,10 @@ class MainActivity : ComponentActivity() {
             this,
             WeatherViewModelFactory(locationProvider, WeatherRepository() ,application )
         ).get(WeatherViewModel::class.java)
+        favouriteViewModel = ViewModelProvider(
+            this,
+            FavouriteViewModelFactory()
+        ).get(FavouriteViewModel::class.java)
 
 
         permissionHandler = PermissionHandler(this).also {
@@ -47,7 +54,8 @@ class MainActivity : ComponentActivity() {
             AppScreen(
                 weatherViewModel    = weatherViewModel,
                 permissionViewModel = permissionViewModel,
-                permissionHandler   = permissionHandler
+                permissionHandler   = permissionHandler,
+                favouriteViewModel  = favouriteViewModel,
             )
         }
     }

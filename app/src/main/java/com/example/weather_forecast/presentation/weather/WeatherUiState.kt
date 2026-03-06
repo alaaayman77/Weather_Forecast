@@ -1,5 +1,6 @@
 package com.example.weather_forecast.presentation.weather
 
+import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.data.models.OneCallResponse
 
 
@@ -17,4 +18,8 @@ data class WeatherState(
     val oneCall:        OneCallResponse,
     val topBarLocation: String = "--",
     val centerLocation: String = "--"
+)
+
+data class FavouriteState(
+    val favourites: List<FavoriteLocationStat> = emptyList()
 )

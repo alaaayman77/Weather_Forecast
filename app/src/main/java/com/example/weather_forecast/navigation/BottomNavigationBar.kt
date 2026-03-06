@@ -61,7 +61,7 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .navigationBarsPadding()                              // ← add this
+            .navigationBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         NavigationBar(
@@ -73,7 +73,7 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
                     ambientColor = Color(0xFF90CAF9).copy(alpha = 0.4f),
                     spotColor = Color(0xFF90CAF9).copy(alpha = 0.4f)
                 )
-                .height(64.dp)                                    // ← reduce height
+                .height(64.dp)
                 .clip(RoundedCornerShape(32.dp)),
             containerColor = Color.White.copy(alpha = 0.85f),
             tonalElevation = 0.dp
@@ -90,7 +90,7 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.title,
-                            modifier = Modifier.size(24.dp)       // ← reduce icon size
+                            modifier = Modifier.size(24.dp)
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(

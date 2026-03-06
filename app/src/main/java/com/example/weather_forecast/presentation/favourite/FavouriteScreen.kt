@@ -1,9 +1,9 @@
 package com.example.weather_forecast.presentation.favourite
 
-import android.content.Intent
-import android.net.Uri
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -21,103 +20,140 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.presentation.favourite.components.FavouriteLocationItem
+import com.example.weather_forecast.presentation.weather.FavouriteState
+import com.example.weather_forecast.presentation.weather.UiState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
-fun FavouriteScreen(modifier: Modifier) {
-
-
+fun FavouriteScreen(
+    modifier: Modifier,
+    viewModel: FavouriteViewModel,
+    uiState: UiState<FavouriteState>,
+    onAddLocation: () -> Unit
+) {
     Box(modifier = modifier.fillMaxSize()) {
-        FavouriteScreenContent()
+        when (val state = uiState) {
+            is UiState.Idle,
+            is UiState.Loading -> {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+            is UiState.Error -> {
+                Text(
+                    text     = state.message,
+                    modifier = Modifier.align(Alignment.Center),
+                    style    = MaterialTheme.typography.bodyMedium
+                )
+            }
+            is UiState.Success -> {
+                FavouriteScreenContent(
+                    favourites = state.data.favourites,
+                    onRemove   = {  }
+                )
+            }
+        }
 
         FloatingActionButton(
-            onClick = {},
-            modifier = Modifier
+            onClick        = onAddLocation,
+            modifier       = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
             containerColor = MaterialTheme.colorScheme.primary
         ) {
             Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "Open Maps",
-                tint = MaterialTheme.colorScheme.onPrimary
+                imageVector        = Icons.Default.LocationOn,
+                contentDescription = "Add Location",
+                tint               = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
 }
 @Composable
-fun FavouriteScreenContent(){
+fun FavouriteScreenContent(
+    favourites: List<FavoriteLocationStat>,
+    onRemove: (FavoriteLocationStat) -> Unit
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp),
-        contentPadding = PaddingValues(8.dp)
-    ){
-        item{
-            FavouriteHeader()
-        }
-        items(favouriteLocationStat.size){
-                index ->
-            FavouriteLocationItem(favouriteLocationStat[index])
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+    ) {
+        item { FavouriteHeader() }
+
+        if (favourites.isEmpty()) {
+            item { FavouriteEmptyState() }
+        } else {
+            items(favourites) { item ->
+                FavouriteLocationItem(
+                    item     = item,
+                    onRemove = { onRemove(item) }
+                )
+            }
         }
     }
 }
 
 @Composable
-fun FavouriteHeader(){
+fun FavouriteHeader() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ){
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Icon(
-            imageVector = Icons.Default.LocationOn,
+            imageVector        = Icons.Default.LocationOn,
             contentDescription = null,
-            modifier = Modifier.size(32.dp),
-            tint = MaterialTheme.colorScheme.primary
+            modifier           = Modifier.size(24.dp),
+            tint               = MaterialTheme.colorScheme.primary
         )
-        Text("Favourite Locations" , style = MaterialTheme.typography.labelLarge.copy(MaterialTheme.colorScheme.secondary))
+        Text(
+            text  = "Favourite Locations",
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = MaterialTheme.colorScheme.secondary
+            )
+        )
     }
 }
 
-val favouriteLocationStat = listOf(
-    FavoriteLocationStat(
-        cityName         = "Cairo",
-        countryName      = "Egypt",
-        countryCode      = "EG",
-        temp             = 24,
-        highTemp         = 28,
-        lowTemp          = 16,
-        weatherCondition = "Clear Sky",
-        humidity         = 54,
-        windSpeed        = 12.0,
-        iconUrl          = null
-    ),
-    FavoriteLocationStat(
-        cityName         = "London",
-        countryName      = "United Kingdom",
-        countryCode      = "UK",
-        temp             = 9,
-        highTemp         = 12,
-        lowTemp          = 6,
-        weatherCondition = "Light Rain",
-        humidity         = 82,
-        windSpeed        = 7.0,
-        iconUrl          = null
-    ),
-    FavoriteLocationStat(
-        cityName         = "New York",
-        countryName      = "United States",
-        countryCode      = "US",
-        temp             = -2,
-        highTemp         = 1,
-        lowTemp          = -6,
-        weatherCondition = "Snow",
-        humidity         = 75,
-        windSpeed        = 15.0,
-        iconUrl          = null
-    ),
-)
+
+
+@Composable
+fun FavouriteEmptyState() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 80.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector        = Icons.Default.LocationOn,
+                contentDescription = null,
+                modifier           = Modifier.size(56.dp),
+                tint               = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+            )
+            Text(
+                text  = "No favourite locations yet",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                )
+            )
+            Text(
+                text  = "Tap + to add one",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+                )
+            )
+        }
+    }
+}
