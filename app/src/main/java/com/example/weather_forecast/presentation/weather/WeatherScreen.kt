@@ -1,5 +1,7 @@
 package com.example.weather_forecast.presentation.weather
 
+import android.content.Context
+import android.location.Geocoder
 import android.location.Location
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,10 +11,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,6 +85,9 @@ fun WeatherScreen(
 
 @Composable
 fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  timezone: String) {
+    val context  = LocalContext.current
+    val topBarLocation = remember(location) { getTopBarLocation(context, location) }
+    val centerLocation = remember(location) { getCenterLocation(context, location) }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -89,8 +95,8 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
         verticalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp)
     ) {
-        item { WeatherTopBar(currentWeather , timezone) }
-        item { WeatherCenterSection(currentWeather) }
+        item { WeatherTopBar(currentWeather , timezone , topBarLocation) }
+        item { WeatherCenterSection(currentWeather , centerLocation) }
         item { WeatherInfoGrid(currentWeather) }
         item {
             SectionCard {
@@ -157,7 +163,7 @@ fun WeeklyList(dailyList: List<DailyItem>) {
     }
 }
 @Composable
-fun WeatherTopBar(currentWeather: CurrentWeather , timezone: String) {
+fun WeatherTopBar(currentWeather: CurrentWeather , timezone: String , topBarLocaton :String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -182,7 +188,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather , timezone: String) {
         ) {
             val locationLabel = timezone.substringAfterLast("/").replace("_", " ")
             Text(
-                text = "📍 ${locationLabel}",
+                text = "📍 ${topBarLocaton}",
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.primary,
@@ -194,7 +200,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather , timezone: String) {
 }
 
 @Composable
-fun WeatherCenterSection(currentWeather: CurrentWeather) {
+fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -203,7 +209,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather) {
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = currentWeather.weather.firstOrNull()?.main ?: "",
+            text = centerLocation,
             style = MaterialTheme.typography.headlineMedium.copy(
                 color = MaterialTheme.colorScheme.primary
             )
@@ -414,3 +420,33 @@ fun getGreeting(timestamp: Long?): String {
 }
 
 fun Double.toCelsius() = (this - 273.15).toInt()
+fun getTopBarLocation(context: Context, location: Location?): String {
+    return try {
+        val geocoder  = Geocoder(context, Locale.getDefault())
+        val addresses = geocoder.getFromLocation(location?.latitude ?: 0.0, location?.longitude ?: 0.0, 1)
+        if (!addresses.isNullOrEmpty()) {
+            val address   = addresses[0]
+            val adminArea = address.adminArea    // "alexandria"
+            val country   = address.countryCode  // "EG"
+            "$adminArea, $country"
+        } else "Unknown"
+    } catch (e: Exception) { "Unknown" }
+}
+
+fun getCenterLocation(context: Context, location: Location?): String {
+    return try {
+        val geocoder  = Geocoder(context, Locale.getDefault())
+        val addresses = geocoder.getFromLocation(location?.latitude ?: 0.0, location?.longitude ?: 0.0, 1)
+        if (!addresses.isNullOrEmpty()) {
+            val address  = addresses[0]
+            val locality = address.locality      // "san"
+            val subAdmin = address.subAdminArea  // "el raml"
+            when {
+                locality != null && subAdmin != null -> "$locality, $subAdmin"
+                locality  != null -> locality
+                subAdmin  != null -> subAdmin
+                else -> "Unknown"
+            }
+        } else "Unknown"
+    } catch (e: Exception) { "Unknown" }
+}
