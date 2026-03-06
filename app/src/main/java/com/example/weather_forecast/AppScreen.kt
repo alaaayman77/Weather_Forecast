@@ -34,8 +34,9 @@ import com.example.weather_forecast.presentation.permission.PermissionDeniedScre
 import com.example.weather_forecast.presentation.permission.PermissionRationaleScreen
 import com.example.weather_forecast.presentation.permission.PermissionUiState
 import com.example.weather_forecast.presentation.permission.PermissionViewModel
+import com.example.weather_forecast.presentation.weather.UiState
 import com.example.weather_forecast.presentation.weather.WeatherScreen
-import com.example.weather_forecast.presentation.weather.WeatherUiState
+
 import com.example.weather_forecast.presentation.weather.WeatherViewModel
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 import com.example.weather_forecast.utils.PermissionHandler
@@ -101,7 +102,8 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.WeatherRoute> {
-                        val uiState by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(WeatherUiState.Idle)
+                        val uiState by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(
+                            UiState.Idle)
                         val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
 
                         when (permissionState.value) {

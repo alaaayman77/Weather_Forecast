@@ -30,11 +30,11 @@ class MainActivity : ComponentActivity() {
             LocationServices.getFusedLocationProviderClient(this)
         )
 
-        permissionViewModel = ViewModelProvider(this)[PermissionViewModel::class.java]
+        permissionViewModel = ViewModelProvider(this).get(PermissionViewModel::class.java)
 
         weatherViewModel = ViewModelProvider(
             this,
-            WeatherViewModelFactory(locationProvider, WeatherRepository())
+            WeatherViewModelFactory(locationProvider, WeatherRepository() ,application )
         ).get(WeatherViewModel::class.java)
 
 

@@ -4,9 +4,17 @@ import com.example.weather_forecast.data.models.OneCallResponse
 
 
 
-sealed class WeatherUiState {
-    object Idle    : WeatherUiState()
-    object Loading : WeatherUiState()
-    data class Success(val data: OneCallResponse) : WeatherUiState()
-    data class Error(val message: String) : WeatherUiState()
+
+
+sealed class UiState<out T> {
+    object Idle    : UiState<Nothing>()
+    object Loading : UiState<Nothing>()
+    data class Success<T>(val data: T) : UiState<T>()
+    data class Error(val message: String) : UiState<Nothing>()
 }
+
+data class WeatherState(
+    val oneCall:        OneCallResponse,
+    val topBarLocation: String = "--",
+    val centerLocation: String = "--"
+)
