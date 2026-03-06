@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.compose.runtime.livedata)
     implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.androidx.foundation.layout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,7 +89,17 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("com.google.maps.android:maps-compose:4.3.3")
 
+    // Google Maps SDK
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
 
+    // Places API (for search bar autocomplete)
+    implementation("com.google.android.libraries.places:places:3.5.0")
+
+    implementation("io.coil-kt:coil-gif:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+//    implementation("androidx.media3:media3-exoplayer:1.3.1")
+//    implementation("androidx.media3:media3-ui:1.3.1")
 
 }

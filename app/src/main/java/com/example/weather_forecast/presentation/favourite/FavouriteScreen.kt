@@ -1,5 +1,7 @@
 package com.example.weather_forecast.presentation.favourite
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,21 +14,38 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.presentation.favourite.components.FavouriteLocationItem
 
 @Composable
-fun FavouriteScreen(modifier: Modifier){
-    Box (modifier = modifier
+fun FavouriteScreen(modifier: Modifier) {
 
-    ){
-      FavouriteScreenContent()
+
+    Box(modifier = modifier.fillMaxSize()) {
+        FavouriteScreenContent()
+
+        FloatingActionButton(
+            onClick = {},
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primary
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = "Open Maps",
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }
     }
 }
 @Composable

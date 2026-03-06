@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,6 +24,7 @@ import com.example.weather_forecast.data.models.WeatherResponse
 import com.example.weather_forecast.data.models.WeatherStat
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
+import com.example.weather_forecast.presentation.weather.components.SectionCard
 import com.example.weather_forecast.presentation.weather.components.WeatherInfoCard
 import com.example.weather_forecast.presentation.weather.components.WeeklyForecastItem
 import com.example.weather_forecast.ui.theme.lightGray
@@ -80,27 +82,44 @@ fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, h
             .fillMaxSize()
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
-        contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp)
+        contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp)
     ) {
         item { WeatherTopBar(currentWeather) }
         item { WeatherCenterSection(currentWeather) }
         item { WeatherInfoGrid(currentWeather) }
-        item { HourlyForecastList( hourlyList = hourlyList) }
         item {
-            Text(
-                text = "Weekly Forecast",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
+            SectionCard {
+                HourlyForecastList(hourlyList = hourlyList)
+            }
         }
-        items(weeklyStats.size) { index ->
-            WeeklyForecastItem(weeklyStats[index])
+        item {
+            SectionCard {
+              WeeklyList()
+            }
+        }
+
+
+    }
+}
+@Composable
+fun WeeklyList(){
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = "5-DAY FORECAST",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.5.sp,
+
+                ),
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        weeklyStats.forEachIndexed { _, stat ->
+            WeeklyForecastItem(stat )
+
         }
     }
 }
-
 @Composable
 fun WeatherTopBar(currentWeather: WeatherResponse) {
     Row(
@@ -148,9 +167,9 @@ fun WeatherCenterSection(currentWeather: WeatherResponse) {
     ) {
         Text(
             text = currentWeather.name,
-            style = MaterialTheme.typography.labelLarge.copy(
+            style = MaterialTheme.typography.headlineMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
+
             )
         )
         currentWeather.weather.firstOrNull()?.iconUrl()?.let { iconUrl ->
@@ -173,7 +192,7 @@ fun WeatherCenterSection(currentWeather: WeatherResponse) {
         Text(
             text = currentWeather.weather.firstOrNull()?.description
                 ?.replaceFirstChar { it.uppercase() } ?: "",
-            style = MaterialTheme.typography.labelMedium.copy(
+            style = MaterialTheme.typography.titleMedium.copy(
                 color = lightGray,
             )
         )
@@ -304,31 +323,36 @@ val stats = listOf(
 )
 
 val weeklyStats = listOf(
-    WeeklyWeatherForecast("Mon", Icons.Default.Home, 18, 24),
-    WeeklyWeatherForecast("Tue", Icons.Default.Home, 16, 22),
-    WeeklyWeatherForecast("Wed", Icons.Default.Home, 14, 20),
-    WeeklyWeatherForecast("Thu", Icons.Default.Home, 17, 25),
-    WeeklyWeatherForecast("Fri", Icons.Default.Home, 15, 21),
+    WeeklyWeatherForecast("Today", Icons.Default.Home,  16, 28, "Clear Sky"),
+    WeeklyWeatherForecast("Sat",   Icons.Default.Home,    14, 26, "Partly Cloudy"),
+    WeeklyWeatherForecast("Sun",   Icons.Default.Home,    13, 21, "Light Rain"),
+    WeeklyWeatherForecast("Mon",   Icons.Default.Home, 12, 18, "Thunderstorm"),
+    WeeklyWeatherForecast("Tue",   Icons.Default.Home,    14, 23, "Cloudy"),
 )
 
 @Composable
-fun HourlyForecastList( hourlyList : List<HourlyItem>) {
+fun HourlyForecastList(hourlyList: List<HourlyItem>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Hourly Forecast",
+            text = "HOURLY FORECAST",
             style = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                letterSpacing = 1.5.sp,
+
             ),
             modifier = Modifier.padding(bottom = 12.dp)
         )
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(hourlyList.size) { item ->
-                HourlyForecastItem(hourlyList[item])
+            items(hourlyList.size) { index ->
+                HourlyForecastItem(
+                    hourlyItem = hourlyList[index],
+                    isNow = index == 0
+                )
             }
         }
     }

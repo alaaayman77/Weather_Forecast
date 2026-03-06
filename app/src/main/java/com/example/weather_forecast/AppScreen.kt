@@ -6,6 +6,7 @@ import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -13,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -72,6 +72,7 @@ fun AppScreen(
 
             Scaffold(
                 containerColor = Color.Transparent,
+                contentWindowInsets = WindowInsets(0),
                 bottomBar = {
                     if (showBottomBar) {
                         BottomNavigationBar { item ->
@@ -121,7 +122,8 @@ fun AppScreen(
 
 
                                 WeatherScreen(
-                                    modifier  = Modifier.padding(innerPadding),
+                                    modifier  = Modifier.fillMaxSize()
+                                        .padding(innerPadding),
                                     uiState   = uiState,
                                     location  = location,
                                 )

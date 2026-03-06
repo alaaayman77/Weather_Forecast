@@ -3,6 +3,7 @@ package com.example.weather_forecast.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,6 +61,7 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .navigationBarsPadding()                              // ← add this
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         NavigationBar(
@@ -71,16 +73,13 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
                     ambientColor = Color(0xFF90CAF9).copy(alpha = 0.4f),
                     spotColor = Color(0xFF90CAF9).copy(alpha = 0.4f)
                 )
-                .height(80.dp)
+                .height(64.dp)                                    // ← reduce height
                 .clip(RoundedCornerShape(32.dp)),
-
             containerColor = Color.White.copy(alpha = 0.85f),
             tonalElevation = 0.dp
-
         ) {
             navigationItems.forEachIndexed { index, item ->
                 val isSelected = selectedNavigationIndex.intValue == index
-
                 NavigationBarItem(
                     selected = isSelected,
                     onClick = {
@@ -91,10 +90,9 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
                         Icon(
                             painter = painterResource(id = item.icon),
                             contentDescription = item.title,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(24.dp)       // ← reduce icon size
                         )
                     },
-
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color.White,
                         unselectedIconColor = Color(0xFF90A4AE),

@@ -1,26 +1,23 @@
 package com.example.weather_forecast.presentation.weather.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 
 @Composable
-fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast){
+fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast) {
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -32,26 +29,81 @@ fun WeeklyForecastItem(weeklyWeatherForecast: WeeklyWeatherForecast){
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 16.dp),
+
+                .padding(vertical = 14.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(weeklyWeatherForecast.day, style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.secondary))
-            Icon(
+        ) {
+
+            Text(
+                text = weeklyWeatherForecast.day,
+                modifier = Modifier.width(48.dp),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.SemiBold,
+
+                )
+            )
+
+
+            weeklyWeatherForecast.iconUrl?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp)
+                )
+            } ?: Icon(
                 imageVector = weeklyWeatherForecast.icon,
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-            Row(
 
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
 
-            ){
-                Text(weeklyWeatherForecast.highTemp.toString(),style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.secondary))
-                Text(weeklyWeatherForecast.lowTemp.toString(),style = MaterialTheme.typography.labelMedium)
-            }
+            Text(
+                text = weeklyWeatherForecast.condition,
+                modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f),
 
+                )
+            )
+
+            Text(
+                text = "${weeklyWeatherForecast.lowTemp}°",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+
+                )
+            )
+
+
+            Spacer(modifier = Modifier.width(6.dp))
+            Box(
+                modifier = Modifier
+                    .width(64.dp)
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                                MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    )
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+
+
+            Text(
+                text = "${weeklyWeatherForecast.highTemp}°",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.SemiBold,
+
+                )
+            )
         }
     }
 }

@@ -14,8 +14,10 @@ data class HourlyWeatherStat(
 )
 
 data class WeeklyWeatherForecast(
-    val day : String,
-    val icon : ImageVector,
-    val highTemp : Int,
-    val lowTemp: Int
+    val day: String,
+    val icon: ImageVector,           // keep for fallback
+    val lowTemp: Int,
+    val highTemp: Int,
+    val condition: String = "",      // e.g. "Clear Sky", "Light Rain"
+    val iconUrl: String? = null      // if you have a URL from API
 )
