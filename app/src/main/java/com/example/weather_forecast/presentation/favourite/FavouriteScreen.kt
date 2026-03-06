@@ -83,12 +83,41 @@ fun FavouriteHeader(){
     }
 }
 
-val favouriteLocationStat  = listOf(
-    FavoriteLocationStat(Icons.Default.Home , "San Francisco" , 10 , "• Cloudy"),
-    FavoriteLocationStat(Icons.Default.Home , "San Francisco" , 10 , "• Cloudy"),
-    FavoriteLocationStat(Icons.Default.Home , "San Francisco" , 10 , "• Cloudy"),
-    FavoriteLocationStat(Icons.Default.Home , "San Francisco" , 10 , "• Cloudy"),
-    FavoriteLocationStat(Icons.Default.Home , "San Francisco" , 10 , "• Cloudy"),
-
-
-    )
+val favouriteLocationStat = listOf(
+    FavoriteLocationStat(
+        cityName         = "Cairo",
+        countryName      = "Egypt",
+        countryCode      = "EG",
+        temp             = 24,
+        highTemp         = 28,
+        lowTemp          = 16,
+        weatherCondition = "Clear Sky",
+        humidity         = 54,
+        windSpeed        = 12.0,
+        iconUrl          = null
+    ),
+    FavoriteLocationStat(
+        cityName         = "London",
+        countryName      = "United Kingdom",
+        countryCode      = "UK",
+        temp             = 9,
+        highTemp         = 12,
+        lowTemp          = 6,
+        weatherCondition = "Light Rain",
+        humidity         = 82,
+        windSpeed        = 7.0,
+        iconUrl          = null
+    ),
+    FavoriteLocationStat(
+        cityName         = "New York",
+        countryName      = "United States",
+        countryCode      = "US",
+        temp             = -2,
+        highTemp         = 1,
+        lowTemp          = -6,
+        weatherCondition = "Snow",
+        humidity         = 75,
+        windSpeed        = 15.0,
+        iconUrl          = null
+    ),
+)
