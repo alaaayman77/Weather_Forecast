@@ -25,6 +25,8 @@ import com.example.weather_forecast.data.models.WeatherStat
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
 import com.example.weather_forecast.presentation.weather.components.SectionCard
+import com.example.weather_forecast.presentation.weather.components.SunTimesCard
+import com.example.weather_forecast.presentation.weather.components.UvIndexCard
 import com.example.weather_forecast.presentation.weather.components.WeatherInfoCard
 import com.example.weather_forecast.presentation.weather.components.WeeklyForecastItem
 import com.example.weather_forecast.ui.theme.lightGray
@@ -93,10 +95,22 @@ fun WeatherScreenContent(location: Location?, currentWeather: WeatherResponse, h
             }
         }
         item {
+            SunTimesCard(
+                sunriseText = formatTime(currentWeather.sys.sunrise),
+                sunsetText  = formatTime(currentWeather.sys.sunset),
+                progress    = 0.6f
+            )
+        }
+        item {
+            UvIndexCard(uvi = 9.76)
+        }
+        item {
             SectionCard {
               WeeklyList()
             }
         }
+
+
 
 
     }
