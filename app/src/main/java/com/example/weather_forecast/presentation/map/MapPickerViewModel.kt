@@ -5,8 +5,10 @@ import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
+import com.example.weather_forecast.presentation.weather.UiState
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import kotlinx.coroutines.Dispatchers
@@ -16,21 +18,25 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class MapPickerViewModel(private val app: Application) : ViewModel() {
+class MapPickerViewModel(
+    private val app: Application,
+    private val weatherRepository: WeatherRepository
+) : ViewModel() {
+
     private val _pickedLatLng = MutableStateFlow<LatLng?>(null)
     val pickedLatLng: StateFlow<LatLng?> get() = _pickedLatLng
 
     private val _pickedName = MutableStateFlow("")
     val pickedName: StateFlow<String> get() = _pickedName
-init{
-    initPlaces()
-}
 
-fun initPlaces(){
-    if (!Places.isInitialized()) {
-        Places.initialize(app, "AIzaSyCJLsLgqW_MrzD7861dn16hNxVpfxCqxfU")
+    private val _addState = MutableStateFlow<UiState<Unit>>(UiState.Idle)
+    val addState: StateFlow<UiState<Unit>> get() = _addState
+
+    init {
+        if (!Places.isInitialized()) {
+            Places.initialize(app, "AIzaSyCJLsLgqW_MrzD7861dn16hNxVpfxCqxfU")
+        }
     }
-}
 
     fun onPlacePicked(latLng: LatLng, name: String) {
         _pickedLatLng.value = latLng
@@ -41,20 +47,17 @@ fun initPlaces(){
         _pickedLatLng.value = latLng
         _pickedName.value   = "Pinned Location"
 
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val geocoder  = Geocoder(app, Locale.getDefault())
                 val addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
                 val address   = addresses?.firstOrNull()
-
                 val name = when {
-                    address?.locality    != null -> address.locality
+                    address?.locality     != null -> address.locality
                     address?.subAdminArea != null -> address.subAdminArea
-                    address?.adminArea   != null -> address.adminArea
-                    else                         -> "Pinned Location"
+                    address?.adminArea    != null -> address.adminArea
+                    else                          -> "Pinned Location"
                 }
-
                 withContext(Dispatchers.Main) {
                     if (_pickedLatLng.value == latLng) {
                         _pickedName.value = name
@@ -62,56 +65,90 @@ fun initPlaces(){
                 }
             } catch (e: Exception) {
 
-            }}}
+            }
+        }
+    }
 
     fun clearPin() {
         _pickedLatLng.value = null
         _pickedName.value   = ""
+        _addState.value     = UiState.Idle
     }
+
     fun onLocationPicked(
         lat: Double,
         lng: Double,
         name: String,
-        favouriteViewModel: FavouriteViewModel
+        favouriteViewModel: FavouriteViewModel,
+        apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
+            _addState.value = UiState.Loading
             try {
                 val geocoder  = Geocoder(app, Locale.getDefault())
-                val addresses = geocoder.getFromLocation(lat, lng, 1)
-                val address   = addresses?.firstOrNull()
+                var cityName    = name
+                var countryName = ""
+                var countryCode = ""
 
-                val cityName    = address?.locality    ?: name
-                val countryName = address?.countryName ?: ""
-                val countryCode = address?.countryCode ?: ""
+                launch(Dispatchers.IO) {
+                    try {
+                        val addresses = geocoder.getFromLocation(lat, lng, 1)
+                        val address   = addresses?.firstOrNull()
+                        cityName    = address?.locality    ?: name
+                        countryName = address?.countryName ?: ""
+                        countryCode = address?.countryCode ?: ""
+                    } catch (e: Exception) {
 
-                val item = FavoriteLocationStat(
-                    cityName = cityName,
-                    countryName = countryName,
-                    countryCode = countryCode,
-                    temp = 0,
-                    highTemp = 0,
-                    lowTemp = 0,
-                    weatherCondition = "",
-                    humidity = 0,
-                    windSpeed = 0.0,
-                    iconUrl = null
-                )
+                    }
+                }.join()
 
-                withContext(Dispatchers.Main) {
-                    favouriteViewModel.addFavourite(item)
-                    clearPin()
+
+                val response = weatherRepository.getOneCallResponse(lat, lng, apiKey)
+
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        val current = body.current
+                        val daily   = body.daily.firstOrNull()
+
+                        val item = FavoriteLocationStat(
+                            cityName         = cityName,
+                            countryName      = countryName,
+                            countryCode      = countryCode,
+                            temp             = current.temp.toCelsius(),
+                            highTemp         = daily?.temp?.max?.toCelsius() ?: current.temp.toCelsius(),
+                            lowTemp          = daily?.temp?.min?.toCelsius() ?: current.temp.toCelsius(),
+                            weatherCondition = current.weather.firstOrNull()?.description
+                                ?.replaceFirstChar { it.uppercase() } ?: "",
+                            humidity         = current.humidity,
+                            windSpeed        = current.wind_speed,
+                            iconUrl          = current.weather.firstOrNull()?.iconUrl()
+                        )
+
+                        favouriteViewModel.addFavourite(item)
+                        _addState.value = UiState.Success(Unit)
+
+                    } else {
+                        _addState.value = UiState.Error("Empty response")
+                    }
+                } else {
+                    _addState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
                 }
-            } catch (e: Exception) {
-                clearPin()
+
+            } catch (ex: Exception) {
+                _addState.value = UiState.Error(ex.message ?: "Unknown error")
             }
         }
     }
+
+    private fun Double.toCelsius() = (this - 273.15).toInt()
 }
 
-
-
-class MapPickerViewModelFactory(private val app: Application) : ViewModelProvider.Factory {
+class MapPickerViewModelFactory(
+    private val app: Application,
+    private val weatherRepository: WeatherRepository
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return MapPickerViewModel(app) as T
+        return MapPickerViewModel(app, weatherRepository) as T
     }
 }

@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
         ).get(FavouriteViewModel::class.java)
         mapPickerViewModel = ViewModelProvider(
             this,
-            MapPickerViewModelFactory(application)
+            MapPickerViewModelFactory(application, WeatherRepository())
         ).get(MapPickerViewModel::class.java)
 
 

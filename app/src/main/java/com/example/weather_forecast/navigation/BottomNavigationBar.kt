@@ -54,9 +54,14 @@ val navigationItems = listOf(
 
 
 @Composable
-fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
-
-    val selectedNavigationIndex = rememberSaveable { mutableIntStateOf(0) }
+fun BottomNavigationBar(
+    currentRoute: String?,
+    navigate: (BottomNavigationBarItem) -> Unit
+) {
+    // Derive selected index from real current route
+    val selectedIndex = navigationItems.indexOfFirst { item ->
+        currentRoute?.contains(item.route::class.simpleName ?: "") == true
+    }.coerceAtLeast(0)
 
     Box(
         modifier = Modifier
@@ -68,10 +73,10 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
-                    elevation = 16.dp,
-                    shape = RoundedCornerShape(32.dp),
+                    elevation    = 16.dp,
+                    shape        = RoundedCornerShape(32.dp),
                     ambientColor = Color(0xFF90CAF9).copy(alpha = 0.4f),
-                    spotColor = Color(0xFF90CAF9).copy(alpha = 0.4f)
+                    spotColor    = Color(0xFF90CAF9).copy(alpha = 0.4f)
                 )
                 .height(64.dp)
                 .clip(RoundedCornerShape(32.dp)),
@@ -79,24 +84,20 @@ fun BottomNavigationBar(navigate: (BottomNavigationBarItem) -> Unit) {
             tonalElevation = 0.dp
         ) {
             navigationItems.forEachIndexed { index, item ->
-                val isSelected = selectedNavigationIndex.intValue == index
                 NavigationBarItem(
-                    selected = isSelected,
-                    onClick = {
-                        selectedNavigationIndex.intValue = index
-                        navigate.invoke(item)
-                    },
-                    icon = {
+                    selected = selectedIndex == index,
+                    onClick  = { navigate(item) },
+                    icon     = {
                         Icon(
-                            painter = painterResource(id = item.icon),
+                            painter            = painterResource(id = item.icon),
                             contentDescription = item.title,
-                            modifier = Modifier.size(24.dp)
+                            modifier           = Modifier.size(24.dp)
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color.White,
+                        selectedIconColor   = Color.White,
                         unselectedIconColor = Color(0xFF90A4AE),
-                        indicatorColor = MaterialTheme.colorScheme.primary
+                        indicatorColor      = MaterialTheme.colorScheme.primary
                     )
                 )
             }

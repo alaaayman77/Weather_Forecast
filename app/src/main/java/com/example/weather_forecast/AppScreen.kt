@@ -81,7 +81,9 @@ fun AppScreen(
                         enter   = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                         exit    = slideOutVertically(targetOffsetY = { it }) + fadeOut()
                     ) {
-                        BottomNavigationBar { item ->
+                        BottomNavigationBar(
+                            currentRoute = currentRoute,
+                        ) { item ->
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     saveState = true
@@ -162,6 +164,7 @@ fun AppScreen(
                             modifier      = Modifier.padding(innerPadding),
                             uiState       = uiState,
                             onAddLocation = {
+                                mapPickerViewModel.clearPin()
                                 favouriteViewModel.navigateToMapPicker(navController)
                             }
                         )
@@ -171,26 +174,29 @@ fun AppScreen(
                     composable<NavigationRoutes.MapPickerRoute> {
                         val pickedLatLng by mapPickerViewModel.pickedLatLng.collectAsStateWithLifecycle()
                         val pickedName   by mapPickerViewModel.pickedName.collectAsStateWithLifecycle()
+                        val addState     by mapPickerViewModel.addState.collectAsStateWithLifecycle()
 
+                        var hasNavigatedBack by remember { mutableStateOf(false) }
+
+                        LaunchedEffect(addState) {
+                            if (addState is UiState.Success && !hasNavigatedBack) {
+                                hasNavigatedBack = true
+                                navController.popBackStack()
+                            }
+                        }
 
                         val userLatLng = remember(location) {
-                            LatLng(
-                                location?.latitude  ?: 30.0444,
-                                location?.longitude ?: 31.2357
-                            )
+                            LatLng(location?.latitude ?: 30.0444, location?.longitude ?: 31.2357)
                         }
 
                         val cameraState = rememberCameraPositionState {
-                            // position cam at user loc
                             position = CameraPosition.fromLatLngZoom(userLatLng, 12f)
                         }
 
-                        //open map at user loc
                         LaunchedEffect(Unit) {
                             mapPickerViewModel.onMapTapped(userLatLng)
                         }
 
-                        // when user picks somewhere else, take cam there
                         LaunchedEffect(pickedLatLng) {
                             pickedLatLng?.let { latLng ->
                                 cameraState.animate(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
@@ -201,12 +207,14 @@ fun AppScreen(
                             pickedLatLng     = pickedLatLng,
                             pickedName       = pickedName,
                             cameraState      = cameraState,
+                            isAddingLocation = addState is UiState.Loading,
+                            addError         = (addState as? UiState.Error)?.message,
                             onMapTapped      = { mapPickerViewModel.onMapTapped(it) },
                             onPlacePicked    = { latLng, name -> mapPickerViewModel.onPlacePicked(latLng, name) },
                             onClearPin       = { mapPickerViewModel.clearPin() },
                             onLocationPicked = { lat, lng, name ->
                                 mapPickerViewModel.onLocationPicked(lat, lng, name, favouriteViewModel)
-                                navController.popBackStack()
+
                             },
                             onDismiss = {
                                 mapPickerViewModel.clearPin()
