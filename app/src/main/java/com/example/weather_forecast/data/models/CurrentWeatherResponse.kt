@@ -1,5 +1,8 @@
 package com.example.weather_forecast.data.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class OneCallResponse(
     val lat: Double,
     val lon: Double,
@@ -9,7 +12,7 @@ data class OneCallResponse(
     val hourly: List<HourlyItem>,
     val daily: List<DailyItem>
 )
-
+@Serializable
 data class CurrentWeather(
     val dt: Long,
     val sunrise: Long,
@@ -31,7 +34,7 @@ data class CurrentWeather(
 
 
 
-
+@Serializable
 data class WeatherCondition(
     val id: Int,
     val main: String,

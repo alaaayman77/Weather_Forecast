@@ -1,6 +1,7 @@
 package com.example.weather_forecast.presentation.weather
 
 import com.example.weather_forecast.data.models.FavoriteLocationStat
+import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.OneCallResponse
 
 
@@ -21,5 +22,5 @@ data class WeatherState(
 )
 
 data class FavouriteState(
-    val favourites: List<FavoriteLocationStat> = emptyList()
+    val favourites: List<FavouriteEntity> = emptyList()
 )

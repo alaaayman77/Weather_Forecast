@@ -1,6 +1,9 @@
 package com.example.weather_forecast.data.models
 
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class DailyItem(
     val dt: Long,
     val sunrise: Long,
@@ -27,7 +30,7 @@ data class DailyItem(
         return sdf.format(java.util.Date(dt * 1000))
     }
 }
-
+@Serializable
 data class DailyTemp(
     val day: Double,
     val min: Double,
@@ -36,7 +39,7 @@ data class DailyTemp(
     val eve: Double,
     val morn: Double
 )
-
+@Serializable
 data class DailyFeelsLike(
     val day: Double,
     val night: Double,

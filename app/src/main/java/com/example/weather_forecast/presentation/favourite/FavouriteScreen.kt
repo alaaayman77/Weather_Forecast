@@ -27,6 +27,7 @@ import com.example.weather_forecast.presentation.weather.FavouriteState
 import com.example.weather_forecast.presentation.weather.UiState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import com.example.weather_forecast.data.models.FavouriteEntity
 
 @Composable
 fun FavouriteScreen(
@@ -76,7 +77,7 @@ fun FavouriteScreen(
 }
 @Composable
 fun FavouriteScreenContent(
-    favourites: List<FavoriteLocationStat>,
+    favourites: List<FavouriteEntity>,
     onRemove: (FavoriteLocationStat) -> Unit,
     onNavigateToDetails : (Double , Double)-> Unit
 ) {
@@ -95,7 +96,7 @@ fun FavouriteScreenContent(
             items(favourites) { item ->
                 FavouriteLocationItem(
                     item     = item,
-                    onRemove = { onRemove(item) },
+                    onRemove = { },
                     onNavigateToDetails = onNavigateToDetails
                 )
             }

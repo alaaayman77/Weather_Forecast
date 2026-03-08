@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModelFactory
+import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModel
+import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModelFactory
 import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.map.MapPickerViewModelFactory
 import com.example.weather_forecast.utils.PermissionHandler
@@ -27,6 +29,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var weatherViewModel: WeatherViewModel
     private lateinit var favouriteViewModel: FavouriteViewModel
     private lateinit var mapPickerViewModel: MapPickerViewModel
+    private lateinit var favouriteDetailsViewModel: FavouriteDetailsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,17 +43,21 @@ class MainActivity : ComponentActivity() {
 
         weatherViewModel = ViewModelProvider(
             this,
-            WeatherViewModelFactory(locationProvider, WeatherRepository() ,application )
+            WeatherViewModelFactory(locationProvider, WeatherRepository(application) ,application )
         ).get(WeatherViewModel::class.java)
         favouriteViewModel = ViewModelProvider(
             this,
-            FavouriteViewModelFactory()
+            FavouriteViewModelFactory(WeatherRepository(application))
         ).get(FavouriteViewModel::class.java)
         mapPickerViewModel = ViewModelProvider(
             this,
-            MapPickerViewModelFactory(application, WeatherRepository())
+            MapPickerViewModelFactory(application, WeatherRepository(application))
         ).get(MapPickerViewModel::class.java)
 
+        favouriteDetailsViewModel = ViewModelProvider(
+            this,
+            FavouriteDetailsViewModelFactory( WeatherRepository(application), application)
+        ).get(FavouriteDetailsViewModel::class.java)
 
         permissionHandler = PermissionHandler(this).also {
             it.init(permissionViewModel)
@@ -63,7 +70,8 @@ class MainActivity : ComponentActivity() {
                 permissionViewModel = permissionViewModel,
                 permissionHandler   = permissionHandler,
                 favouriteViewModel  = favouriteViewModel,
-                mapPickerViewModel = mapPickerViewModel
+                mapPickerViewModel = mapPickerViewModel,
+                favouriteDetailsViewModel = favouriteDetailsViewModel
             )
         }
     }

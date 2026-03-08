@@ -15,14 +15,24 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.FavoriteLocationStat
+import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.ui.theme.lightGray
 
 @Composable
 fun FavouriteLocationItem(
-    item: FavoriteLocationStat,
+    item: FavouriteEntity,
     onRemove: () -> Unit = {},
     onNavigateToDetails : (Double,Double)->Unit,
 ) {
+    val current = item.oneCallResponse.current
+    val daily   = item.oneCallResponse.daily.firstOrNull()
+    val temp             = (current.temp - 273.15).toInt()
+    val highTemp         = daily?.temp?.max?.let { (it - 273.15).toInt() } ?: temp
+    val lowTemp          = daily?.temp?.min?.let { (it - 273.15).toInt() } ?: temp
+    val weatherCondition = current.weather.firstOrNull()?.description
+        ?.replaceFirstChar { it.uppercase() } ?: ""
+    val iconUrl          = current.weather.firstOrNull()?.iconUrl()
+
     Card(
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -80,7 +90,7 @@ fun FavouriteLocationItem(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text = "${item.temp}°",
+                            text = "${temp}°",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
@@ -88,7 +98,7 @@ fun FavouriteLocationItem(
                             )
                         )
                         Text(
-                            text = item.weatherCondition,
+                            text = weatherCondition,
                             style = MaterialTheme.typography.labelMedium.copy(
                                 color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
                             )
@@ -96,7 +106,7 @@ fun FavouriteLocationItem(
                     }
 
 
-                    item.iconUrl?.let { url ->
+                    iconUrl?.let { url ->
                         AsyncImage(
                             model = url,
                             contentDescription = null,
@@ -129,7 +139,7 @@ fun FavouriteLocationItem(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "${item.humidity}%",
+                            text = "${current.humidity}%",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.SemiBold
@@ -148,7 +158,7 @@ fun FavouriteLocationItem(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "${item.windSpeed} m/s",
+                            text = "${current.wind_speed} m/s",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.SemiBold
@@ -162,7 +172,7 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
-                            text = "${item.highTemp}°",
+                            text = "${highTemp}°",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold
@@ -173,7 +183,7 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
-                            text = "${item.lowTemp}°",
+                            text = "${lowTemp}°",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold

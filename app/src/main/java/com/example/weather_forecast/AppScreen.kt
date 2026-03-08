@@ -19,12 +19,13 @@ import androidx.navigation.toRoute
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.presentation.AlertScreen
-import com.example.weather_forecast.presentation.FavouriteDetailsScreen
+import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsScreen
 import com.example.weather_forecast.presentation.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.MapPickerScreen
+import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModel
 import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.permission.*
 import com.example.weather_forecast.presentation.weather.*
@@ -41,7 +42,8 @@ fun AppScreen(
     permissionViewModel: PermissionViewModel,
     permissionHandler: PermissionHandler,
     favouriteViewModel: FavouriteViewModel,
-    mapPickerViewModel : MapPickerViewModel
+    mapPickerViewModel : MapPickerViewModel,
+    favouriteDetailsViewModel: FavouriteDetailsViewModel,
 ) {
     val navController : NavHostController  = rememberNavController()
     val context         = LocalContext.current
@@ -238,18 +240,18 @@ fun AppScreen(
                         SettingsScreen(modifier = Modifier.padding(innerPadding))
                     }
                     composable<NavigationRoutes.FavouriteDetailsRoute> {
-                        val route            = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
-                        val favouriteUiState by weatherViewModel.favouriteWeatherUiState.collectAsState()
+                        val route    = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
+                        val uiState by favouriteDetailsViewModel.uiState.collectAsState()
 
                         LaunchedEffect(route.lat, route.lon) {
-                            weatherViewModel.fetchWeatherForFavourite(route.lat, route.lon)
+                            favouriteDetailsViewModel.fetchWeather(route.lat, route.lon)
                         }
 
                         FavouriteDetailsScreen(
                             modifier = Modifier.padding(innerPadding),
                             lat      = route.lat,
                             lon      = route.lon,
-                            uiState  = favouriteUiState,
+                            uiState  = uiState,
                             onBack   = { navController.popBackStack() }
                         )
                     }

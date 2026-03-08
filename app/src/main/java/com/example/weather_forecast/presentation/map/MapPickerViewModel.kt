@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.FavoriteLocationStat
+import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.weather.UiState
 import com.google.android.gms.maps.model.LatLng
@@ -108,32 +109,21 @@ class MapPickerViewModel(
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {
-                        val current = body.current
-                        val daily   = body.daily.firstOrNull()
 
-                        val item = FavoriteLocationStat(
-                            lat = body.lat,
-                            lon = body.lon,
-                            cityName         = cityName,
-                            countryName      = countryName,
-                            countryCode      = countryCode,
-                            temp             = current.temp.toCelsius(),
-                            highTemp         = daily?.temp?.max?.toCelsius() ?: current.temp.toCelsius(),
-                            lowTemp          = daily?.temp?.min?.toCelsius() ?: current.temp.toCelsius(),
-                            weatherCondition = current.weather.firstOrNull()?.description
-                                ?.replaceFirstChar { it.uppercase() } ?: "",
-                            humidity         = current.humidity,
-                            windSpeed        = current.wind_speed,
-                            iconUrl          = current.weather.firstOrNull()?.iconUrl()
+                        val item = FavouriteEntity(
+                            lat             = body.lat,
+                            lon             = body.lon,
+                            cityName        = cityName,
+                            countryName     = countryName,
+                            countryCode     = countryCode,
+                            oneCallResponse = body
                         )
-
                         favouriteViewModel.addFavourite(item)
                         _addState.value = UiState.Success(Unit)
-
                     } else {
                         _addState.value = UiState.Error("Empty response")
                     }
-                } else {
+                }else {
                     _addState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
                 }
 

@@ -84,47 +84,7 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
             }
         }
     }
-    private val _favouriteWeatherUiState = MutableStateFlow<UiState<WeatherState>>(UiState.Idle)
-    val favouriteWeatherUiState: StateFlow<UiState<WeatherState>>
-        get() = _favouriteWeatherUiState
 
-    fun fetchWeatherForFavourite(
-        lat: Double,
-        lon: Double,
-        apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
-    ) {
-        viewModelScope.launch {
-            _favouriteWeatherUiState.value = UiState.Loading
-            try {
-                val response = weatherRepository.getOneCallResponse(lat, lon, apiKey)
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        _favouriteWeatherUiState.value = UiState.Success(WeatherState(oneCall = body))
-                        launch(Dispatchers.IO) {
-                            val topBar  = getTopBarLocation(app, lat, lon)
-                            val center  = getCenterLocation(app, lat, lon)
-                            val current = _favouriteWeatherUiState.value
-                            if (current is UiState.Success) {
-                                _favouriteWeatherUiState.value = UiState.Success(
-                                    current.data.copy(
-                                        topBarLocation = topBar,
-                                        centerLocation = center
-                                    )
-                                )
-                            }
-                        }
-                    } else {
-                        _favouriteWeatherUiState.value = UiState.Error("Empty response")
-                    }
-                } else {
-                    _favouriteWeatherUiState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
-                }
-            } catch (ex: Exception) {
-                _favouriteWeatherUiState.value = UiState.Error(ex.message ?: "Unknown error")
-            }
-        }
-    }
 }
 
 

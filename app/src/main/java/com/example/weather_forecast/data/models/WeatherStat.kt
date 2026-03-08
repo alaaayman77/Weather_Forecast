@@ -8,7 +8,6 @@ data class WeatherInfoItem(
     val label: String
 )
 
-
 data class WeeklyWeatherForecast(
     val day: String,
     val icon: ImageVector,

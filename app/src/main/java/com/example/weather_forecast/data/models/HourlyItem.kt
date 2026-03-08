@@ -1,4 +1,8 @@
 package com.example.weather_forecast.data.models
+
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class HourlyItem(
     val dt: Long,
     val temp: Double,
