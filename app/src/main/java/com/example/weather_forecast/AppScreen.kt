@@ -237,10 +237,21 @@ fun AppScreen(
                     composable<NavigationRoutes.SettingsRoute> {
                         SettingsScreen(modifier = Modifier.padding(innerPadding))
                     }
-                    composable<NavigationRoutes.FavouriteDetailsRoute> {it->
-                        val lat =  it.toRoute<NavigationRoutes.FavouriteDetailsRoute>().lat
-                        val lon = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>().lon
-                        FavouriteDetailsScreen(lat = lat , lon = lon ,modifier = Modifier.padding(innerPadding))
+                    composable<NavigationRoutes.FavouriteDetailsRoute> {
+                        val route            = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
+                        val favouriteUiState by weatherViewModel.favouriteWeatherUiState.collectAsState()
+
+                        LaunchedEffect(route.lat, route.lon) {
+                            weatherViewModel.fetchWeatherForFavourite(route.lat, route.lon)
+                        }
+
+                        FavouriteDetailsScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            lat      = route.lat,
+                            lon      = route.lon,
+                            uiState  = favouriteUiState,
+                            onBack   = { navController.popBackStack() }
+                        )
                     }
                 }
             }
