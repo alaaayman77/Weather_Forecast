@@ -32,7 +32,8 @@ import androidx.compose.material3.CircularProgressIndicator
 fun FavouriteScreen(
     modifier: Modifier,
     uiState: UiState<FavouriteState>,
-    onAddLocation: () -> Unit
+    onAddLocation: () -> Unit,
+    onNavigateToDetails: (FavoriteLocationStat) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (val state = uiState) {
@@ -52,7 +53,8 @@ fun FavouriteScreen(
             is UiState.Success -> {
                 FavouriteScreenContent(
                     favourites = state.data.favourites,
-                    onRemove   = {  }
+                    onRemove   = {  },
+                    onNavigateToDetails = onNavigateToDetails
                 )
             }
         }
@@ -75,7 +77,8 @@ fun FavouriteScreen(
 @Composable
 fun FavouriteScreenContent(
     favourites: List<FavoriteLocationStat>,
-    onRemove: (FavoriteLocationStat) -> Unit
+    onRemove: (FavoriteLocationStat) -> Unit,
+    onNavigateToDetails : (FavoriteLocationStat)-> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -92,7 +95,8 @@ fun FavouriteScreenContent(
             items(favourites) { item ->
                 FavouriteLocationItem(
                     item     = item,
-                    onRemove = { onRemove(item) }
+                    onRemove = { onRemove(item) },
+                    onNavigateToDetails = {onNavigateToDetails(item)}
                 )
             }
         }

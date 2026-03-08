@@ -20,7 +20,8 @@ import com.example.weather_forecast.ui.theme.lightGray
 @Composable
 fun FavouriteLocationItem(
     item: FavoriteLocationStat,
-    onRemove: () -> Unit = {}
+    onRemove: () -> Unit = {},
+    onNavigateToDetails : ()->Unit,
 ) {
     Card(
         shape = RoundedCornerShape(24.dp),
@@ -28,7 +29,8 @@ fun FavouriteLocationItem(
         colors = CardDefaults.cardColors(
             containerColor = Color.White.copy(alpha = 0.4f)
         ),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)),
+        onClick = onNavigateToDetails
     ) {
         Box(
             modifier = Modifier

@@ -58,7 +58,7 @@ fun BottomNavigationBar(
     currentRoute: String?,
     navigate: (BottomNavigationBarItem) -> Unit
 ) {
-    // Derive selected index from real current route
+
     val selectedIndex = navigationItems.indexOfFirst { item ->
         currentRoute?.contains(item.route::class.simpleName ?: "") == true
     }.coerceAtLeast(0)

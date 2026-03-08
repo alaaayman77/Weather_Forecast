@@ -15,4 +15,6 @@ sealed class NavigationRoutes {
     object  SplashRoute : NavigationRoutes()
     @Serializable
     object MapPickerRoute : NavigationRoutes()
+    @Serializable
+    object FavouriteDetailsRoute : NavigationRoutes()
 }

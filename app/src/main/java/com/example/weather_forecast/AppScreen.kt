@@ -18,6 +18,7 @@ import androidx.navigation.compose.*
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.presentation.AlertScreen
+import com.example.weather_forecast.presentation.FavouriteDetailsScreen
 import com.example.weather_forecast.presentation.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteScreen
@@ -52,6 +53,7 @@ fun AppScreen(
     val showBottomBar = currentRoute != null
             && !currentRoute.contains("SplashRoute")
             && !currentRoute.contains("MapPickerRoute")
+            && !currentRoute.contains("FavouriteDetailsRoute")
 
 
     val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
@@ -165,7 +167,10 @@ fun AppScreen(
                             uiState       = uiState,
                             onAddLocation = {
                                 mapPickerViewModel.clearPin()
-                                favouriteViewModel.navigateToMapPicker(navController)
+                                navController.navigate(NavigationRoutes.MapPickerRoute)
+                            },
+                            onNavigateToDetails = {
+                                navController.navigate(NavigationRoutes.FavouriteDetailsRoute)
                             }
                         )
                     }
@@ -228,6 +233,9 @@ fun AppScreen(
                     }
                     composable<NavigationRoutes.SettingsRoute> {
                         SettingsScreen(modifier = Modifier.padding(innerPadding))
+                    }
+                    composable<NavigationRoutes.FavouriteDetailsRoute> {
+                        FavouriteDetailsScreen(modifier = Modifier.padding(innerPadding))
                     }
                 }
             }
