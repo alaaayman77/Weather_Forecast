@@ -29,6 +29,8 @@ class FavouriteViewModel : ViewModel() {
             try {
                 val mockData = listOf(
                     FavoriteLocationStat(
+                        lat = 0.0,
+                        lon=0.0,
                         cityName         = "Cairo",
                         countryName      = "Egypt",
                         countryCode      = "EG",
@@ -41,6 +43,8 @@ class FavouriteViewModel : ViewModel() {
                         iconUrl          = null
                     ),
                     FavoriteLocationStat(
+                        lat = 0.0,
+                        lon=0.0,
                         cityName         = "London",
                         countryName      = "United Kingdom",
                         countryCode      = "UK",
@@ -51,6 +55,7 @@ class FavouriteViewModel : ViewModel() {
                         humidity         = 82,
                         windSpeed        = 7.0,
                         iconUrl          = null
+
                     )
                 )
                 _uiState.value = UiState.Success(FavouriteState(favourites = mockData))

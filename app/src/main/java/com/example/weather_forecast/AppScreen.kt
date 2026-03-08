@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import androidx.navigation.toRoute
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.presentation.AlertScreen
@@ -167,16 +168,21 @@ fun AppScreen(
                             uiState       = uiState,
                             onAddLocation = {
                                 mapPickerViewModel.clearPin()
-                                navController.navigate(NavigationRoutes.MapPickerRoute)
+                                val lat = location?.latitude ?: 30.0444
+                                val lon = location?.longitude ?: 31.2357
+                                navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon))
                             },
-                            onNavigateToDetails = {
-                                navController.navigate(NavigationRoutes.FavouriteDetailsRoute)
-                            }
-                        )
+
+                        ){ lat , lon ->
+                            navController.navigate(
+                                NavigationRoutes.FavouriteDetailsRoute(lat ,lon)
+                            )
+                        }
                     }
 
 
                     composable<NavigationRoutes.MapPickerRoute> {
+                        val route        = it.toRoute<NavigationRoutes.MapPickerRoute>()
                         val pickedLatLng by mapPickerViewModel.pickedLatLng.collectAsStateWithLifecycle()
                         val pickedName   by mapPickerViewModel.pickedName.collectAsStateWithLifecycle()
                         val addState     by mapPickerViewModel.addState.collectAsStateWithLifecycle()
@@ -190,9 +196,7 @@ fun AppScreen(
                             }
                         }
 
-                        val userLatLng = remember(location) {
-                            LatLng(location?.latitude ?: 30.0444, location?.longitude ?: 31.2357)
-                        }
+                        val userLatLng = remember { LatLng(route.lat, route.lon) }
 
                         val cameraState = rememberCameraPositionState {
                             position = CameraPosition.fromLatLngZoom(userLatLng, 12f)
@@ -219,7 +223,6 @@ fun AppScreen(
                             onClearPin       = { mapPickerViewModel.clearPin() },
                             onLocationPicked = { lat, lng, name ->
                                 mapPickerViewModel.onLocationPicked(lat, lng, name, favouriteViewModel)
-
                             },
                             onDismiss = {
                                 mapPickerViewModel.clearPin()
@@ -234,8 +237,10 @@ fun AppScreen(
                     composable<NavigationRoutes.SettingsRoute> {
                         SettingsScreen(modifier = Modifier.padding(innerPadding))
                     }
-                    composable<NavigationRoutes.FavouriteDetailsRoute> {
-                        FavouriteDetailsScreen(modifier = Modifier.padding(innerPadding))
+                    composable<NavigationRoutes.FavouriteDetailsRoute> {it->
+                        val lat =  it.toRoute<NavigationRoutes.FavouriteDetailsRoute>().lat
+                        val lon = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>().lon
+                        FavouriteDetailsScreen(lat = lat , lon = lon ,modifier = Modifier.padding(innerPadding))
                     }
                 }
             }

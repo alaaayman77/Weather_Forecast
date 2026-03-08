@@ -33,7 +33,7 @@ fun FavouriteScreen(
     modifier: Modifier,
     uiState: UiState<FavouriteState>,
     onAddLocation: () -> Unit,
-    onNavigateToDetails: (FavoriteLocationStat) -> Unit,
+    onNavigateToDetails: (Double , Double) -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         when (val state = uiState) {
@@ -78,7 +78,7 @@ fun FavouriteScreen(
 fun FavouriteScreenContent(
     favourites: List<FavoriteLocationStat>,
     onRemove: (FavoriteLocationStat) -> Unit,
-    onNavigateToDetails : (FavoriteLocationStat)-> Unit
+    onNavigateToDetails : (Double , Double)-> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -96,7 +96,7 @@ fun FavouriteScreenContent(
                 FavouriteLocationItem(
                     item     = item,
                     onRemove = { onRemove(item) },
-                    onNavigateToDetails = {onNavigateToDetails(item)}
+                    onNavigateToDetails = onNavigateToDetails
                 )
             }
         }

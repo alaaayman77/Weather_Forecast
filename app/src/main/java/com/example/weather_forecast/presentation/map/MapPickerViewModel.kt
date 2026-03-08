@@ -112,6 +112,8 @@ class MapPickerViewModel(
                         val daily   = body.daily.firstOrNull()
 
                         val item = FavoriteLocationStat(
+                            lat = body.lat,
+                            lon = body.lon,
                             cityName         = cityName,
                             countryName      = countryName,
                             countryCode      = countryCode,

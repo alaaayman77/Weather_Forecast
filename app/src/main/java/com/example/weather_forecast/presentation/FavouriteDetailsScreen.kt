@@ -7,12 +7,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun FavouriteDetailsScreen(modifier : Modifier){
-    Box (modifier = modifier
-
-    ){
+fun FavouriteDetailsScreen(
+    modifier: Modifier,
+    lat: Double,
+    lon: Double
+) {
+    Box(modifier = modifier) {
         Text(
-            text = "Favourite Details Screen",
+            text  = "Favourite Details Screen\n$lat, $lon",
             style = MaterialTheme.typography.headlineLarge
         )
     }
