@@ -18,7 +18,7 @@ import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
-import com.example.weather_forecast.presentation.AlertScreen
+import com.example.weather_forecast.presentation.alerts.AlertScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsScreen
 import com.example.weather_forecast.presentation.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen

@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.weather_forecast.data.WeatherRepository
-import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.presentation.weather.UiState

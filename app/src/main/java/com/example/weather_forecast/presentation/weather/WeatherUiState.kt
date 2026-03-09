@@ -1,6 +1,6 @@
 package com.example.weather_forecast.presentation.weather
 
-import com.example.weather_forecast.data.models.FavoriteLocationStat
+
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.OneCallResponse
 
