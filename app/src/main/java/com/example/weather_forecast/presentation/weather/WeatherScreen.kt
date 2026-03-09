@@ -42,7 +42,8 @@ fun WeatherScreen(
     uiState: UiState<WeatherState>,
     location: Location?,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()
+          .statusBarsPadding()) {
         when (val state =uiState) {
             is UiState.Idle,
             is UiState.Loading -> {
