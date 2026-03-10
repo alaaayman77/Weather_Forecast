@@ -31,10 +31,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.weather_forecast.data.models.AlertItem
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
@@ -170,34 +168,7 @@ private fun ActiveAlertsContent(
     ) {
 
 
-        when (weatherAlertsState) {
-            is UiState.Idle,
-            is UiState.Loading -> item {
-                Box(Modifier.fillMaxWidth().padding(24.dp), Alignment.Center) {
-                    CircularProgressIndicator(color = Color(0xFF1E88E5), strokeWidth = 2.dp)
-                }
-            }
-            is UiState.Error -> item {
-                ErrorCard(message = weatherAlertsState.message, onRetry = onRetry)
-            }
-            is UiState.Success -> {
-                val alerts = weatherAlertsState.data
-                if (alerts.isEmpty()) {
-                    item {
-                        InfoCard(
-                            icon     = Icons.Default.Notifications,
-                            color    = Color(0xFF42A5F5),
-                            title    = "No active weather warnings",
-                            subtitle = "Conditions look clear for your area"
-                        )
-                    }
-                } else {
-                    items(alerts, key = { it.event + it.start }) { alert ->
-                        OWMAlertCard(alert = alert)
-                    }
-                }
-            }
-        }
+
 
         item {
             Spacer(Modifier.height(4.dp))

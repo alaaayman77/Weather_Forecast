@@ -1,6 +1,6 @@
 package com.example.weather_forecast.navigation
 
-import com.example.weather_forecast.data.models.FavoriteLocationStat
+
 import kotlinx.serialization.Serializable
 
 sealed class NavigationRoutes {

@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.presentation.favourite.components.FavouriteLocationItem
 import com.example.weather_forecast.presentation.weather.FavouriteState
 import com.example.weather_forecast.presentation.weather.UiState
@@ -80,7 +79,7 @@ fun FavouriteScreen(
 @Composable
 fun FavouriteScreenContent(
     favourites: List<FavouriteEntity>,
-    onRemove: (FavoriteLocationStat) -> Unit,
+    onRemove: () -> Unit,
     onNavigateToDetails : (Double , Double)-> Unit
 ) {
     LazyColumn(

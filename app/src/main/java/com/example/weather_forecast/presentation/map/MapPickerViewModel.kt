@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
-import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.weather.UiState

@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.R
-import com.example.weather_forecast.data.models.FavoriteLocationStat
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.ui.theme.lightGray
 
