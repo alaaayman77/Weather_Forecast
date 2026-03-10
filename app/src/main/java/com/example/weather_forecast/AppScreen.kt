@@ -22,6 +22,7 @@ import com.example.weather_forecast.presentation.alerts.AlertScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsScreen
 import com.example.weather_forecast.presentation.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen
+import com.example.weather_forecast.presentation.alerts.AlertViewModel
 import com.example.weather_forecast.presentation.favourite.FavouriteScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.MapPickerScreen
@@ -30,6 +31,7 @@ import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.permission.*
 import com.example.weather_forecast.presentation.weather.*
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
+import com.example.weather_forecast.utils.NotificationPermissionHandler
 import com.example.weather_forecast.utils.PermissionHandler
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -41,9 +43,11 @@ fun AppScreen(
     weatherViewModel: WeatherViewModel,
     permissionViewModel: PermissionViewModel,
     permissionHandler: PermissionHandler,
+    notificationPermissionHandler : NotificationPermissionHandler,
     favouriteViewModel: FavouriteViewModel,
     mapPickerViewModel : MapPickerViewModel,
     favouriteDetailsViewModel: FavouriteDetailsViewModel,
+    alertViewModel : AlertViewModel,
 ) {
     val navController : NavHostController  = rememberNavController()
     val context         = LocalContext.current
@@ -60,7 +64,9 @@ fun AppScreen(
 
 
     val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
-
+    LaunchedEffect(Unit) {
+        notificationPermissionHandler.requestIfNeeded()
+    }
 
     Weather_ForecastTheme {
         Box(
@@ -234,7 +240,40 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.AlertRoute> {
-                        AlertScreen(modifier = Modifier.padding(innerPadding))
+                        val weatherAlertsState by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle()
+                        val scheduledAlerts    by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
+                        val selectedTab        by alertViewModel.selectedTab.collectAsStateWithLifecycle()
+                        val showBottomSheet    by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
+                        val showPermDialog     by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
+
+                        LaunchedEffect(location) {
+                            val lat = location?.latitude  ?: 0.0
+                            val lon = location?.longitude ?: 0.0
+                            if (lat != 0.0 && lon != 0.0) alertViewModel.fetchWeatherAlerts(lat, lon)
+                        }
+
+                        AlertScreen(
+                            modifier            = Modifier.padding(innerPadding),
+                            weatherAlertsState  = weatherAlertsState,
+                            scheduledAlerts     = scheduledAlerts,
+                            selectedTab         = selectedTab,
+                            showBottomSheet     = showBottomSheet,
+                            showPermDialog      = showPermDialog,
+                            canScheduleExact    = alertViewModel.canScheduleExactAlarms(),
+                            onRetry             = {
+                                val lat = location?.latitude  ?: 0.0
+                                val lon = location?.longitude ?: 0.0
+                                alertViewModel.fetchWeatherAlerts(lat, lon)
+                            },
+                            onCancelAlert       = { alertViewModel.cancelAlert(it) },
+                            onScheduleAlert     = { type, startMillis, endMillis, startLabel, endLabel ->
+                                alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel)
+                            },
+                            onTabSelected       = { alertViewModel.onTabSelected(it) },
+                            onFabClicked        = { alertViewModel.onFabClicked() },
+                            onDismissSheet      = { alertViewModel.onDismissBottomSheet() },
+                            onDismissPermDialog = { alertViewModel.onDismissPermDialog() }
+                        )
                     }
                     composable<NavigationRoutes.SettingsRoute> {
                         SettingsScreen(modifier = Modifier.padding(innerPadding))

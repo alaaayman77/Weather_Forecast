@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Exact alarms -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- Required for foreground service + notifications -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,9 +25,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Weather_Forecast">
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCJLsLgqW_MrzD7861dn16hNxVpfxCqxfU" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -23,10 +37,32 @@
             android:theme="@style/Theme.Weather_Forecast">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!--
+            BroadcastReceiver fired by AlarmManager at the exact scheduled time.
+            Must be registered here or Android will silently drop the broadcast.
+        -->
+        <receiver
+            android:name=".presentation.alerts.AlertReceiver"
+            android:exported="false" />
+
+        <!--
+            Foreground service that plays sound / vibrates / shows notification.
+            foregroundServiceType="specialUse" is required on Android 14+
+            when the service does alarm-style work.
+        -->
+        <service
+            android:name=".presentation.alerts.AlertNotificationService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="alarm" />
+        </service>
+
     </application>
 
 </manifest>

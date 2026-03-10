@@ -1,7 +1,5 @@
 package com.example.weather_forecast.data.models
 
-import com.example.weather_forecast.presentation.alerts.AlertType
-
 data class AlertItem(
     val id         : Int,
     val type       : AlertType,

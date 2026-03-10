@@ -1,20 +1,20 @@
 package com.example.weather_forecast.presentation.alerts
 
 import android.app.TimePickerDialog
-import androidx.compose.animation.AnimatedVisibility
+import android.os.Build
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Warning
@@ -34,61 +34,55 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weather_forecast.presentation.alerts.components.AlertTypeCard
-import java.util.Calendar
-
-
-private enum class AlertTab(val label: String, val icon: ImageVector) {
-    ACTIVE("Active", Icons.Default.Notifications),
-    HISTORY("History", Icons.Default.Home)
-}
-
- enum class AlertType(
-    val label: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val color: Color
-) {
-    NOTIFICATION(
-        label    = "Notification",
-        subtitle = "Silent push alert",
-        icon     = Icons.Default.Notifications,
-        color    = Color(0xFF42A5F5)
-    ),
-    ALERT(
-        label    = "Alert",
-        subtitle = "Sound + vibration",
-        icon     = Icons.Outlined.Warning,
-        color    = Color(0xFFFF7043)
-    )
-}
-
-
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertTab
+import com.example.weather_forecast.data.models.AlertType
+import com.example.weather_forecast.data.models.WeatherAlert
+import com.example.weather_forecast.presentation.alerts.components.SectionHeader
+import com.example.weather_forecast.presentation.weather.UiState
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlertScreen(modifier: Modifier = Modifier) {
+fun AlertScreen(
+    modifier          : Modifier  = Modifier,
+    weatherAlertsState: UiState<List<WeatherAlert>>,
+    scheduledAlerts   : List<AlertItem>,
+    selectedTab       : AlertTab,
+    showBottomSheet   : Boolean,
+    showPermDialog    : Boolean,
+    canScheduleExact  : Boolean,
+    onRetry           : () -> Unit,
+    onCancelAlert     : (AlertItem) -> Unit,
+    onScheduleAlert   : (AlertType, Long, Long, String, String) -> Unit,
+    onTabSelected     : (AlertTab) -> Unit,
+    onFabClicked      : () -> Unit,
+    onDismissSheet    : () -> Unit,
+    onDismissPermDialog: () -> Unit
+) {
+    val context    = LocalContext.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    var selectedTab      by remember { mutableStateOf(AlertTab.ACTIVE) }
-    var showBottomSheet  by remember { mutableStateOf(false) }
-    val sheetState       = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    Box(modifier = modifier.fillMaxSize().statusBarsPadding()) {
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-    ) {
         Column(modifier = Modifier.fillMaxSize()) {
             AlertTabRow(
                 selectedTab   = selectedTab,
-                onTabSelected = { selectedTab = it }
+                onTabSelected = onTabSelected
             )
-            AnimatedVisibility(
-                visible = true,
-                enter   = fadeIn(tween(300)) + slideInVertically(tween(400)) { it / 4 },
-                exit    = fadeOut()
-            ) {
-                EmptyStateContent(tab = selectedTab)
+
+            when (selectedTab) {
+                AlertTab.ACTIVE -> ActiveAlertsContent(
+                    weatherAlertsState = weatherAlertsState,
+                    scheduledAlerts    = scheduledAlerts,
+                    onCancelScheduled  = onCancelAlert,
+                    onRetry            = onRetry
+                )
+                AlertTab.HISTORY -> EmptyStateContent(
+                    message = "Your past alerts will appear here once\nyou've set up and triggered alerts."
+                )
             }
         }
 
@@ -96,17 +90,44 @@ fun AlertScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 16.dp, bottom = 16.dp),
-            onClick  = { showBottomSheet = true }
+            onClick  = onFabClicked
+        )
+    }
+
+    if (showPermDialog) {
+        AlertDialog(
+            onDismissRequest = onDismissPermDialog,
+            title = { Text("Permission needed") },
+            text  = {
+                Text(
+                    "To fire alerts at exact times, allow 'Alarms & Reminders' " +
+                            "in Settings → Apps → Special app access."
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDismissPermDialog()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                        context.startActivity(
+                            android.content.Intent(
+                                android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+                            )
+                        )
+                }) { Text("Open Settings") }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissPermDialog) { Text("Cancel") }
+            }
         )
     }
 
     if (showBottomSheet) {
         ModalBottomSheet(
-            onDismissRequest  = { showBottomSheet = false },
-            sheetState        = sheetState,
-            containerColor    = Color(0xFFF0F6FF),
-            shape             = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            dragHandle        = {
+            onDismissRequest = onDismissSheet,
+            sheetState       = sheetState,
+            containerColor   = Color(0xFFF0F6FF),
+            shape            = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+            dragHandle       = {
                 Box(
                     modifier = Modifier
                         .padding(top = 12.dp, bottom = 4.dp)
@@ -118,8 +139,276 @@ fun AlertScreen(modifier: Modifier = Modifier) {
             }
         ) {
             AddAlertSheetContent(
-                onDismiss = { showBottomSheet = false },
-                onSave    = { showBottomSheet = false }
+                onDismiss = onDismissSheet,
+                onSave    = { type, sH, sM, eH, eM, sLbl, eLbl ->
+                    onScheduleAlert(
+                        type,
+                        AlertScheduler.toEpochMillis(sH, sM),
+                        AlertScheduler.toEpochMillis(eH, eM),
+                        sLbl,
+                        eLbl
+                    )
+                }
+            )
+        }
+    }
+}
+
+
+
+@Composable
+private fun ActiveAlertsContent(
+    weatherAlertsState: UiState<List<WeatherAlert>>,
+    scheduledAlerts   : List<AlertItem>,
+    onCancelScheduled : (AlertItem) -> Unit,
+    onRetry           : () -> Unit
+) {
+    LazyColumn(
+        modifier            = Modifier.fillMaxSize(),
+        contentPadding      = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+
+
+        when (weatherAlertsState) {
+            is UiState.Idle,
+            is UiState.Loading -> item {
+                Box(Modifier.fillMaxWidth().padding(24.dp), Alignment.Center) {
+                    CircularProgressIndicator(color = Color(0xFF1E88E5), strokeWidth = 2.dp)
+                }
+            }
+            is UiState.Error -> item {
+                ErrorCard(message = weatherAlertsState.message, onRetry = onRetry)
+            }
+            is UiState.Success -> {
+                val alerts = weatherAlertsState.data
+                if (alerts.isEmpty()) {
+                    item {
+                        InfoCard(
+                            icon     = Icons.Default.Notifications,
+                            color    = Color(0xFF42A5F5),
+                            title    = "No active weather warnings",
+                            subtitle = "Conditions look clear for your area"
+                        )
+                    }
+                } else {
+                    items(alerts, key = { it.event + it.start }) { alert ->
+                        OWMAlertCard(alert = alert)
+                    }
+                }
+            }
+        }
+
+        item {
+            Spacer(Modifier.height(4.dp))
+            SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
+        }
+
+        if (scheduledAlerts.isEmpty()) {
+            item {
+                InfoCard(
+                    icon     = Icons.Default.Home,
+                    color    = Color(0xFF90A4AE),
+                    title    = "No scheduled alerts",
+                    subtitle = "Tap + to add one"
+                )
+            }
+        } else {
+            items(scheduledAlerts, key = { it.id }) { item ->
+                ScheduledAlertCard(item = item, onCancel = { onCancelScheduled(item) })
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun OWMAlertCard(alert: WeatherAlert) {
+    val fmt      = remember { SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()) }
+    var expanded by remember { mutableStateOf(false) }
+
+    Surface(
+        shape           = RoundedCornerShape(16.dp),
+        color           = Color(0xFFFFF3E0),
+        shadowElevation = 3.dp,
+        modifier        = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(10.dp).clip(CircleShape).background(Color(0xFFFF7043)))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text     = alert.event,
+                    style    = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold, color = Color(0xFF7B3900)
+                    ),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text  = "By: ${alert.senderName}",
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = Color(0xFFBF6B00), fontSize = 11.sp
+                )
+            )
+            Spacer(Modifier.height(6.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                TimeChip("From",  fmt.format(Date(alert.start * 1000L)))
+                TimeChip("Until", fmt.format(Date(alert.end   * 1000L)))
+            }
+            if (alert.description.isNotBlank()) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text  = if (expanded) alert.description
+                    else alert.description.take(120) +
+                            if (alert.description.length > 120) "…" else "",
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = Color(0xFF5D3200), fontSize = 12.sp, lineHeight = 18.sp
+                    )
+                )
+                if (alert.description.length > 120) {
+                    Text(
+                        text     = if (expanded) "Show less" else "Read more",
+                        style    = MaterialTheme.typography.labelSmall.copy(
+                            color = Color(0xFFFF7043), fontWeight = FontWeight.SemiBold
+                        ),
+                        modifier = Modifier.padding(top = 4.dp).clickable { expanded = !expanded }
+                    )
+                }
+            }
+            if (alert.tags.isNotEmpty()) {
+                Spacer(Modifier.height(6.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    alert.tags.take(3).forEach { tag ->
+                        Surface(shape = RoundedCornerShape(50), color = Color(0xFFFFCC80)) {
+                            Text(
+                                text     = tag,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                style    = MaterialTheme.typography.labelSmall.copy(
+                                    color = Color(0xFF7B3900), fontSize = 10.sp
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimeChip(label: String, time: String) {
+    Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFE0B2)) {
+        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+            Text(label, style = MaterialTheme.typography.labelSmall.copy(
+                color = Color(0xFFBF6B00), fontSize = 9.sp))
+            Text(time, style = MaterialTheme.typography.labelSmall.copy(
+                color = Color(0xFF7B3900), fontWeight = FontWeight.Bold, fontSize = 11.sp))
+        }
+    }
+}
+
+
+
+@Composable
+private fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
+    Surface(
+        shape           = RoundedCornerShape(16.dp),
+        color           = Color.White.copy(alpha = 0.85f),
+        shadowElevation = 4.dp,
+        modifier        = Modifier.fillMaxWidth()
+    ) {
+        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(item.type.color.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(item.type.icon, null, tint = item.type.color, modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(item.type.label, style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Bold, color = Color(0xFF0D2B4E)))
+                Text(item.label, style = MaterialTheme.typography.bodySmall.copy(
+                    color = Color(0xFF5B7FA6), fontSize = 12.sp))
+            }
+            IconButton(onClick = onCancel) {
+                Icon(Icons.Default.Delete, "Cancel alert", tint = Color(0xFFE53935))
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoCard(icon: ImageVector, color: Color, title: String, subtitle: String) {
+    Surface(shape = RoundedCornerShape(14.dp), color = Color.White.copy(alpha = 0.7f)) {
+        Row(
+            modifier          = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon, null, tint = color, modifier = Modifier.size(28.dp))
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(title, style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.SemiBold, color = Color(0xFF0D2B4E)))
+                Text(subtitle, style = MaterialTheme.typography.bodySmall.copy(
+                    color = Color(0xFF5B7FA6), fontSize = 12.sp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ErrorCard(message: String, onRetry: () -> Unit) {
+    Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFEBEE)) {
+        Row(
+            modifier          = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Outlined.Warning, null,
+                tint = Color(0xFFE53935), modifier = Modifier.size(24.dp))
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Failed to load alerts", style = MaterialTheme.typography.labelLarge.copy(
+                    color = Color(0xFFB71C1C), fontWeight = FontWeight.Bold))
+                Text(message, style = MaterialTheme.typography.bodySmall.copy(
+                    color = Color(0xFFE53935), fontSize = 11.sp))
+            }
+            TextButton(onClick = onRetry) { Text("Retry", color = Color(0xFFE53935)) }
+        }
+    }
+}
+
+@Composable
+private fun EmptyStateContent(message: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier            = Modifier.padding(horizontal = 40.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB)))
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Notifications, null,
+                    modifier = Modifier.size(44.dp), tint = Color(0xFF42A5F5))
+            }
+            Text(
+                text      = message,
+                style     = MaterialTheme.typography.bodyMedium.copy(
+                    color = Color(0xFF8FA4B8), fontSize = 14.sp, lineHeight = 21.sp
+                ),
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -129,29 +418,26 @@ fun AlertScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun AddAlertSheetContent(
     onDismiss: () -> Unit,
-    onSave: () -> Unit
+    onSave   : (AlertType, Int, Int, Int, Int, String, String) -> Unit
 ) {
-    val context         = LocalContext.current
-    var selectedType    by remember { mutableStateOf(AlertType.NOTIFICATION) }
-    var startTime       by remember { mutableStateOf("") }
-    var endTime         by remember { mutableStateOf("") }
-    var startError      by remember { mutableStateOf(false) }
-    var endError        by remember { mutableStateOf(false) }
+    val context     = LocalContext.current
+    var selType     by remember { mutableStateOf(AlertType.NOTIFICATION) }
+    var startHour   by remember { mutableStateOf(-1) }
+    var startMinute by remember { mutableStateOf(-1) }
+    var endHour     by remember { mutableStateOf(-1) }
+    var endMinute   by remember { mutableStateOf(-1) }
+    var startLabel  by remember { mutableStateOf("") }
+    var endLabel    by remember { mutableStateOf("") }
+    var startError  by remember { mutableStateOf(false) }
+    var endError    by remember { mutableStateOf(false) }
 
-    fun showTimePicker(onTimeSelected: (String) -> Unit) {
+    fun showPicker(onPicked: (Int, Int, String) -> Unit) {
         val cal = Calendar.getInstance()
-        TimePickerDialog(
-            context,
-            { _, hour, minute ->
-                val amPm  = if (hour < 12) "AM" else "PM"
-                val h     = if (hour % 12 == 0) 12 else hour % 12
-                val m     = minute.toString().padStart(2, '0')
-                onTimeSelected("$h:$m $amPm")
-            },
-            cal.get(Calendar.HOUR_OF_DAY),
-            cal.get(Calendar.MINUTE),
-            false
-        ).show()
+        TimePickerDialog(context, { _, h, m ->
+            val amPm = if (h < 12) "AM" else "PM"
+            val hr   = if (h % 12 == 0) 12 else h % 12
+            onPicked(h, m, "$hr:${m.toString().padStart(2, '0')} $amPm")
+        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), false).show()
     }
 
     Column(
@@ -163,156 +449,129 @@ private fun AddAlertSheetContent(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            text  = "New Weather Alert",
+            "New Weather Alert",
             style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize   = 20.sp,
-                color      = Color(0xFF0D2B4E)
+                fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF0D2B4E)
             )
         )
-
         Text(
-            text  = "Alert Type",
+            "Alert Type",
             style = MaterialTheme.typography.labelMedium.copy(
-                color      = Color(0xFF5B7FA6),
-                fontWeight = FontWeight.SemiBold,
-                fontSize   = 12.sp
+                color = Color(0xFF5B7FA6), fontWeight = FontWeight.SemiBold, fontSize = 12.sp
             )
         )
-        Row(
-            modifier            = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             AlertType.entries.forEach { type ->
                 AlertTypeCard(
                     type       = type,
-                    isSelected = selectedType == type,
-                    onClick    = { selectedType = type },
+                    isSelected = selType == type,
+                    onClick    = { selType = type },
                     modifier   = Modifier.weight(1f)
                 )
             }
         }
-
         Text(
-            text  = "Time Range",
+            "Time Range",
             style = MaterialTheme.typography.labelMedium.copy(
-                color      = Color(0xFF5B7FA6),
-                fontWeight = FontWeight.SemiBold,
-                fontSize   = 12.sp
+                color = Color(0xFF5B7FA6), fontWeight = FontWeight.SemiBold, fontSize = 12.sp
             )
         )
-        Row(
-            modifier              = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TimePickerField(
-                label    = "Start Time",
-                value    = startTime,
-                hasError = startError,
+                label    = "Start Time", value = startLabel, hasError = startError,
                 onClick  = {
-                    showTimePicker { t ->
-                        startTime  = t
-                        startError = false
+                    showPicker { h, m, l ->
+                        startHour = h; startMinute = m; startLabel = l; startError = false
                     }
                 },
                 modifier = Modifier.weight(1f)
             )
             TimePickerField(
-                label    = "End Time",
-                value    = endTime,
-                hasError = endError,
+                label    = "End Time", value = endLabel, hasError = endError,
                 onClick  = {
-                    showTimePicker { t ->
-                        endTime  = t
-                        endError = false
+                    showPicker { h, m, l ->
+                        endHour = h; endMinute = m; endLabel = l; endError = false
                     }
                 },
                 modifier = Modifier.weight(1f)
             )
         }
-
-        Row(
-            modifier              = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp),
-                shape  = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFF1E88E5)
-                ),
-                border = androidx.compose.foundation.BorderStroke(
-                    width = 1.5.dp,
-                    color = Color(0xFF1E88E5)
-                )
-            ) {
-                Text(
-                    text  = "Cancel",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.SemiBold
-                    )
-                )
-            }
-            //save btn
+                onClick  = onDismiss,
+                modifier = Modifier.weight(1f).height(50.dp),
+                shape    = RoundedCornerShape(14.dp),
+                colors   = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1E88E5)),
+                border   = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF1E88E5))
+            ) { Text("Cancel", fontWeight = FontWeight.SemiBold) }
+
             Button(
                 onClick = {
-                    startError = startTime.isBlank()
-                    endError   = endTime.isBlank()
-                    if (!startError && !endError) onSave()
+                    startError = startHour == -1
+                    endError   = endHour   == -1
+                    if (!startError && !endError)
+                        onSave(selType, startHour, startMinute, endHour, endMinute, startLabel, endLabel)
                 },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(50.dp),
-                shape  = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF1E88E5)
-                ),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-            ) {
-                Text(
-                    text  = "Save Alert",
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color      = Color.White
-                    )
-                )
-            }
+                modifier = Modifier.weight(1f).height(50.dp),
+                shape    = RoundedCornerShape(14.dp),
+                colors   = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+            ) { Text("Save Alert", fontWeight = FontWeight.SemiBold, color = Color.White) }
         }
     }
 }
 
-
-
-
+@Composable
+private fun AlertTypeCard(
+    type: AlertType, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .clip(RoundedCornerShape(14.dp))
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) type.color else Color(0xFFD9E8F7),
+                shape = RoundedCornerShape(14.dp)
+            )
+            .clickable(onClick = onClick),
+        color = if (isSelected) type.color.copy(alpha = 0.12f) else Color.White,
+        shape = RoundedCornerShape(14.dp)
+    ) {
+        Column(
+            modifier            = Modifier.padding(vertical = 14.dp, horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(type.icon, null,
+                tint     = if (isSelected) type.color else Color(0xFF90A4AE),
+                modifier = Modifier.size(26.dp))
+            Text(type.label, style = MaterialTheme.typography.labelLarge.copy(
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                fontSize   = 13.sp,
+                color      = if (isSelected) Color(0xFF0D2B4E) else Color(0xFF90A4AE)))
+            Text(type.subtitle, style = MaterialTheme.typography.bodySmall.copy(
+                fontSize = 10.sp, color = Color(0xFF90A4AE)))
+        }
+    }
+}
 
 @Composable
 private fun TimePickerField(
-    label: String,
-    value: String,
-    hasError: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    label: String, value: String, hasError: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     val borderColor = when {
-        hasError   -> Color(0xFFE53935)
+        hasError           -> Color(0xFFE53935)
         value.isNotBlank() -> Color(0xFF1E88E5)
-        else       -> Color(0xFFD9E8F7)
+        else               -> Color(0xFFD9E8F7)
     }
-    val bgColor = if (value.isNotBlank()) Color(0xFFE3F2FD) else Color.White
-
     Surface(
         modifier = modifier
             .clip(RoundedCornerShape(14.dp))
             .border(
                 width = if (value.isNotBlank() || hasError) 2.dp else 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(14.dp)
+                color = borderColor, shape = RoundedCornerShape(14.dp)
             )
             .clickable(onClick = onClick),
-        color = bgColor,
+        color = if (value.isNotBlank()) Color(0xFFE3F2FD) else Color.White,
         shape = RoundedCornerShape(14.dp)
     ) {
         Column(
@@ -320,50 +579,32 @@ private fun TimePickerField(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
+            Text(label, style = MaterialTheme.typography.bodySmall.copy(
+                color      = if (hasError) Color(0xFFE53935) else Color(0xFF5B7FA6),
+                fontSize   = 11.sp, fontWeight = FontWeight.Medium))
             Text(
-                text  = label,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color    = if (hasError) Color(0xFFE53935) else Color(0xFF5B7FA6),
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            )
-            Text(
-                text  = value.ifBlank { "--:-- --" },
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize   = 18.sp,
-                    color      = if (value.isBlank()) Color(0xFFBBDEFB)
-                    else Color(0xFF0D2B4E)
+                text      = value.ifBlank { "--:-- --" },
+                style     = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold, fontSize = 18.sp,
+                    color      = if (value.isBlank()) Color(0xFFBBDEFB) else Color(0xFF0D2B4E)
                 ),
                 textAlign = TextAlign.Center
             )
-            if (hasError) {
-                Text(
-                    text  = "Required",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color    = Color(0xFFE53935),
-                        fontSize = 10.sp
-                    )
-                )
-            }
+            if (hasError) Text("Required", style = MaterialTheme.typography.bodySmall.copy(
+                color = Color(0xFFE53935), fontSize = 10.sp))
         }
     }
 }
 
 
 @Composable
-private fun AlertTabRow(
-    selectedTab: AlertTab,
-    onTabSelected: (AlertTab) -> Unit
-) {
+private fun AlertTabRow(selectedTab: AlertTab, onTabSelected: (AlertTab) -> Unit) {
     val tabs = AlertTab.entries
-
     TabRow(
         selectedTabIndex = tabs.indexOf(selectedTab),
         containerColor   = Color.Transparent,
         contentColor     = Color.White,
-        indicator        = { tabPositions ->
+        indicator = { tabPositions ->
             Box(
                 modifier = Modifier
                     .tabIndicatorOffset(tabPositions[tabs.indexOf(selectedTab)])
@@ -378,143 +619,37 @@ private fun AlertTabRow(
     ) {
         tabs.forEach { tab ->
             val isSelected = tab == selectedTab
-            val iconAlpha by animateFloatAsState(
-                targetValue    = if (isSelected) 1f else 0.45f,
-                animationSpec  = tween(200),
-                label          = "iconAlpha"
+            val iconAlpha  by animateFloatAsState(
+                targetValue   = if (isSelected) 1f else 0.45f,
+                animationSpec = tween(200), label = "alpha"
             )
-            Tab(
-                selected = isSelected,
-                onClick  = { onTabSelected(tab) },
-                modifier = Modifier.height(52.dp)
-            ) {
+            Tab(selected = isSelected, onClick = { onTabSelected(tab) }, modifier = Modifier.height(52.dp)) {
                 Row(
                     verticalAlignment     = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Icon(
-                        imageVector        = tab.icon,
-                        contentDescription = null,
-                        modifier           = Modifier.size(18.dp).alpha(iconAlpha),
-                        tint               = if (isSelected) MaterialTheme.colorScheme.primary else Color.White
-                    )
-                    Text(
-                        text  = tab.label,
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                            fontSize   = 14.sp
-                        ),
-                        color = if (isSelected) MaterialTheme.colorScheme.primary else Color.White
-                    )
+                    Icon(tab.icon, null, Modifier.size(18.dp).alpha(iconAlpha),
+                        tint = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f))
+                    Text(tab.label, style = MaterialTheme.typography.labelLarge.copy(
+                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                        fontSize   = 14.sp),
+                        color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f))
                 }
             }
         }
     }
 }
 
-
 @Composable
-private fun EmptyStateContent(tab: AlertTab) {
-    val isActive = tab == AlertTab.ACTIVE
-    Box(
-        modifier        = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier            = Modifier.padding(horizontal = 40.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB))
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector        = Icons.Default.Notifications,
-                    contentDescription = null,
-                    modifier           = Modifier.size(44.dp),
-                    tint               = Color(0xFF42A5F5)
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text  = if (isActive) "No Active Alerts" else "No Alert History",
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize   = 20.sp,
-                    color      = Color(0xFF1A2B4A)
-                ),
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text  = if (isActive)
-                    "You haven't set up any weather alerts yet.\nTap + to create your first alert."
-                else
-                    "Your past alerts will appear here once\nyou've set up and triggered alerts.",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color      = Color(0xFF8FA4B8),
-                    fontSize   = 14.sp,
-                    lineHeight = 21.sp
-                ),
-                textAlign = TextAlign.Center
-            )
-            if (isActive) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = Color(0xFFE3F2FD)
-                ) {
-                    Text(
-                        text     = "Tap  +  below to add an alert",
-                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp),
-                        style    = MaterialTheme.typography.labelMedium.copy(
-                            color      = Color(0xFF1E88E5),
-                            fontWeight = FontWeight.Medium,
-                            fontSize   = 12.sp
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-private fun AddAlertFab(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
+private fun AddAlertFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
     FloatingActionButton(
         onClick        = onClick,
         modifier       = modifier,
         containerColor = Color(0xFF1E88E5),
         contentColor   = Color.White,
         shape          = CircleShape,
-        elevation      = FloatingActionButtonDefaults.elevation(
-            defaultElevation = 6.dp,
-            pressedElevation = 2.dp
-        )
+        elevation      = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
     ) {
-        Icon(
-            imageVector        = Icons.Filled.Add,
-            contentDescription = "Add Alert",
-            modifier           = Modifier.size(26.dp)
-        )
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun AlertScreenPreview() {
-    MaterialTheme {
-        AlertScreen()
+        Icon(Icons.Filled.Add, "Add Alert", Modifier.size(26.dp))
     }
 }

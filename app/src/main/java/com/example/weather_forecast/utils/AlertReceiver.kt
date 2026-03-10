@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat
+import com.example.weather_forecast.data.models.AlertType
 
 class AlertReceiver : BroadcastReceiver() {
 
@@ -36,5 +37,6 @@ class AlertReceiver : BroadcastReceiver() {
         const val EXTRA_ALERT_TYPE = "extra_alert_type"
         const val EXTRA_LABEL      = "extra_label"
         const val ACTION_DISMISS   = "ACTION_DISMISS_ALERT"
+        const val ACTION_CANCEL = "ACTION_CANCEL_ALERT"
     }
 }

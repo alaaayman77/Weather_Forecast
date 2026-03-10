@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.weather_forecast.presentation.alerts.AlertType
+import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.ui.theme.lightGray
 
 @Composable
