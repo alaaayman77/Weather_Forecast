@@ -37,6 +37,7 @@ import com.example.weather_forecast.data.models.AlertItem
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.WeatherAlert
+import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.SectionHeader
 import com.example.weather_forecast.presentation.weather.UiState
 import java.text.SimpleDateFormat
@@ -93,28 +94,15 @@ fun AlertScreen(
     }
 
     if (showPermDialog) {
-        AlertDialog(
-            onDismissRequest = onDismissPermDialog,
-            title = { Text("Permission needed") },
-            text  = {
-                Text(
-                    "To fire alerts at exact times, allow 'Alarms & Reminders' " +
-                            "in Settings → Apps → Special app access."
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onDismissPermDialog()
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-                        context.startActivity(
-                            android.content.Intent(
-                                android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                            )
+        AlarmPermissionDialog(
+            onDismiss     = onDismissPermDialog,
+            onOpenSettings = {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    context.startActivity(
+                        android.content.Intent(
+                            android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
                         )
-                }) { Text("Open Settings") }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismissPermDialog) { Text("Cancel") }
+                    )
             }
         )
     }
@@ -166,10 +154,6 @@ private fun ActiveAlertsContent(
         contentPadding      = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
-
-
-
         item {
             Spacer(Modifier.height(4.dp))
             SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
