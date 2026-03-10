@@ -5,6 +5,7 @@ import com.example.weather_forecast.data.datasource.local.WeatherLocalDataSource
 import com.example.weather_forecast.data.datasource.remote.WeatherRemoteDataSource
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.OneCallResponse
+import com.example.weather_forecast.data.models.WeatherAlert
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
@@ -27,5 +28,17 @@ class WeatherRepository (context: Context){
     suspend fun getCachedWeather(lat: Double, lon: Double): FavouriteEntity? {
         return localDataSource.getCachedWeather(lat, lon)
     }
-
+    suspend fun getWeatherAlerts(lat: Double, lon: Double, apiKey: String
+    ): Result<List<WeatherAlert>> {
+        return try {
+            val response = remoteDataSource.getWeatherAlerts(lat, lon, apiKey)
+            if (response.isSuccessful) {
+                Result.success(response.body()?.alerts ?: emptyList())
+            } else {
+                Result.failure(Exception("API error ${response.code()}: ${response.message()}"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

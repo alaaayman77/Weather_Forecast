@@ -12,5 +12,7 @@ class WeatherRemoteDataSource {
     suspend fun getOneCallResponse(lat: Double, lon: Double, apiKey: String): Response<OneCallResponse> {
         return weatherService.getOneCallResponse(lat, lon, apiKey)
     }
+    suspend fun getWeatherAlerts(lat: Double, lon: Double, apiKey: String): Response<OneCallResponse> =
+        weatherService.getOneCallResponse(lat = lat, lon= lon, apiKey  = apiKey, exclude = "current,minutely,hourly,daily")
 
 }

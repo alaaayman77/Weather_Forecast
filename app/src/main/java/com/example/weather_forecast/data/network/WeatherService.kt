@@ -13,6 +13,7 @@ interface WeatherService {
             @Query("lat") lat: Double,
             @Query("lon") lon: Double,
             @Query("appid") apiKey: String,
+            @Query("exclude") exclude: String = "minutely"
         ): Response<OneCallResponse>
 
 

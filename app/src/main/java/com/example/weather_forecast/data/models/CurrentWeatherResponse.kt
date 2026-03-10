@@ -10,7 +10,8 @@ data class OneCallResponse(
     val timezone_offset: Int,
     val current: CurrentWeather,
     val hourly: List<HourlyItem>,
-    val daily: List<DailyItem>
+    val daily: List<DailyItem>,
+    val alerts: List<WeatherAlert>
 )
 @Serializable
 data class CurrentWeather(
