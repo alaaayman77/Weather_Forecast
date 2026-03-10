@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -40,7 +39,6 @@ import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.SectionHeader
 import com.example.weather_forecast.presentation.weather.UiState
-import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -178,81 +176,6 @@ private fun ActiveAlertsContent(
 
 
 @Composable
-private fun OWMAlertCard(alert: WeatherAlert) {
-    val fmt      = remember { SimpleDateFormat("MMM d, h:mm a", Locale.getDefault()) }
-    var expanded by remember { mutableStateOf(false) }
-
-    Surface(
-        shape           = RoundedCornerShape(16.dp),
-        color           = Color(0xFFFFF3E0),
-        shadowElevation = 3.dp,
-        modifier        = Modifier.fillMaxWidth()
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(10.dp).clip(CircleShape).background(Color(0xFFFF7043)))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text     = alert.event,
-                    style    = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.Bold, color = Color(0xFF7B3900)
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text  = "By: ${alert.senderName}",
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = Color(0xFFBF6B00), fontSize = 11.sp
-                )
-            )
-            Spacer(Modifier.height(6.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                TimeChip("From",  fmt.format(Date(alert.start * 1000L)))
-                TimeChip("Until", fmt.format(Date(alert.end   * 1000L)))
-            }
-            if (alert.description.isNotBlank()) {
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text  = if (expanded) alert.description
-                    else alert.description.take(120) +
-                            if (alert.description.length > 120) "…" else "",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = Color(0xFF5D3200), fontSize = 12.sp, lineHeight = 18.sp
-                    )
-                )
-                if (alert.description.length > 120) {
-                    Text(
-                        text     = if (expanded) "Show less" else "Read more",
-                        style    = MaterialTheme.typography.labelSmall.copy(
-                            color = Color(0xFFFF7043), fontWeight = FontWeight.SemiBold
-                        ),
-                        modifier = Modifier.padding(top = 4.dp).clickable { expanded = !expanded }
-                    )
-                }
-            }
-            if (alert.tags.isNotEmpty()) {
-                Spacer(Modifier.height(6.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    alert.tags.take(3).forEach { tag ->
-                        Surface(shape = RoundedCornerShape(50), color = Color(0xFFFFCC80)) {
-                            Text(
-                                text     = tag,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                                style    = MaterialTheme.typography.labelSmall.copy(
-                                    color = Color(0xFF7B3900), fontSize = 10.sp
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun TimeChip(label: String, time: String) {
     Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFE0B2)) {
         Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
@@ -317,26 +240,6 @@ private fun InfoCard(icon: ImageVector, color: Color, title: String, subtitle: S
     }
 }
 
-@Composable
-private fun ErrorCard(message: String, onRetry: () -> Unit) {
-    Surface(shape = RoundedCornerShape(14.dp), color = Color(0xFFFFEBEE)) {
-        Row(
-            modifier          = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(Icons.Outlined.Warning, null,
-                tint = Color(0xFFE53935), modifier = Modifier.size(24.dp))
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Failed to load alerts", style = MaterialTheme.typography.labelLarge.copy(
-                    color = Color(0xFFB71C1C), fontWeight = FontWeight.Bold))
-                Text(message, style = MaterialTheme.typography.bodySmall.copy(
-                    color = Color(0xFFE53935), fontSize = 11.sp))
-            }
-            TextButton(onClick = onRetry) { Text("Retry", color = Color(0xFFE53935)) }
-        }
-    }
-}
 
 @Composable
 private fun EmptyStateContent(message: String) {
