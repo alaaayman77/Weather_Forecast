@@ -107,8 +107,6 @@ class AlertNotificationService : Service() {
 
 
     private fun startAlertMode(alertId: Int, alertType: String, label: String) {
-        Log.d(TAG, "startAlertMode id=$alertId")
-
         val dismissIntent    = dismissPendingIntent(alertId, alertType, label)
         val cancelIntent     = cancelPendingIntent(alertId, alertType, label)
         val fullScreenIntent = PendingIntent.getActivity(
@@ -118,34 +116,43 @@ class AlertNotificationService : Service() {
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+
+
         val largeIconBitmap = android.graphics.Bitmap.createBitmap(
             96, 96, android.graphics.Bitmap.Config.ARGB_8888
         )
         android.graphics.Canvas(largeIconBitmap).also { canvas ->
             val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-            paint.color = 0xFFFF5722.toInt()
+
+            paint.color = 0xFF1565C0.toInt()
             canvas.drawCircle(48f, 48f, 48f, paint)
+
+            paint.color = 0xFF1E88E5.toInt()
+            paint.style = android.graphics.Paint.Style.STROKE
+            paint.strokeWidth = 4f
+            canvas.drawCircle(48f, 48f, 38f, paint)
+
+            paint.style     = android.graphics.Paint.Style.FILL
             paint.color     = android.graphics.Color.WHITE
-            paint.textSize  = 62f
+            paint.textSize  = 58f
             paint.textAlign = android.graphics.Paint.Align.CENTER
             paint.typeface  = android.graphics.Typeface.DEFAULT_BOLD
-            canvas.drawText("!", 48f, 72f, paint)
+            canvas.drawText("!", 48f, 70f, paint)
         }
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ALERT)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setLargeIcon(largeIconBitmap)
-
-            .setContentTitle("Weather Alert")
+            .setContentTitle("⚠️ Weather Alert Active")
             .setContentText(label)
-            .setSubText("Tap to view details")
+            .setSubText("Tap for details")
             .setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(label)
-                    .setBigContentTitle("Weather Alert")
+                    .setBigContentTitle("⚠️ Weather Alert Active")
                     .setSummaryText("Active alert for your area")
             )
-            .setColor(0xFFFF5722.toInt())
+            .setColor(0xFF1E88E5.toInt())
             .setColorized(true)
             .setSortKey("0")
             .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -155,18 +162,17 @@ class AlertNotificationService : Service() {
             .setAutoCancel(false)
             .setOnlyAlertOnce(false)
             .setFullScreenIntent(fullScreenIntent, true)
-
             .addAction(
                 NotificationCompat.Action.Builder(
                     R.drawable.ic_launcher_foreground,
-                    "Dismiss",
+                    "✓  Dismiss",
                     dismissIntent
                 ).build()
             )
             .addAction(
                 NotificationCompat.Action.Builder(
                     R.drawable.ic_launcher_foreground,
-                    "Cancel",
+                    "✕  Cancel Alert",
                     cancelIntent
                 ).build()
             )
@@ -178,38 +184,38 @@ class AlertNotificationService : Service() {
             }
 
         startForegroundCompat(alertId, notification)
-
         try { playRingtone() } catch (e: Exception) { Log.e(TAG, "playRingtone: ${e.message}", e) }
         try { vibrate()      } catch (e: Exception) { Log.e(TAG, "vibrate: ${e.message}", e)      }
     }
 
 
 
-    private fun startNotificationMode(alertId: Int, alertType: String, label: String) {
-        Log.d(TAG, "startNotificationMode id=$alertId")
 
+    private fun startNotificationMode(alertId: Int, alertType: String, label: String) {
         val notification = NotificationCompat.Builder(this, CHANNEL_NOTIFICATION)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("Weather Notification")
+            .setSmallIcon(R.drawable.logo)
+            .setContentTitle("🌤️ Weather Update")
             .setContentText(label)
             .setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(label)
-                    .setBigContentTitle("Weather Notification")
-                    .setSummaryText("Tap to dismiss")
+                    .setBigContentTitle("🌤️ Weather Update")
+                    .setSummaryText("Scheduled weather notification")
             )
+            .setColor(0xFF1E88E5.toInt())
+            .setColorized(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
+            .setOngoing(true)
             .setSilent(true)
-            .addAction(0, "Dismiss", dismissPendingIntent(alertId, alertType, label))
+            .addAction(0, "✓  Dismiss",      dismissPendingIntent(alertId, alertType, label))
+            .addAction(0, "✕  Cancel", cancelPendingIntent(alertId, alertType, label))
             .build()
 
         startForegroundCompat(alertId, notification)
 
-        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH)
-        stopSelf()
     }
 
 

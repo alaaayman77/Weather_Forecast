@@ -240,29 +240,31 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.AlertRoute> {
-                        val weatherAlertsState by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle()
+                        val uiState by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
                         val scheduledAlerts    by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
                         val selectedTab        by alertViewModel.selectedTab.collectAsStateWithLifecycle()
                         val showBottomSheet    by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
                         val showPermDialog     by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
 
                         LaunchedEffect(location) {
-                            val lat = location?.latitude  ?: 0.0
-                            val lon = location?.longitude ?: 0.0
+//                            val lat = location?.latitude  ?: 0.0
+//                            val lon = location?.longitude ?: 0.0
+                            val lat = 40.1934
+                            val lon = -85.3864
                             if (lat != 0.0 && lon != 0.0) alertViewModel.fetchWeatherAlerts(lat, lon)
                         }
 
                         AlertScreen(
                             modifier            = Modifier.padding(innerPadding),
-                            weatherAlertsState  = weatherAlertsState,
+                            weatherAlertsState  = uiState,
                             scheduledAlerts     = scheduledAlerts,
                             selectedTab         = selectedTab,
                             showBottomSheet     = showBottomSheet,
                             showPermDialog      = showPermDialog,
                             canScheduleExact    = alertViewModel.canScheduleExactAlarms(),
                             onRetry             = {
-                                val lat = location?.latitude  ?: 0.0
-                                val lon = location?.longitude ?: 0.0
+                                val lat = 40.1934
+                                val lon = -85.3864
                                 alertViewModel.fetchWeatherAlerts(lat, lon)
                             },
                             onCancelAlert       = { alertViewModel.cancelAlert(it) },
