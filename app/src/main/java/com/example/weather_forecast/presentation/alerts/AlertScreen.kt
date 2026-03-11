@@ -36,6 +36,7 @@ import com.example.weather_forecast.data.models.AlertItem
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.WeatherAlert
+import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsContent
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.SectionHeader
 import com.example.weather_forecast.presentation.weather.UiState
@@ -140,57 +141,9 @@ fun AlertScreen(
 
 
 
-@Composable
-private fun ActiveAlertsContent(
-    weatherAlertsState: UiState<List<WeatherAlert>>,
-    scheduledAlerts   : List<AlertItem>,
-    onCancelScheduled : (AlertItem) -> Unit,
-    onRetry           : () -> Unit
-) {
-    LazyColumn(
-        modifier            = Modifier.fillMaxSize(),
-        contentPadding      = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Spacer(Modifier.height(4.dp))
-            SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
-        }
-
-        if (scheduledAlerts.isEmpty()) {
-            item {
-                InfoCard(
-                    icon     = Icons.Default.Home,
-                    color    = Color(0xFF90A4AE),
-                    title    = "No scheduled alerts",
-                    subtitle = "Tap + to add one"
-                )
-            }
-        } else {
-            items(scheduledAlerts, key = { it.id }) { item ->
-                ScheduledAlertCard(item = item, onCancel = { onCancelScheduled(item) })
-            }
-        }
-    }
-}
-
 
 @Composable
-private fun TimeChip(label: String, time: String) {
-    Surface(shape = RoundedCornerShape(8.dp), color = Color(0xFFFFE0B2)) {
-        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-            Text(label, style = MaterialTheme.typography.labelSmall.copy(
-                color = Color(0xFFBF6B00), fontSize = 9.sp))
-            Text(time, style = MaterialTheme.typography.labelSmall.copy(
-                color = Color(0xFF7B3900), fontWeight = FontWeight.Bold, fontSize = 11.sp))
-        }
-    }
-}
-
-
-
-@Composable
-private fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
+ fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
     Surface(
         shape           = RoundedCornerShape(16.dp),
         color           = Color.White.copy(alpha = 0.85f),
@@ -221,24 +174,7 @@ private fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
     }
 }
 
-@Composable
-private fun InfoCard(icon: ImageVector, color: Color, title: String, subtitle: String) {
-    Surface(shape = RoundedCornerShape(14.dp), color = Color.White.copy(alpha = 0.7f)) {
-        Row(
-            modifier          = Modifier.fillMaxWidth().padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(icon, null, tint = color, modifier = Modifier.size(28.dp))
-            Spacer(Modifier.width(12.dp))
-            Column {
-                Text(title, style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.SemiBold, color = Color(0xFF0D2B4E)))
-                Text(subtitle, style = MaterialTheme.typography.bodySmall.copy(
-                    color = Color(0xFF5B7FA6), fontSize = 12.sp))
-            }
-        }
-    }
-}
+
 
 
 @Composable
