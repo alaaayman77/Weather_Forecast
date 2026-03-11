@@ -38,5 +38,7 @@ class AlertReceiver : BroadcastReceiver() {
         const val EXTRA_LABEL      = "extra_label"
         const val ACTION_DISMISS   = "ACTION_DISMISS_ALERT"
         const val ACTION_CANCEL = "ACTION_CANCEL_ALERT"
+        const val ACTION_STATUS_UPDATE = "ACTION_STATUS_UPDATE"
+        const val EXTRA_STATUS         = "extra_status"
     }
 }

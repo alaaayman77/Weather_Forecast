@@ -17,14 +17,15 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.example.weather_forecast.MainActivity
 import com.example.weather_forecast.R
+import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertType
 
 class AlertNotificationService : Service() {
 
-    private var mediaPlayer: MediaPlayer?  = null
+    private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
-    private var currentAlertId  : Int = -1
-    private var currentNotification: Notification? = null
+    private var currentAlertId : Int = -1
+    private var currentNotification : Notification? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -47,8 +48,9 @@ class AlertNotificationService : Service() {
 
                 stopAlarm()
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+                broadcastStatusUpdate(alertId, AlertStatus.DISMISSED.name) //status dismiss
 
-                // reschedule same alert for tomorrow at the same time
+                // re-schedule for tomorrow on dismiss
                 val tomorrowMillis = System.currentTimeMillis() + 24 * 60 * 60 * 1000L
                 AlertScheduler(this).schedule(
                     id              = alertId,
@@ -57,7 +59,6 @@ class AlertNotificationService : Service() {
                     triggerAtMillis = tomorrowMillis
                 )
                 Log.d(TAG, "Dismissed — rescheduled for tomorrow id=$alertId")
-
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -70,6 +71,7 @@ class AlertNotificationService : Service() {
 
                 stopAlarm()
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+                broadcastStatusUpdate(alertId, AlertStatus.CANCELLED.name) //status cancel
 
                 AlertScheduler(this).cancel(
                     id    = alertId,
@@ -77,21 +79,18 @@ class AlertNotificationService : Service() {
                     label = label
                 )
                 Log.d(TAG, "Cancelled entirely id=$alertId")
-
                 stopSelf()
                 return START_NOT_STICKY
             }
         }
 
-
         val alertId = intent?.getIntExtra(AlertReceiver.EXTRA_ALERT_ID, startId) ?: startId
         val alertType = try {
             AlertType.valueOf(
-                intent?.getStringExtra(AlertReceiver.EXTRA_ALERT_TYPE) ?: AlertType.NOTIFICATION.name
+                intent?.getStringExtra(AlertReceiver.EXTRA_ALERT_TYPE)
+                    ?: AlertType.NOTIFICATION.name
             )
-        } catch (e: Exception) {
-            AlertType.NOTIFICATION
-        }
+        } catch (e: Exception) { AlertType.NOTIFICATION }
         val label = intent?.getStringExtra(AlertReceiver.EXTRA_LABEL) ?: "Weather Alert"
         Log.d(TAG, "   alertId=$alertId  type=$alertType  label=$label")
 
@@ -100,15 +99,16 @@ class AlertNotificationService : Service() {
             AlertType.NOTIFICATION -> startNotificationMode(alertId, alertType.name, label)
         }
 
-
         return START_STICKY
     }
 
 
-
     private fun startAlertMode(alertId: Int, alertType: String, label: String) {
+        Log.d(TAG, "startAlertMode id=$alertId")
+
         val dismissIntent    = dismissPendingIntent(alertId, alertType, label)
         val cancelIntent     = cancelPendingIntent(alertId, alertType, label)
+        //navigate to main activity
         val fullScreenIntent = PendingIntent.getActivity(
             this, alertId,
             Intent(this, MainActivity::class.java).apply {
@@ -117,21 +117,17 @@ class AlertNotificationService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-
         val largeIconBitmap = android.graphics.Bitmap.createBitmap(
             96, 96, android.graphics.Bitmap.Config.ARGB_8888
         )
         android.graphics.Canvas(largeIconBitmap).also { canvas ->
             val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-
             paint.color = 0xFF1565C0.toInt()
             canvas.drawCircle(48f, 48f, 48f, paint)
-
-            paint.color = 0xFF1E88E5.toInt()
-            paint.style = android.graphics.Paint.Style.STROKE
+            paint.color       = 0xFF1E88E5.toInt()
+            paint.style       = android.graphics.Paint.Style.STROKE
             paint.strokeWidth = 4f
             canvas.drawCircle(48f, 48f, 38f, paint)
-
             paint.style     = android.graphics.Paint.Style.FILL
             paint.color     = android.graphics.Color.WHITE
             paint.textSize  = 58f
@@ -158,22 +154,18 @@ class AlertNotificationService : Service() {
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setOngoing(true)
+            .setOngoing(true) //can't swipe away
             .setAutoCancel(false)
             .setOnlyAlertOnce(false)
             .setFullScreenIntent(fullScreenIntent, true)
             .addAction(
                 NotificationCompat.Action.Builder(
-                    R.drawable.ic_launcher_foreground,
-                    "✓  Dismiss",
-                    dismissIntent
+                    R.drawable.ic_launcher_foreground, "✓  Dismiss", dismissIntent
                 ).build()
             )
             .addAction(
                 NotificationCompat.Action.Builder(
-                    R.drawable.ic_launcher_foreground,
-                    "✕  Cancel Alert",
-                    cancelIntent
+                    R.drawable.ic_launcher_foreground, "✕  Cancel Alert", cancelIntent
                 ).build()
             )
             .build()
@@ -184,14 +176,16 @@ class AlertNotificationService : Service() {
             }
 
         startForegroundCompat(alertId, notification)
+        broadcastStatusUpdate(alertId, AlertStatus.ACTIVE.name)  //status is active now
+
         try { playRingtone() } catch (e: Exception) { Log.e(TAG, "playRingtone: ${e.message}", e) }
         try { vibrate()      } catch (e: Exception) { Log.e(TAG, "vibrate: ${e.message}", e)      }
     }
 
 
-
-
     private fun startNotificationMode(alertId: Int, alertType: String, label: String) {
+        Log.d(TAG, "startNotificationMode id=$alertId")
+
         val notification = NotificationCompat.Builder(this, CHANNEL_NOTIFICATION)
             .setSmallIcon(R.drawable.logo)
             .setContentTitle("🌤️ Weather Update")
@@ -207,21 +201,30 @@ class AlertNotificationService : Service() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setAutoCancel(false)
             .setOngoing(true)
+            .setAutoCancel(false)
             .setSilent(true)
             .addAction(0, "✓  Dismiss",      dismissPendingIntent(alertId, alertType, label))
-            .addAction(0, "✕  Cancel", cancelPendingIntent(alertId, alertType, label))
+            .addAction(0, "✕  Cancel Alert", cancelPendingIntent(alertId, alertType, label))
             .build()
 
         startForegroundCompat(alertId, notification)
-
+        broadcastStatusUpdate(alertId, AlertStatus.ACTIVE.name)  //status active
     }
 
 
+    private fun broadcastStatusUpdate(alertId: Int, status: String) {
+        val intent = Intent(AlertReceiver.ACTION_STATUS_UPDATE).apply {
+            putExtra(AlertReceiver.EXTRA_ALERT_ID, alertId)
+            putExtra(AlertReceiver.EXTRA_STATUS,   status)
+            setPackage(packageName)
+        }
+        sendBroadcast(intent)
+        Log.d(TAG, "broadcastStatusUpdate id=$alertId status=$status")
+    }
 
     private fun startForegroundCompat(id: Int, notification: Notification) {
-        currentAlertId      = id
+        currentAlertId     = id
         currentNotification = notification
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -235,7 +238,6 @@ class AlertNotificationService : Service() {
         }
     }
 
-    // Re-post notification if app is removed from recents
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         val notification = currentNotification ?: return
@@ -245,12 +247,9 @@ class AlertNotificationService : Service() {
         Log.d(TAG, "onTaskRemoved — re-posted notification id=$currentAlertId")
     }
 
-
-
     private fun playRingtone() {
         val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-        Log.d(TAG, "   Ringtone URI: $uri")
         mediaPlayer = MediaPlayer().apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
@@ -288,50 +287,41 @@ class AlertNotificationService : Service() {
         vibrator = null
     }
 
-    private fun dismissPendingIntent(alertId: Int, alertType: String, label: String): PendingIntent {
-        val intent = Intent(this, AlertNotificationService::class.java).apply {
-            action = AlertReceiver.ACTION_DISMISS
-            putExtra(AlertReceiver.EXTRA_ALERT_ID,   alertId)
-            putExtra(AlertReceiver.EXTRA_ALERT_TYPE, alertType)
-            putExtra(AlertReceiver.EXTRA_LABEL,      label)
-        }
-        return PendingIntent.getService(
-            this, alertId, intent,
+    private fun dismissPendingIntent(alertId: Int, alertType: String, label: String): PendingIntent =
+        PendingIntent.getService(
+            this, alertId,
+            Intent(this, AlertNotificationService::class.java).apply {
+                action = AlertReceiver.ACTION_DISMISS
+                putExtra(AlertReceiver.EXTRA_ALERT_ID,   alertId)
+                putExtra(AlertReceiver.EXTRA_ALERT_TYPE, alertType)
+                putExtra(AlertReceiver.EXTRA_LABEL,      label)
+            },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-    }
 
-    private fun cancelPendingIntent(alertId: Int, alertType: String, label: String): PendingIntent {
-        val intent = Intent(this, AlertNotificationService::class.java).apply {
-            action = AlertReceiver.ACTION_CANCEL
-            putExtra(AlertReceiver.EXTRA_ALERT_ID,   alertId)
-            putExtra(AlertReceiver.EXTRA_ALERT_TYPE, alertType)
-            putExtra(AlertReceiver.EXTRA_LABEL,      label)
-        }
-        return PendingIntent.getService(
-            this, alertId + 200_000, intent,
+    private fun cancelPendingIntent(alertId: Int, alertType: String, label: String): PendingIntent =
+        PendingIntent.getService(
+            this, alertId + 200_000,
+            Intent(this, AlertNotificationService::class.java).apply {
+                action = AlertReceiver.ACTION_CANCEL
+                putExtra(AlertReceiver.EXTRA_ALERT_ID,   alertId)
+                putExtra(AlertReceiver.EXTRA_ALERT_TYPE, alertType)
+                putExtra(AlertReceiver.EXTRA_LABEL,      label)
+            },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-    }
-
-
 
     private fun createNotificationChannels() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-
         nm.deleteNotificationChannel("channel_weather_alert")
         nm.deleteNotificationChannel("channel_weather_notification")
 
         if (nm.getNotificationChannel(CHANNEL_ALERT) == null) {
-            NotificationChannel(
-                CHANNEL_ALERT,
-                "Weather Alerts",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Full-screen alarm notifications with sound"
-                lightColor    = 0xFF5722
+            NotificationChannel(CHANNEL_ALERT, "Weather Alerts", NotificationManager.IMPORTANCE_HIGH).apply {
+                description          = "Full-screen alarm notifications with sound"
+                lightColor           = 0xFF1E88E5.toInt()
                 enableLights(true)
                 setSound(
                     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
@@ -342,22 +332,18 @@ class AlertNotificationService : Service() {
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 nm.createNotificationChannel(this)
             }
-            Log.d(TAG, "Created $CHANNEL_ALERT")
         }
 
         if (nm.getNotificationChannel(CHANNEL_NOTIFICATION) == null) {
-            NotificationChannel(
-                CHANNEL_NOTIFICATION,
-                "Weather Notifications",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
+            NotificationChannel(CHANNEL_NOTIFICATION, "Weather Notifications", NotificationManager.IMPORTANCE_HIGH).apply {
                 description          = "Silent weather alert notifications"
+                lightColor           = 0xFF1E88E5.toInt()
+                enableLights(true)
                 setSound(null, null)
                 enableVibration(false)
                 lockscreenVisibility = Notification.VISIBILITY_PUBLIC
                 nm.createNotificationChannel(this)
             }
-            Log.d(TAG, "Created $CHANNEL_NOTIFICATION")
         }
     }
 
@@ -368,8 +354,8 @@ class AlertNotificationService : Service() {
     }
 
     companion object {
-        private const val TAG  = "AlertNotifService"
-        const val CHANNEL_ALERT = "channel_weather_alert_v2"
-        const val CHANNEL_NOTIFICATION = "channel_weather_notification_v2"
+        private const val TAG              = "AlertNotifService"
+        const val CHANNEL_ALERT            = "channel_weather_alert_v2"
+        const val CHANNEL_NOTIFICATION     = "channel_weather_notification_v2"
     }
 }
