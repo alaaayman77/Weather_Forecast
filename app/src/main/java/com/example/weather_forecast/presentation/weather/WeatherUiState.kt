@@ -3,9 +3,7 @@ package com.example.weather_forecast.presentation.weather
 
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.OneCallResponse
-
-
-
+import com.example.weather_forecast.data.models.WeatherAlert
 
 
 sealed class UiState<out T> {
@@ -23,4 +21,8 @@ data class WeatherState(
 
 data class FavouriteState(
     val favourites: List<FavouriteEntity> = emptyList()
+)
+
+data class AlertState(
+    val alerts: List<WeatherAlert> = emptyList()
 )

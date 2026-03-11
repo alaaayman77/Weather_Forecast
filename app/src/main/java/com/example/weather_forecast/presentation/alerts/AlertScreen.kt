@@ -32,6 +32,7 @@ import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsContent
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.EmptyStateContent
+import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 import com.example.weather_forecast.ui.theme.lightGray
 import java.util.*
@@ -40,7 +41,7 @@ import java.util.*
 @Composable
 fun AlertScreen(
     modifier          : Modifier  = Modifier,
-    weatherAlertsState: UiState<List<WeatherAlert>>,
+    weatherAlertsState: UiState<AlertState>,
     scheduledAlerts   : List<AlertItem>,
     selectedTab       : AlertTab,
     showBottomSheet   : Boolean,

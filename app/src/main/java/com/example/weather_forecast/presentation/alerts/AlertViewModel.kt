@@ -1,6 +1,7 @@
 package com.example.weather_forecast.presentation.alerts
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.example.weather_forecast.data.models.AlertItem
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.WeatherAlert
+import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,8 +27,8 @@ class AlertViewModel(
     private val scheduler = AlertScheduler(app)
 
 
-    private val _weatherAlertsState = MutableStateFlow<UiState<List<WeatherAlert>>>(UiState.Idle)
-    val weatherAlertsState: StateFlow<UiState<List<WeatherAlert>>> =
+    private val _weatherAlertsState = MutableStateFlow<UiState<AlertState>>(UiState.Idle)
+    val weatherAlertsState: StateFlow<UiState<AlertState>> =
         _weatherAlertsState.asStateFlow()
 
     private val _scheduledAlerts = MutableStateFlow<List<AlertItem>>(emptyList())
@@ -66,7 +68,8 @@ class AlertViewModel(
             _weatherAlertsState.value = UiState.Loading
             weatherRepository.getWeatherAlerts(lat, lon, apiKey)
                 .onSuccess { alerts ->
-                    _weatherAlertsState.value = UiState.Success(alerts)
+                    Log.d("AlertDebug", "Fetched ${alerts.size} alerts: ${alerts.map { it.event }}")
+                    _weatherAlertsState.value = UiState.Success(AlertState(alerts = alerts))
                     alerts.forEach { autoSchedule(it) }
                 }
                 .onFailure { e ->
@@ -109,7 +112,7 @@ class AlertViewModel(
         val id = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
 
 
-        val activeAlerts = (_weatherAlertsState.value as? UiState.Success)?.data ?: emptyList()
+        val activeAlerts = (_weatherAlertsState.value as? UiState.Success)?.data?.alerts ?: emptyList()
 
         val overlappingAlert = activeAlerts.firstOrNull { networkAlert ->
             val alertStart = networkAlert.start * 1000L

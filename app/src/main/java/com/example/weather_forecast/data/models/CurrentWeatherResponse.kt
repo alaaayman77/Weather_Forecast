@@ -2,7 +2,7 @@ package com.example.weather_forecast.data.models
 
 import kotlinx.serialization.Serializable
 
-@Serializable
+
 data class OneCallResponse(
     val lat: Double,
     val lon: Double,
@@ -11,7 +11,7 @@ data class OneCallResponse(
     val current: CurrentWeather,
     val hourly: List<HourlyItem>,
     val daily: List<DailyItem>,
-    val alerts: List<WeatherAlert>
+    val alerts: List<WeatherAlert>  = emptyList()
 )
 @Serializable
 data class CurrentWeather(

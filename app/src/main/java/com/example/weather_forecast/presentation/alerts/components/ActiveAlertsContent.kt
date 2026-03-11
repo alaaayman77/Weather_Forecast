@@ -15,12 +15,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.AlertItem
 import com.example.weather_forecast.data.models.WeatherAlert
+import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 
 
 @Composable
  fun ActiveAlertsContent(
-    weatherAlertsState: UiState<List<WeatherAlert>>,
+    weatherAlertsState: UiState<AlertState>,
     scheduledAlerts   : List<AlertItem>,
     onCancelScheduled : (AlertItem) -> Unit,
     onRetry           : () -> Unit
@@ -43,7 +44,10 @@ import com.example.weather_forecast.presentation.weather.UiState
                 SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
             }
             items(scheduledAlerts, key = { it.id }) { item ->
-                ScheduledAlertCard(item = item, onCancel = { onCancelScheduled(item) })
+                ScheduledAlertCard(
+                    item = item,
+                    onCancel= { onCancelScheduled(item) }
+                )
             }
         }
     }
