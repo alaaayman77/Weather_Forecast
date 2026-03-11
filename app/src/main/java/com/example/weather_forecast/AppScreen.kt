@@ -1,7 +1,10 @@
 package com.example.weather_forecast
 
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -22,6 +25,7 @@ import com.example.weather_forecast.presentation.alerts.AlertScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsScreen
 import com.example.weather_forecast.presentation.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen
+import com.example.weather_forecast.presentation.alerts.AlertReceiver
 import com.example.weather_forecast.presentation.alerts.AlertViewModel
 import com.example.weather_forecast.presentation.favourite.FavouriteScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
@@ -31,6 +35,7 @@ import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.permission.*
 import com.example.weather_forecast.presentation.weather.*
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
+import com.example.weather_forecast.utils.AlertStatusReceiver
 import com.example.weather_forecast.utils.NotificationPermissionHandler
 import com.example.weather_forecast.utils.PermissionHandler
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -240,33 +245,43 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.AlertRoute> {
-                        val uiState by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
-                        val scheduledAlerts    by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
-                        val selectedTab        by alertViewModel.selectedTab.collectAsStateWithLifecycle()
-                        val showBottomSheet    by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
-                        val showPermDialog     by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
+                        val uiState         by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
+                        val scheduledAlerts by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
+                        val selectedTab     by alertViewModel.selectedTab.collectAsStateWithLifecycle()
+                        val showBottomSheet by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
+                        val showPermDialog  by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
+                        val alertStatuses   by alertViewModel.alertStatuses.collectAsStateWithLifecycle()
+
+                        // register status receiver only while on this screen
+                        DisposableEffect(Unit) {
+                            val receiver = AlertStatusReceiver { alertId, status ->
+                                alertViewModel.updateAlertStatus(alertId, status)
+                            }
+                            val filter = IntentFilter(AlertReceiver.ACTION_STATUS_UPDATE)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+                            } else {
+                                context.registerReceiver(receiver, filter)
+                            }
+                            onDispose { context.unregisterReceiver(receiver) }
+                        }
 
                         LaunchedEffect(location) {
-//                            val lat = location?.latitude  ?: 0.0
-//                            val lon = location?.longitude ?: 0.0
                             val lat = 40.1934
                             val lon = -85.3864
-                            if (lat != 0.0 && lon != 0.0) alertViewModel.fetchWeatherAlerts(lat, lon)
+                            alertViewModel.fetchWeatherAlerts(lat, lon)
                         }
 
                         AlertScreen(
                             modifier            = Modifier.padding(innerPadding),
                             weatherAlertsState  = uiState,
                             scheduledAlerts     = scheduledAlerts,
+                            alertStatuses       = alertStatuses,
                             selectedTab         = selectedTab,
                             showBottomSheet     = showBottomSheet,
                             showPermDialog      = showPermDialog,
                             canScheduleExact    = alertViewModel.canScheduleExactAlarms(),
-                            onRetry             = {
-                                val lat = 40.1934
-                                val lon = -85.3864
-                                alertViewModel.fetchWeatherAlerts(lat, lon)
-                            },
+                            onRetry             = { alertViewModel.fetchWeatherAlerts(40.1934, -85.3864) },
                             onCancelAlert       = { alertViewModel.cancelAlert(it) },
                             onScheduleAlert     = { type, startMillis, endMillis, startLabel, endLabel ->
                                 alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel)

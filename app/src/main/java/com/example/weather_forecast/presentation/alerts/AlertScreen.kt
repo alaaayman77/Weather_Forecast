@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.WeatherAlert
@@ -43,6 +44,7 @@ fun AlertScreen(
     modifier          : Modifier  = Modifier,
     weatherAlertsState: UiState<AlertState>,
     scheduledAlerts   : List<AlertItem>,
+    alertStatuses      : Map<Int, AlertStatus>,
     selectedTab       : AlertTab,
     showBottomSheet   : Boolean,
     showPermDialog    : Boolean,
@@ -70,6 +72,7 @@ fun AlertScreen(
                 AlertTab.ACTIVE -> ActiveAlertsContent(
                     weatherAlertsState = weatherAlertsState,
                     scheduledAlerts    = scheduledAlerts,
+                    alertStatuses      = alertStatuses,
                     onCancelScheduled  = onCancelAlert,
                     onRetry            = onRetry
                 )

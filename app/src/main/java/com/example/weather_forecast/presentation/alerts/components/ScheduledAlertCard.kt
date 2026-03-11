@@ -32,14 +32,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.ui.theme.lightGray
 @Composable
-fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
-    val timeRange  = "${formatMillis(item.startMillis)} → ${formatMillis(item.endMillis)}"
-    val duration   = durationLabel(item.startMillis, item.endMillis)
-    val isUpcoming = item.startMillis > System.currentTimeMillis()
-    val statusText = if (isUpcoming) "Scheduled" else "Active"
-    val statusColor = if (isUpcoming) Color(0xFF1E88E5) else Color(0xFF43A047)
+fun ScheduledAlertCard(
+    item    : AlertItem,
+    status  : AlertStatus = AlertStatus.SCHEDULED,
+    onCancel: () -> Unit
+) {
+    val timeRange = "${formatMillis(item.startMillis)} → ${formatMillis(item.endMillis)}"
+    val duration  = durationLabel(item.startMillis, item.endMillis)
+
+    val statusText  = when (status) {
+        AlertStatus.SCHEDULED -> "Scheduled"
+        AlertStatus.ACTIVE    -> "Active"
+        AlertStatus.DISMISSED -> "Dismissed"
+        AlertStatus.CANCELLED -> "Cancelled"
+    }
+    val statusColor = when (status) {
+        AlertStatus.SCHEDULED -> Color.Blue
+        AlertStatus.ACTIVE    -> Color.Green
+        AlertStatus.DISMISSED -> Color.Yellow
+        AlertStatus.CANCELLED -> Color.Red
+    }
 
     Surface(
         shape           = RoundedCornerShape(20.dp),
@@ -49,8 +64,8 @@ fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
 
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
@@ -58,11 +73,7 @@ fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
                         .background(item.type.color.copy(alpha = 0.13f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        item.type.icon, null,
-                        tint     = item.type.color,
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Icon(item.type.icon, null, tint = item.type.color, modifier = Modifier.size(24.dp))
                 }
 
                 Spacer(Modifier.width(12.dp))
@@ -84,7 +95,6 @@ fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
                     )
                 }
 
-
                 Surface(
                     shape = RoundedCornerShape(20.dp),
                     color = statusColor.copy(alpha = 0.12f)
@@ -101,11 +111,7 @@ fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
                 }
 
                 IconButton(onClick = onCancel, modifier = Modifier.size(36.dp)) {
-                    Icon(
-                        Icons.Default.Delete, "Cancel",
-                        tint     = Color(0xFFE53935),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Icon(Icons.Default.Delete, "Cancel", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
                 }
             }
 
@@ -113,54 +119,23 @@ fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
             HorizontalDivider(color = Color(0xFFE3F2FD), thickness = 1.dp)
             Spacer(Modifier.height(12.dp))
 
+
             Row(
                 modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment     = Alignment.CenterVertically
             ) {
-                TimeChip(
-                    label = "Start",
-                    time  = formatMillis(item.startMillis),
-                    color = Color(0xFF1E88E5),
-                    modifier = Modifier.weight(1f)
-                )
+                TimeChip(label = "Start", time = formatMillis(item.startMillis), color = Color(0xFF1E88E5), modifier = Modifier.weight(1f))
+                Icon(Icons.Default.ArrowForward, null, tint = lightGray, modifier = Modifier.size(14.dp))
+                TimeChip(label = "End",   time = formatMillis(item.endMillis),   color = Color(0xFF43A047), modifier = Modifier.weight(1f))
 
-                Icon(
-                    Icons.Default.ArrowForward, null,
-                    tint     = lightGray,
-                    modifier = Modifier.size(14.dp)
-                )
-
-                TimeChip(
-                    label = "End",
-                    time  = formatMillis(item.endMillis),
-                    color = Color(0xFF43A047),
-                    modifier = Modifier.weight(1f)
-                )
-
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFFF0F6FF)
-                ) {
+                Surface(shape = RoundedCornerShape(10.dp), color = Color(0xFFF0F6FF)) {
                     Column(
                         modifier            = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            "Duration",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color    = lightGray,
-                                fontSize = 9.sp
-                            )
-                        )
-                        Text(
-                            duration,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                color      = Color(0xFF0D2B4E),
-                                fontWeight = FontWeight.Bold,
-                                fontSize   = 11.sp
-                            )
-                        )
+                        Text("Duration", style = MaterialTheme.typography.labelSmall.copy(color = lightGray, fontSize = 9.sp))
+                        Text(duration,   style = MaterialTheme.typography.labelMedium.copy(color = Color(0xFF0D2B4E), fontWeight = FontWeight.Bold, fontSize = 11.sp))
                     }
                 }
             }

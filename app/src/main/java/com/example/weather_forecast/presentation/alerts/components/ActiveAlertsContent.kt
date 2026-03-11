@@ -7,13 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
@@ -23,6 +22,7 @@ import com.example.weather_forecast.presentation.weather.UiState
  fun ActiveAlertsContent(
     weatherAlertsState: UiState<AlertState>,
     scheduledAlerts   : List<AlertItem>,
+    alertStatuses      : Map<Int, AlertStatus>,
     onCancelScheduled : (AlertItem) -> Unit,
     onRetry           : () -> Unit
 ) {
@@ -46,6 +46,7 @@ import com.example.weather_forecast.presentation.weather.UiState
             items(scheduledAlerts, key = { it.id }) { item ->
                 ScheduledAlertCard(
                     item = item,
+                    status   = alertStatuses[item.id] ?: AlertStatus.SCHEDULED,
                     onCancel= { onCancelScheduled(item) }
                 )
             }
