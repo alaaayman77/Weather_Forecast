@@ -33,6 +33,7 @@ import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsC
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.EmptyStateContent
 import com.example.weather_forecast.presentation.weather.UiState
+import com.example.weather_forecast.ui.theme.lightGray
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,13 +119,13 @@ fun AlertScreen(
         ) {
             AddAlertSheetContent(
                 onDismiss = onDismissSheet,
-                onSave    = { type, sH, sM, eH, eM, sLbl, eLbl ->
+                onSave    = { type, startHour, startMinute, endHour, endMinute, startLabel, endLabel ->
                     onScheduleAlert(
                         type,
-                        AlertScheduler.toEpochMillis(sH, sM),
-                        AlertScheduler.toEpochMillis(eH, eM),
-                        sLbl,
-                        eLbl
+                        AlertScheduler.toEpochMillis(startHour, startMinute),
+                        AlertScheduler.toEpochMillis(endHour, endMinute),
+                        startLabel,
+                        endLabel
                     )
                 }
             )
@@ -140,7 +141,7 @@ fun AlertScreen(
 
 
 @Composable
-private fun AddAlertSheetContent(
+ fun AddAlertSheetContent(
     onDismiss: () -> Unit,
     onSave   : (AlertType, Int, Int, Int, Int, String, String) -> Unit
 ) {
@@ -175,13 +176,13 @@ private fun AddAlertSheetContent(
         Text(
             "New Weather Alert",
             style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF0D2B4E)
+                 color = MaterialTheme.colorScheme.primary
             )
         )
         Text(
             "Alert Type",
             style = MaterialTheme.typography.labelMedium.copy(
-                color = Color(0xFF5B7FA6), fontWeight = FontWeight.SemiBold, fontSize = 12.sp
+                color= lightGray
             )
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -197,7 +198,7 @@ private fun AddAlertSheetContent(
         Text(
             "Time Range",
             style = MaterialTheme.typography.labelMedium.copy(
-                color = Color(0xFF5B7FA6), fontWeight = FontWeight.SemiBold, fontSize = 12.sp
+                color= lightGray
             )
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -225,8 +226,8 @@ private fun AddAlertSheetContent(
                 onClick  = onDismiss,
                 modifier = Modifier.weight(1f).height(50.dp),
                 shape    = RoundedCornerShape(14.dp),
-                colors   = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1E88E5)),
-                border   = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF1E88E5))
+                colors   = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                border   = androidx.compose.foundation.BorderStroke(1.5.dp, Color.Red)
             ) { Text("Cancel", fontWeight = FontWeight.SemiBold) }
 
             Button(
@@ -238,7 +239,7 @@ private fun AddAlertSheetContent(
                 },
                 modifier = Modifier.weight(1f).height(50.dp),
                 shape    = RoundedCornerShape(14.dp),
-                colors   = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+                colors   = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) { Text("Save Alert", fontWeight = FontWeight.SemiBold, color = Color.White) }
         }
     }
