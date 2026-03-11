@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.AlertItem
 import com.example.weather_forecast.data.models.WeatherAlert
-import com.example.weather_forecast.presentation.alerts.ScheduledAlertCard
 import com.example.weather_forecast.presentation.weather.UiState
 
 
@@ -31,20 +30,18 @@ import com.example.weather_forecast.presentation.weather.UiState
         contentPadding      = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item {
-            Spacer(Modifier.height(4.dp))
-            SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
-        }
 
         if (scheduledAlerts.isEmpty()) {
             item {
-                InfoCard(
-                    icon     = Icons.Default.Home,
-                    title    = "No scheduled alerts",
-                    subtitle = "Tap + to add one"
+                EmptyStateContent(
+                    message = "Your past alerts will appear here once\nyou've set up and triggered alerts."
                 )
             }
         } else {
+            item {
+                Spacer(Modifier.height(4.dp))
+                SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
+            }
             items(scheduledAlerts, key = { it.id }) { item ->
                 ScheduledAlertCard(item = item, onCancel = { onCancelScheduled(item) })
             }

@@ -8,15 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -24,9 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -38,7 +31,7 @@ import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsContent
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
-import com.example.weather_forecast.presentation.alerts.components.SectionHeader
+import com.example.weather_forecast.presentation.alerts.components.EmptyStateContent
 import com.example.weather_forecast.presentation.weather.UiState
 import java.util.*
 
@@ -142,71 +135,8 @@ fun AlertScreen(
 
 
 
-@Composable
- fun ScheduledAlertCard(item: AlertItem, onCancel: () -> Unit) {
-    Surface(
-        shape           = RoundedCornerShape(16.dp),
-        color           = Color.White.copy(alpha = 0.85f),
-        shadowElevation = 4.dp,
-        modifier        = Modifier.fillMaxWidth()
-    ) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(item.type.color.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(item.type.icon, null, tint = item.type.color, modifier = Modifier.size(22.dp))
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(item.type.label, style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.Bold, color = Color(0xFF0D2B4E)))
-                Text(item.label, style = MaterialTheme.typography.bodySmall.copy(
-                    color = Color(0xFF5B7FA6), fontSize = 12.sp))
-            }
-            IconButton(onClick = onCancel) {
-                Icon(Icons.Default.Delete, "Cancel alert", tint = Color(0xFFE53935))
-            }
-        }
-    }
-}
 
 
-
-
-@Composable
-private fun EmptyStateContent(message: String) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier            = Modifier.padding(horizontal = 40.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB)))
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(Icons.Default.Notifications, null,
-                    modifier = Modifier.size(44.dp), tint = Color(0xFF42A5F5))
-            }
-            Text(
-                text      = message,
-                style     = MaterialTheme.typography.bodyMedium.copy(
-                    color = Color(0xFF8FA4B8), fontSize = 14.sp, lineHeight = 21.sp
-                ),
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
 
 
 @Composable
