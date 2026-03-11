@@ -3,6 +3,8 @@ package com.example.weather_forecast.data
 import android.content.Context
 import com.example.weather_forecast.data.datasource.local.WeatherLocalDataSource
 import com.example.weather_forecast.data.datasource.remote.WeatherRemoteDataSource
+import com.example.weather_forecast.data.models.AlertEntity
+import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.OneCallResponse
 import com.example.weather_forecast.data.models.WeatherAlert
@@ -40,5 +42,19 @@ class WeatherRepository (context: Context){
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    fun getAllAlerts(): Flow<List<AlertEntity>>{
+        return localDataSource.getAllAlerts()
+
+    }
+    suspend fun insertAlert(alert: AlertEntity){
+        return localDataSource.insertAlert(alert)
+    }
+    suspend fun updateStatus(alertId: Int, status: AlertStatus){
+        return localDataSource.updateStatus(alertId, status)
+    }
+    suspend fun deleteAlert(alertId: Int){
+        return localDataSource.deleteAlert(alertId)
     }
 }

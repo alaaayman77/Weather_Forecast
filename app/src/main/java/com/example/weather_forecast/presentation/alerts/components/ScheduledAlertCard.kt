@@ -35,19 +35,19 @@ import com.example.weather_forecast.ui.theme.lightGray
 @Composable
 fun ScheduledAlertCard(
     item    : AlertEntity,
-    status  : AlertStatus = AlertStatus.SCHEDULED,
+
     onCancel: () -> Unit
 ) {
     val timeRange = "${formatMillis(item.startMillis)} → ${formatMillis(item.endMillis)}"
     val duration  = durationLabel(item.startMillis, item.endMillis)
 
-    val statusText  = when (status) {
+    val statusText  = when (item.status) {
         AlertStatus.SCHEDULED -> "Scheduled"
         AlertStatus.ACTIVE    -> "Active"
         AlertStatus.DISMISSED -> "Dismissed"
         AlertStatus.CANCELLED -> "Cancelled"
     }
-    val statusColor = when (status) {
+    val statusColor = when (item.status) {
         AlertStatus.SCHEDULED -> Color.Blue
         AlertStatus.ACTIVE    -> Color.Green
         AlertStatus.DISMISSED -> Color.Yellow

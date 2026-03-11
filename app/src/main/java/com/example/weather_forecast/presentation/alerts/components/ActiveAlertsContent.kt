@@ -45,7 +45,6 @@ import com.example.weather_forecast.presentation.weather.UiState
             items(scheduledAlerts, key = { it.id }) { item ->
                 ScheduledAlertCard(
                     item = item,
-                    status   = alertStatuses[item.id] ?: AlertStatus.SCHEDULED,
                     onCancel= { onCancelScheduled(item) }
                 )
             }

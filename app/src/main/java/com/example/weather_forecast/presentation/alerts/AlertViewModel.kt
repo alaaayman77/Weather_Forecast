@@ -11,10 +11,12 @@ import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.presentation.weather.AlertState
+import com.example.weather_forecast.presentation.weather.FavouriteState
 import com.example.weather_forecast.presentation.weather.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -43,7 +45,9 @@ class AlertViewModel(
 
     private val _alertStatuses = MutableStateFlow<Map<Int, AlertStatus>>(emptyMap())
     val alertStatuses: StateFlow<Map<Int, AlertStatus>> = _alertStatuses.asStateFlow()
-
+init{
+    loadScheduledAlerts()
+}
     fun onTabSelected(tab: AlertTab) { _selectedTab.value = tab }
 
     fun onFabClicked() {
@@ -54,11 +58,11 @@ class AlertViewModel(
     fun onDismissBottomSheet() { _showBottomSheet.value = false }
     fun onDismissPermDialog()  { _showPermDialog.value  = false }
 
+
     fun updateAlertStatus(alertId: Int, status: AlertStatus) {
-        val newMap = _alertStatuses.value.toMutableMap()
-        newMap[alertId] = status
-        _alertStatuses.value = newMap
-    }
+        viewModelScope.launch {
+                weatherRepository.updateStatus(alertId, status)
+        }}
 
     fun fetchWeatherAlerts(lat: Double, lon: Double) {
         viewModelScope.launch {
@@ -75,7 +79,15 @@ class AlertViewModel(
                 }
         }
     }
+    private fun loadScheduledAlerts() {
+        viewModelScope.launch {
+            weatherRepository.getAllAlerts()
+                .collect { items ->
+                    _scheduledAlerts.value = items
+                }
+        }
 
+    }
 
     fun scheduleAlert(
         type       : AlertType,
@@ -87,47 +99,33 @@ class AlertViewModel(
         val id           = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
         val activeAlerts = (_weatherAlertsState.value as? UiState.Success)?.data?.alerts ?: emptyList()
 
-        val overlappingAlert = activeAlerts.firstOrNull { networkAlert ->
-            val alertStart = networkAlert.start * 1000L
-            val alertEnd   = networkAlert.end   * 1000L
-            startMillis < alertEnd && endMillis > alertStart
-        }
+        val label = activeAlerts.firstOrNull { alert ->
+            startMillis < alert.end * 1000L && endMillis > alert.start * 1000L
+        }?.event ?: "Weather looks good! No active warnings for your selected time."
 
-        val label = overlappingAlert?.event
-            ?: "Weather looks good! No active warnings for your selected time."
+        val item = AlertEntity(
+            id          = id,
+            type        = type,
+            startMillis = startMillis,
+            endMillis   = endMillis,
+            label       = label,
+            status      = AlertStatus.SCHEDULED
+        )
 
         scheduler.schedule(id, type, label, startMillis)
         scheduler.scheduleDismiss(id, endMillis)
 
-        _scheduledAlerts.update { list ->
-            list + AlertEntity(
-                id          = id,
-                type        = type,
-                startMillis = startMillis,
-                endMillis   = endMillis,
-                label       = label
-            )
+        viewModelScope.launch {
+            weatherRepository.insertAlert(item)
         }
-        _alertStatuses.update { it + (id to AlertStatus.SCHEDULED) }
     }
+
 
     fun cancelAlert(item: AlertEntity) {
 
-        val newList = mutableListOf<AlertEntity>()
-        for (alert in _scheduledAlerts.value) {
-            if (alert.id != item.id) {
-                newList.add(alert)
-            }
+        viewModelScope.launch {
+            weatherRepository.deleteAlert(item.id)
         }
-        _scheduledAlerts.value = newList
-
-        val newMap = mutableMapOf<Int, AlertStatus>()
-        for ((id, status) in _alertStatuses.value) {
-            if (id != item.id) {
-                newMap[id] = status
-            }
-        }
-        _alertStatuses.value = newMap
     }
 
     fun canScheduleExactAlarms(): Boolean = scheduler.canScheduleExactAlarms()
