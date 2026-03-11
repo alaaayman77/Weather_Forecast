@@ -6,11 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
-import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
-import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,8 +29,8 @@ class AlertViewModel(
     private val _weatherAlertsState = MutableStateFlow<UiState<AlertState>>(UiState.Idle)
     val weatherAlertsState: StateFlow<UiState<AlertState>> = _weatherAlertsState.asStateFlow()
 
-    private val _scheduledAlerts = MutableStateFlow<List<AlertItem>>(emptyList())
-    val scheduledAlerts: StateFlow<List<AlertItem>> = _scheduledAlerts.asStateFlow()
+    private val _scheduledAlerts = MutableStateFlow<List<AlertEntity>>(emptyList())
+    val scheduledAlerts: StateFlow<List<AlertEntity>> = _scheduledAlerts.asStateFlow()
 
     private val _selectedTab = MutableStateFlow(AlertTab.ACTIVE)
     val selectedTab: StateFlow<AlertTab> = _selectedTab.asStateFlow()
@@ -101,7 +100,7 @@ class AlertViewModel(
         scheduler.scheduleDismiss(id, endMillis)
 
         _scheduledAlerts.update { list ->
-            list + AlertItem(
+            list + AlertEntity(
                 id          = id,
                 type        = type,
                 startMillis = startMillis,
@@ -112,9 +111,9 @@ class AlertViewModel(
         _alertStatuses.update { it + (id to AlertStatus.SCHEDULED) }
     }
 
-    fun cancelAlert(item: AlertItem) {
+    fun cancelAlert(item: AlertEntity) {
 
-        val newList = mutableListOf<AlertItem>()
+        val newList = mutableListOf<AlertEntity>()
         for (alert in _scheduledAlerts.value) {
             if (alert.id != item.id) {
                 newList.add(alert)

@@ -25,11 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
-import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsContent
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.EmptyStateContent
@@ -43,14 +42,14 @@ import java.util.*
 fun AlertScreen(
     modifier          : Modifier  = Modifier,
     weatherAlertsState: UiState<AlertState>,
-    scheduledAlerts   : List<AlertItem>,
+    scheduledAlerts   : List<AlertEntity>,
     alertStatuses      : Map<Int, AlertStatus>,
     selectedTab       : AlertTab,
     showBottomSheet   : Boolean,
     showPermDialog    : Boolean,
     canScheduleExact  : Boolean,
     onRetry           : () -> Unit,
-    onCancelAlert     : (AlertItem) -> Unit,
+    onCancelAlert     : (AlertEntity) -> Unit,
     onScheduleAlert   : (AlertType, Long, Long, String, String) -> Unit,
     onTabSelected     : (AlertTab) -> Unit,
     onFabClicked      : () -> Unit,

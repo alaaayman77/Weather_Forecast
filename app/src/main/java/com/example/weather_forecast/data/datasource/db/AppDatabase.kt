@@ -6,11 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.weather_forecast.data.datasource.local.FavouritesDao
+import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.FavouriteEntity
-import com.example.weather_forecast.data.models.WeatherTypeConverters
+import com.example.weather_forecast.utils.AlertsTypeConvertors
+import com.example.weather_forecast.utils.WeatherTypeConverters
 
-@Database(entities = [FavouriteEntity::class], version = 1)
-@TypeConverters(WeatherTypeConverters::class)
+@Database(entities = [FavouriteEntity::class, AlertEntity::class], version = 1)
+@TypeConverters(WeatherTypeConverters::class , AlertsTypeConvertors::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favouriteDao(): FavouritesDao
 

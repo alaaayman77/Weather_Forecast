@@ -11,9 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
-import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 
@@ -21,9 +20,9 @@ import com.example.weather_forecast.presentation.weather.UiState
 @Composable
  fun ActiveAlertsContent(
     weatherAlertsState: UiState<AlertState>,
-    scheduledAlerts   : List<AlertItem>,
+    scheduledAlerts   : List<AlertEntity>,
     alertStatuses      : Map<Int, AlertStatus>,
-    onCancelScheduled : (AlertItem) -> Unit,
+    onCancelScheduled : (AlertEntity) -> Unit,
     onRetry           : () -> Unit
 ) {
     LazyColumn(
