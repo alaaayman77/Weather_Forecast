@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.AlertItem
+import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.WeatherAlert
@@ -26,10 +27,8 @@ class AlertViewModel(
     private val apiKey    = "3ec08632a7a945e6408e9414cd1fab66"
     private val scheduler = AlertScheduler(app)
 
-
     private val _weatherAlertsState = MutableStateFlow<UiState<AlertState>>(UiState.Idle)
-    val weatherAlertsState: StateFlow<UiState<AlertState>> =
-        _weatherAlertsState.asStateFlow()
+    val weatherAlertsState: StateFlow<UiState<AlertState>> = _weatherAlertsState.asStateFlow()
 
     private val _scheduledAlerts = MutableStateFlow<List<AlertItem>>(emptyList())
     val scheduledAlerts: StateFlow<List<AlertItem>> = _scheduledAlerts.asStateFlow()
@@ -43,25 +42,24 @@ class AlertViewModel(
     private val _showPermDialog = MutableStateFlow(false)
     val showPermDialog: StateFlow<Boolean> = _showPermDialog.asStateFlow()
 
+    private val _alertStatuses = MutableStateFlow<Map<Int, AlertStatus>>(emptyMap())
+    val alertStatuses: StateFlow<Map<Int, AlertStatus>> = _alertStatuses.asStateFlow()
 
-
-    fun onTabSelected(tab: AlertTab) {
-        _selectedTab.value = tab
-    }
+    fun onTabSelected(tab: AlertTab) { _selectedTab.value = tab }
 
     fun onFabClicked() {
         if (!canScheduleExactAlarms()) _showPermDialog.value = true
         else _showBottomSheet.value = true
     }
 
-    fun onDismissBottomSheet() {
-        _showBottomSheet.value = false
-    }
+    fun onDismissBottomSheet() { _showBottomSheet.value = false }
+    fun onDismissPermDialog()  { _showPermDialog.value  = false }
 
-    fun onDismissPermDialog() {
-        _showPermDialog.value = false
+    fun updateAlertStatus(alertId: Int, status: AlertStatus) {
+        val newMap = _alertStatuses.value.toMutableMap()
+        newMap[alertId] = status
+        _alertStatuses.value = newMap
     }
-
 
     fun fetchWeatherAlerts(lat: Double, lon: Double) {
         viewModelScope.launch {
@@ -70,7 +68,7 @@ class AlertViewModel(
                 .onSuccess { alerts ->
                     Log.d("AlertDebug", "Fetched ${alerts.size} alerts: ${alerts.map { it.event }}")
                     _weatherAlertsState.value = UiState.Success(AlertState(alerts = alerts))
-                    alerts.forEach { autoSchedule(it) }
+
                 }
                 .onFailure { e ->
                     _weatherAlertsState.value =
@@ -79,28 +77,6 @@ class AlertViewModel(
         }
     }
 
-    private fun autoSchedule(owmAlert: WeatherAlert) {
-        val startMillis = owmAlert.start * 1000L
-        val endMillis   = owmAlert.end   * 1000L
-        val now         = System.currentTimeMillis()
-
-        if (startMillis < now) return
-        if (_scheduledAlerts.value.any { it.label == owmAlert.event }) return
-
-        val id = Math.abs(owmAlert.event.hashCode())
-        scheduler.schedule(id, AlertType.ALERT, owmAlert.event, startMillis)
-        scheduler.scheduleDismiss(id, endMillis)
-
-        _scheduledAlerts.update { list ->
-            list + AlertItem(
-                id          = id,
-                type        = AlertType.ALERT,
-                startMillis = startMillis,
-                endMillis   = endMillis,
-                label       = owmAlert.event
-            )
-        }
-    }
 
     fun scheduleAlert(
         type       : AlertType,
@@ -109,9 +85,7 @@ class AlertViewModel(
         startLabel : String,
         endLabel   : String
     ) {
-        val id = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
-
-
+        val id           = (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
         val activeAlerts = (_weatherAlertsState.value as? UiState.Success)?.data?.alerts ?: emptyList()
 
         val overlappingAlert = activeAlerts.firstOrNull { networkAlert ->
@@ -120,10 +94,8 @@ class AlertViewModel(
             startMillis < alertEnd && endMillis > alertStart
         }
 
-        val label = when {
-            overlappingAlert != null -> overlappingAlert.event
-            else -> "Weather looks good! No active warnings for your selected time."
-        }
+        val label = overlappingAlert?.event
+            ?: "Weather looks good! No active warnings for your selected time."
 
         scheduler.schedule(id, type, label, startMillis)
         scheduler.scheduleDismiss(id, endMillis)
@@ -137,20 +109,35 @@ class AlertViewModel(
                 label       = label
             )
         }
+        _alertStatuses.update { it + (id to AlertStatus.SCHEDULED) }
     }
 
     fun cancelAlert(item: AlertItem) {
-        scheduler.cancel(item.id, item.type, item.label)
-        _scheduledAlerts.update { list -> list.filter { it.id != item.id } }
+
+        val newList = mutableListOf<AlertItem>()
+        for (alert in _scheduledAlerts.value) {
+            if (alert.id != item.id) {
+                newList.add(alert)
+            }
+        }
+        _scheduledAlerts.value = newList
+
+        val newMap = mutableMapOf<Int, AlertStatus>()
+        for ((id, status) in _alertStatuses.value) {
+            if (id != item.id) {
+                newMap[id] = status
+            }
+        }
+        _alertStatuses.value = newMap
     }
 
     fun canScheduleExactAlarms(): Boolean = scheduler.canScheduleExactAlarms()
 }
 
-
-class AlertViewModelFactory(private val weatherRepository: WeatherRepository, private val app: Application) : ViewModelProvider.Factory {
-
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return AlertViewModel(weatherRepository, app) as T
-    }
+class AlertViewModelFactory(
+    private val weatherRepository: WeatherRepository,
+    private val app: Application
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T =
+        AlertViewModel(weatherRepository, app) as T
 }
