@@ -34,8 +34,7 @@ class AlertViewModel(
     private val _scheduledAlerts = MutableStateFlow<List<AlertEntity>>(emptyList())
     val scheduledAlerts: StateFlow<List<AlertEntity>> = _scheduledAlerts.asStateFlow()
 
-    private val _selectedTab = MutableStateFlow(AlertTab.ACTIVE)
-    val selectedTab: StateFlow<AlertTab> = _selectedTab.asStateFlow()
+
 
     private val _showBottomSheet = MutableStateFlow(false)
     val showBottomSheet: StateFlow<Boolean> = _showBottomSheet.asStateFlow()
@@ -48,7 +47,7 @@ class AlertViewModel(
 init{
     loadScheduledAlerts()
 }
-    fun onTabSelected(tab: AlertTab) { _selectedTab.value = tab }
+
 
     fun onFabClicked() {
         if (!canScheduleExactAlarms()) _showPermDialog.value = true

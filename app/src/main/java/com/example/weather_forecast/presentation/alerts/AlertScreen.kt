@@ -44,14 +44,13 @@ fun AlertScreen(
     weatherAlertsState: UiState<AlertState>,
     scheduledAlerts   : List<AlertEntity>,
     alertStatuses      : Map<Int, AlertStatus>,
-    selectedTab       : AlertTab,
     showBottomSheet   : Boolean,
     showPermDialog    : Boolean,
     canScheduleExact  : Boolean,
     onRetry           : () -> Unit,
     onCancelAlert     : (AlertEntity) -> Unit,
     onScheduleAlert   : (AlertType, Long, Long, String, String) -> Unit,
-    onTabSelected     : (AlertTab) -> Unit,
+
     onFabClicked      : () -> Unit,
     onDismissSheet    : () -> Unit,
     onDismissPermDialog: () -> Unit
@@ -61,25 +60,20 @@ fun AlertScreen(
 
     Box(modifier = modifier.fillMaxSize().statusBarsPadding()) {
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            AlertTabRow(
-                selectedTab   = selectedTab,
-                onTabSelected = onTabSelected
-            )
 
-            when (selectedTab) {
-                AlertTab.ACTIVE -> ActiveAlertsContent(
+
+
+
+               ActiveAlertsContent(
                     weatherAlertsState = weatherAlertsState,
                     scheduledAlerts    = scheduledAlerts,
                     alertStatuses      = alertStatuses,
                     onCancelScheduled  = onCancelAlert,
                     onRetry            = onRetry
                 )
-                AlertTab.HISTORY -> EmptyStateContent(
-                    message = "Your past alerts will appear here once\nyou've set up and triggered alerts."
-                )
-            }
-        }
+
+
+
 
         AddAlertFab(
             modifier = Modifier

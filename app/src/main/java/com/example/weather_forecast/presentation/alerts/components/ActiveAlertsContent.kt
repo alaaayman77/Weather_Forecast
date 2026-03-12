@@ -18,34 +18,31 @@ import com.example.weather_forecast.presentation.weather.UiState
 
 
 @Composable
- fun ActiveAlertsContent(
+fun ActiveAlertsContent(
     weatherAlertsState: UiState<AlertState>,
     scheduledAlerts   : List<AlertEntity>,
-    alertStatuses      : Map<Int, AlertStatus>,
+    alertStatuses     : Map<Int, AlertStatus>,
     onCancelScheduled : (AlertEntity) -> Unit,
     onRetry           : () -> Unit
 ) {
-    LazyColumn(
-        modifier            = Modifier.fillMaxSize(),
-        contentPadding      = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-
-        if (scheduledAlerts.isEmpty()) {
-            item {
-                EmptyStateContent(
-                    message = "Your past alerts will appear here once\nyou've set up and triggered alerts."
-                )
-            }
-        } else {
+    if (scheduledAlerts.isEmpty()) {
+        EmptyStateContent(
+            message = "No alerts scheduled yet.\nTap + to create your first alert."
+        )
+    } else {
+        LazyColumn(
+            modifier            = Modifier.fillMaxSize(),
+            contentPadding      = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             item {
                 Spacer(Modifier.height(4.dp))
                 SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
             }
             items(scheduledAlerts, key = { it.id }) { item ->
                 ScheduledAlertCard(
-                    item = item,
-                    onCancel= { onCancelScheduled(item) }
+                    item     = item,
+                    onCancel = { onCancelScheduled(item) }
                 )
             }
         }
