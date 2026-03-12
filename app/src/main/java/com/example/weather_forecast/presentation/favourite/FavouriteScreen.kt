@@ -1,6 +1,8 @@
 package com.example.weather_forecast.presentation.favourite
 
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,15 +28,25 @@ import com.example.weather_forecast.presentation.favourite.components.FavouriteL
 import com.example.weather_forecast.presentation.weather.FavouriteState
 import com.example.weather_forecast.presentation.weather.UiState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.ui.theme.lightGray
 
 @Composable
 fun FavouriteScreen(
     modifier: Modifier,
     uiState: UiState<FavouriteState>,
     onAddLocation: () -> Unit,
+    onRemove : (Double, Double) -> Unit,
     onNavigateToDetails: (Double , Double) -> Unit,
+
 ) {
     Box(modifier = modifier.fillMaxSize()
         .statusBarsPadding()) {
@@ -55,7 +67,7 @@ fun FavouriteScreen(
             is UiState.Success -> {
                 FavouriteScreenContent(
                     favourites = state.data.favourites,
-                    onRemove   = {  },
+                    onRemove   =onRemove,
                     onNavigateToDetails = onNavigateToDetails
                 )
             }
@@ -79,7 +91,7 @@ fun FavouriteScreen(
 @Composable
 fun FavouriteScreenContent(
     favourites: List<FavouriteEntity>,
-    onRemove: () -> Unit,
+    onRemove: (Double , Double)->Unit,
     onNavigateToDetails : (Double , Double)-> Unit
 ) {
     LazyColumn(
@@ -89,7 +101,7 @@ fun FavouriteScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
     ) {
-        item { FavouriteHeader() }
+        item { FavouriteHeader(locationCount = favourites.size) }
 
         if (favourites.isEmpty()) {
             item { FavouriteEmptyState() }
@@ -97,36 +109,86 @@ fun FavouriteScreenContent(
             items(favourites) { item ->
                 FavouriteLocationItem(
                     item     = item,
-                    onRemove = { },
+                    onRemove = onRemove,
                     onNavigateToDetails = onNavigateToDetails
                 )
             }
         }
     }
 }
-
 @Composable
-fun FavouriteHeader() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+fun FavouriteHeader(locationCount: Int = 0) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(
-            imageVector        = Icons.Default.LocationOn,
-            contentDescription = null,
-            modifier           = Modifier.size(24.dp),
-            tint               = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text  = "Favourite Locations",
-            style = MaterialTheme.typography.titleMedium.copy(
-                color = MaterialTheme.colorScheme.secondary
-            )
+
+        Row(
+            modifier              = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment     = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment     = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(11.dp))
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector        = Icons.Rounded.Favorite,
+                        contentDescription = null,
+                        tint               = MaterialTheme.colorScheme.primary,
+                        modifier           = Modifier.size(20.dp)
+                    )
+                }
+
+                Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                    Text(
+                        text  = "Favourite Locations",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color      = MaterialTheme.colorScheme.onBackground,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.2.sp
+                        )
+                    )
+
+                }
+            }
+
+            // Count badge — only shown when there are locations
+            if (locationCount > 0) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.20f))
+                ) {
+                    Text(
+                        text     = locationCount.toString(),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style    = MaterialTheme.typography.labelMedium.copy(
+                            color      = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            }
+        }
+
+        // ── Subtle divider ────────────────────────────────────────────────────
+        HorizontalDivider(
+            thickness = 0.5.dp,
+            color     = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)
         )
     }
 }
-
 
 
 @Composable

@@ -179,12 +179,14 @@ fun AppScreen(
                         FavouriteScreen(
                             modifier      = Modifier.padding(innerPadding),
                             uiState       = uiState,
+                            onRemove = { lat, lon -> favouriteViewModel.removeFavourite(lat, lon) },
                             onAddLocation = {
                                 mapPickerViewModel.clearPin()
                                 val lat = location?.latitude ?: 30.0444
                                 val lon = location?.longitude ?: 31.2357
                                 navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon))
                             },
+
 
                         ){ lat , lon ->
                             navController.navigate(
@@ -249,7 +251,7 @@ fun AppScreen(
                     composable<NavigationRoutes.AlertRoute> {
                         val uiState         by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
                         val scheduledAlerts by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
-                        val selectedTab     by alertViewModel.selectedTab.collectAsStateWithLifecycle()
+
                         val showBottomSheet by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
                         val showPermDialog  by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
                         val alertStatuses   by alertViewModel.alertStatuses.collectAsStateWithLifecycle()
@@ -279,7 +281,6 @@ fun AppScreen(
                             weatherAlertsState  = uiState,
                             scheduledAlerts     = scheduledAlerts,
                             alertStatuses       = alertStatuses,
-                            selectedTab         = selectedTab,
                             showBottomSheet     = showBottomSheet,
                             showPermDialog      = showPermDialog,
                             canScheduleExact    = alertViewModel.canScheduleExactAlarms(),
@@ -288,7 +289,7 @@ fun AppScreen(
                             onScheduleAlert     = { type, startMillis, endMillis, startLabel, endLabel ->
                                 alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel)
                             },
-                            onTabSelected       = { alertViewModel.onTabSelected(it) },
+
                             onFabClicked        = { alertViewModel.onFabClicked() },
                             onDismissSheet      = { alertViewModel.onDismissBottomSheet() },
                             onDismissPermDialog = { alertViewModel.onDismissPermDialog() }

@@ -20,7 +20,7 @@ import com.example.weather_forecast.ui.theme.lightGray
 @Composable
 fun FavouriteLocationItem(
     item: FavouriteEntity,
-    onRemove: () -> Unit = {},
+    onRemove: (Double, Double) -> Unit,
     onNavigateToDetails : (Double,Double)->Unit,
 ) {
     val current = item.oneCallResponse.current
@@ -48,16 +48,16 @@ fun FavouriteLocationItem(
         ) {
 
             IconButton(
-                onClick = onRemove,
+                onClick = { onRemove(item.lat , item.lon) },
                 modifier = Modifier
                     .size(32.dp)
                     .align(Alignment.TopEnd)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_sunset),
+                    painter = painterResource(R.drawable.delete),
                     contentDescription = "Remove",
-                    tint = Color.White.copy(alpha = 0.7f),
-                    modifier = Modifier.size(16.dp)
+                    tint = Color.Red,
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
