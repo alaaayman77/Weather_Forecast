@@ -6,18 +6,18 @@ import kotlinx.serialization.Serializable
 
 
 
-// Remove @Serializable — Gson doesn't need it
+ @Serializable
 data class WeatherAlert(
-    @SerializedName("sender_name")
+    @SerialName("sender_name")
     val senderName: String = "",
-    @SerializedName("event")
+    @SerialName("event")
     val event: String = "",
-    @SerializedName("start")
+    @SerialName("start")
     val start: Long = 0L,
-    @SerializedName("end")
+    @SerialName("end")
     val end: Long = 0L,
-    @SerializedName("description")
+    @SerialName("description")
     val description: String = "",
-    @SerializedName("tags")
+    @SerialName("tags")
     val tags: List<String> = emptyList()
 )

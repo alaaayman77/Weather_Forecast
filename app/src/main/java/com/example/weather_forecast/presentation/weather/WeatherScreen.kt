@@ -1,19 +1,26 @@
 package com.example.weather_forecast.presentation.weather
 
 import android.location.Location
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -160,38 +167,99 @@ fun WeeklyList(dailyList: List<DailyItem>) {
     }
 }
 @Composable
-fun WeatherTopBar(currentWeather: CurrentWeather ,  topBarLocation :String) {
+fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text(
-                text = getGreeting(currentWeather.dt),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            )
-            Text(
-                text = formatDateTime(currentWeather.dt),
-                style = MaterialTheme.typography.bodySmall.copy(color = lightGray)
-            )
-        }
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-        ) {
+        Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
 
-            Text(
-                text = "📍 ${topBarLocation}",
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+
+                Text(
+                    text = getGreeting(currentWeather.dt),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 )
-            )
+            }
+
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                ) {
+                    Text(
+                        text = formatDate(currentWeather.dt),
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 0.3.sp
+                        )
+                    )
+                }
+
+
+                Box(
+                    modifier = Modifier
+                        .size(3.dp)
+                        .clip(CircleShape)
+                        .background(lightGray.copy(alpha = 0.5f))
+                )
+
+
+                Text(
+                    text = formatTime(currentWeather.dt),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = lightGray,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
+            }
+        }
+
+
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+            modifier = Modifier.widthIn(max = 155.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 7.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_location),
+                    contentDescription = "Location",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(12.dp)
+                )
+                Text(
+                    text = topBarLocation,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
     }
 }
@@ -303,7 +371,7 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Icon(
-            imageVector = icon,
+            painter = painterResource(R.drawable.thermometer),
             contentDescription = null,
             tint = lightGray,
             modifier = Modifier.size(14.dp)
@@ -374,32 +442,38 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>) {
     }
 }
 
+
+
+
+fun Double.toCelsius() = (this - 273.15).toInt()
 fun formatTime(timestamp: Long?): String {
     if (timestamp == null) return "--"
-    val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-    return sdf.format(Date(timestamp * 1000))
+    return SimpleDateFormat("hh:mm a", Locale.getDefault())
+        .format(Date(timestamp * 1000))
 }
+
+fun formatDate(timestamp: Long?): String {
+    if (timestamp == null) return "--"
+    return SimpleDateFormat("EEE, dd MMM", Locale.getDefault())
+        .format(Date(timestamp * 1000))
+}
+
 
 fun formatDateTime(timestamp: Long?): String {
     if (timestamp == null) return "--"
-    val sdf = SimpleDateFormat("EEEE, dd MMM  •  hh:mm a", Locale.getDefault())
-    return sdf.format(Date(timestamp * 1000))
+    return SimpleDateFormat("EEEE, dd MMM  •  hh:mm a", Locale.getDefault())
+        .format(Date(timestamp * 1000))
 }
 
-fun getGreeting(timestamp: Long?): String {
-    val hour = if (timestamp != null) {
-        val cal = Calendar.getInstance()
-        cal.time = Date(timestamp * 1000)
-        cal.get(Calendar.HOUR_OF_DAY)
-    } else {
-        Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    }
-    return when (hour) {
-        in 5..11  -> "Good Morning ☀️"
-        in 12..16 -> "Good Afternoon 🌤️"
-        in 17..20 -> "Good Evening 🌆"
-        else      -> "Good Night 🌙"
-    }
+fun getGreeting(timestamp: Long?): String = when (hourOf(timestamp)) {
+    in 5..11  -> "Good Morning"
+    in 12..16 -> "Good Afternoon"
+    in 17..20 -> "Good Evening"
+    else      -> "Good Night"
 }
 
-fun Double.toCelsius() = (this - 273.15).toInt()
+private fun hourOf(timestamp: Long?): Int {
+    if (timestamp == null) return Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    return Calendar.getInstance().apply { time = Date(timestamp * 1000) }
+        .get(Calendar.HOUR_OF_DAY)
+}

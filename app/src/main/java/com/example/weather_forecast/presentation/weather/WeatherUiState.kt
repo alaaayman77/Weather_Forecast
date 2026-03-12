@@ -17,6 +17,7 @@ data class WeatherState(
     val oneCall:        OneCallResponse,
     val topBarLocation: String = "--",
     val centerLocation: String = "--"
+
 )
 
 data class FavouriteState(

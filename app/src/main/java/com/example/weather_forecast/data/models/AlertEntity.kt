@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 
 enum class AlertStatus { SCHEDULED, ACTIVE, DISMISSED, CANCELLED }
 @Entity(tableName = "alerts")
+
 data class AlertEntity(
     @PrimaryKey
     val id         : Int,
