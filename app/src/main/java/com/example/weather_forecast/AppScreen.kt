@@ -240,7 +240,9 @@ fun AppScreen(
                             onDismiss = {
                                 mapPickerViewModel.clearPin()
                                 navController.popBackStack()
-                            }
+                            },
+                            onZoomIn = { mapPickerViewModel.zoomIn(cameraState) },
+                            onZoomOut = { mapPickerViewModel.zoomOut(cameraState) }
                         )
                     }
 

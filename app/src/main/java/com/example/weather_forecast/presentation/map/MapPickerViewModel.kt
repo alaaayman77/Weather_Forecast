@@ -9,8 +9,10 @@ import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.weather.UiState
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
+import com.google.maps.android.compose.CameraPositionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,6 +75,25 @@ class MapPickerViewModel(
         _pickedLatLng.value = null
         _pickedName.value   = ""
         _addState.value     = UiState.Idle
+    }
+    fun zoomIn(cameraState: CameraPositionState) {
+        viewModelScope.launch {
+            val currentZoom = cameraState.position.zoom
+            cameraState.animate(
+                update     = CameraUpdateFactory.zoomTo(currentZoom + 1f),
+                durationMs = 300
+            )
+        }
+    }
+
+    fun zoomOut(cameraState: CameraPositionState) {
+        viewModelScope.launch {
+            val currentZoom = cameraState.position.zoom
+            cameraState.animate(
+                update     = CameraUpdateFactory.zoomTo(currentZoom - 1f),
+                durationMs = 300
+            )
+        }
     }
 
     fun onLocationPicked(

@@ -53,7 +53,10 @@ fun MapPickerScreen(
     onPlacePicked:    (LatLng, String) -> Unit,
     onClearPin:       () -> Unit,
     onLocationPicked: (lat: Double, lng: Double, name: String) -> Unit,
-    onDismiss:        () -> Unit
+    onDismiss:        () -> Unit,
+    onZoomIn : (CameraPositionState) -> Unit,
+    onZoomOut : (CameraPositionState) -> Unit,
+
 ) {
     val context = LocalContext.current
 
@@ -112,7 +115,7 @@ fun MapPickerScreen(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
-            // Back button
+
             IconButton(
                 onClick  = onDismiss,
                 modifier = Modifier
@@ -175,10 +178,10 @@ fun MapPickerScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             MapControlButton(icon = R.drawable.ic_plus, contentDescription = "Zoom in") {
-
+               onZoomIn(cameraState)
             }
             MapControlButton(icon = R.drawable.ic_minus, contentDescription = "Zoom out") {
-
+                    onZoomOut(cameraState)
             }
             Spacer(Modifier.height(4.dp))
 
