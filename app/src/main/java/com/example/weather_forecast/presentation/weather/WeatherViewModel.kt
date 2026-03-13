@@ -15,8 +15,11 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 
 
 class WeatherViewModel(private val locationProvider: LocationProvider , private  val weatherRepository: WeatherRepository , private val app : Application) : ViewModel() {
@@ -67,36 +70,32 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
         apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
     ) {
         viewModelScope.launch {
-            _weatherUiState.value = UiState.Loading
-            try {
-                val response = weatherRepository.getOneCallResponse(lat, lon, apiKey)
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        _weatherUiState.value = UiState.Success(WeatherState(oneCall = body))
-
-                        launch(Dispatchers.IO) {
-                            val topBar  = getTopBarLocation(app, lat, lon)
-                            val center  = getCenterLocation(app, lat, lon)
-                            val current = _weatherUiState.value
-                            if (current is UiState.Success) {
-                                _weatherUiState.value = UiState.Success(
-                                    current.data.copy(
-                                        topBarLocation = topBar,
-                                        centerLocation = center
-                                    )
+            flow {
+                emit(weatherRepository.getOneCallResponse(lat, lon, apiKey))
+            }
+                .onStart { _weatherUiState.value = UiState.Loading }
+                .catch { ex -> _weatherUiState.value = UiState.Error(ex.message ?: "Unknown error") }
+                .collect { response ->
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null) {
+                            _weatherUiState.value = UiState.Loading
+                            val topBar = withContext(Dispatchers.IO) { getTopBarLocation(app, lat, lon) }
+                            val center = withContext(Dispatchers.IO) { getCenterLocation(app, lat, lon) }
+                            _weatherUiState.value = UiState.Success(
+                                WeatherState(
+                                    oneCall        = body,
+                                    topBarLocation = topBar,
+                                    centerLocation = center
                                 )
-                            }
+                            )
+                        } else {
+                            _weatherUiState.value = UiState.Error("Empty response")
                         }
                     } else {
-                        _weatherUiState.value = UiState.Error("Empty response")
+                        _weatherUiState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
                     }
-                } else {
-                    _weatherUiState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
                 }
-            } catch (ex: Exception) {
-                _weatherUiState.value = UiState.Error(ex.message ?: "Unknown error")
-            }
         }
     }
     fun updateLocationSource(src: LocationSource) {
