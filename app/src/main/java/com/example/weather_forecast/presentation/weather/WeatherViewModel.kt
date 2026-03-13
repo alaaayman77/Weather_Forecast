@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.utils.LocationProvider
+import com.example.weather_forecast.utils.getApiLangCode
 import com.example.weather_forecast.utils.getCenterLocation
 import com.example.weather_forecast.utils.getTopBarLocation
 import kotlinx.coroutines.Dispatchers
@@ -69,9 +70,11 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
         lon: Double,
         apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
     ) {
+        val lang = weatherRepository.getLanguage()
         viewModelScope.launch {
+
             flow {
-                emit(weatherRepository.getOneCallResponse(lat, lon, apiKey))
+                emit(weatherRepository.getOneCallResponse(lat, lon, apiKey, lang))
             }
                 .onStart { _weatherUiState.value = UiState.Loading }
                 .catch { ex -> _weatherUiState.value = UiState.Error(ex.message ?: "Unknown error") }

@@ -5,6 +5,7 @@ import com.example.weather_forecast.data.datasource.db.AppDatabase
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
@@ -28,7 +29,7 @@ class WeatherLocalDataSource(context: Context) {
     }
 
 
-    fun saveLanguage(lang: String) = prefs.edit().putString("language", lang).apply()
+    fun saveLanguage(lang: Language) = prefs.edit().putString("language", lang.name).apply()
 
     fun getTempUnit(): TempUnit = TempUnit.valueOf(prefs.getString("temp_unit", TempUnit.CELSIUS.name)!!)
     fun getWindUnit(): WindUnit = WindUnit.valueOf(prefs.getString("wind_unit", WindUnit.MS.name)!!)
@@ -38,7 +39,7 @@ class WeatherLocalDataSource(context: Context) {
         val lon = prefs.getFloat("manual_lon", Float.MIN_VALUE)
         return if (lat == Float.MIN_VALUE) null else Pair(lat.toDouble(), lon.toDouble())
     }
-    fun getLanguage(): String = prefs.getString("language", "English (US)")!!
+    fun getLanguage(): Language = Language.valueOf(prefs.getString("language", Language.ENGLISH.name)!!)
 
 
 

@@ -14,7 +14,8 @@ interface WeatherService {
             @Query("lon") lon: Double,
             @Query("appid") apiKey: String,
             @Query("exclude") exclude: String = "minutely",
-            @Query("units")   units: String = "metric"
+            @Query("units")   units: String = "metric",
+            @Query("lang")   lang: String = "en"
     ): Response<OneCallResponse>
 
 

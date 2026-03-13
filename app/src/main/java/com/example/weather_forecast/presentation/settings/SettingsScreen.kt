@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.data.models.LocationSource
@@ -27,8 +28,7 @@ import com.example.weather_forecast.presentation.settings.components.LocationOpt
 import com.example.weather_forecast.presentation.settings.components.SettingsSection
 import com.example.weather_forecast.presentation.settings.components.UnitChip
 import com.example.weather_forecast.ui.theme.lightGray
-
-
+import com.example.weather_forecast.utils.getDisplayName
 
 
 @Composable
@@ -38,15 +38,15 @@ fun SettingsScreen(
     onTempUnitClick :(TempUnit) -> Unit,
     windUnit : WindUnit,
     onWindUnitClick : (WindUnit)-> Unit,
-    locationSrc : LocationSource ,
+    locationSrc : LocationSource,
     onLocationSourceGPSClick : (LocationSource)-> Unit,
     onLocationSourceMAPClick : (LocationSource)-> Unit,
-    language :String,
-    onLanguageClick : (String)-> Unit
+    language : Language,
+    onLanguageClick : (Language)-> Unit
 ) {
 
     var langExpanded by remember { mutableStateOf(false) }
-    val languages = listOf("English (US)", "Arabic")
+    val languages = Language.entries
 
     Column(
         modifier = modifier
@@ -155,7 +155,7 @@ fun SettingsScreen(
                         verticalAlignment     = Alignment.CenterVertically
                     ) {
                         Text(
-                            text  = language,
+                            text  = getDisplayName(language),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Medium
                             )
@@ -169,9 +169,10 @@ fun SettingsScreen(
                     }
                 }
                 DropdownMenu(expanded = langExpanded, onDismissRequest = { langExpanded = false }) {
+
                     languages.forEach { lang ->
                         DropdownMenuItem(
-                            text    = { Text(lang) },
+                            text    = { Text(getDisplayName(lang)) },
                             onClick = {
                                onLanguageClick(lang)
                                 langExpanded = false }

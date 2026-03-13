@@ -6,19 +6,21 @@ import com.example.weather_forecast.data.datasource.remote.WeatherRemoteDataSour
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.data.models.OneCallResponse
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeatherAlert
 import com.example.weather_forecast.data.models.WindUnit
+import com.example.weather_forecast.utils.getApiLangCode
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 class WeatherRepository (context: Context){
     private val remoteDataSource = WeatherRemoteDataSource()
     private val localDataSource = WeatherLocalDataSource(context)
-    suspend fun getOneCallResponse(lat: Double, lon: Double, apiKey: String): Response<OneCallResponse> {
-        return remoteDataSource.getOneCallResponse(lat, lon, apiKey)
+    suspend fun getOneCallResponse(lat: Double, lon: Double, apiKey: String , lang: Language = Language.ENGLISH): Response<OneCallResponse> {
+        return remoteDataSource.getOneCallResponse(lat, lon, apiKey ,getApiLangCode(lang))
     }
     fun getAllFavourites(): Flow<List<FavouriteEntity>> {
         return localDataSource.getAllFavourites()
@@ -66,12 +68,13 @@ class WeatherRepository (context: Context){
     fun saveLocationSource(src: LocationSource) = localDataSource.saveLocationSource(src)
     fun saveManualLocation(lat: Double, lon: Double) = localDataSource.saveManualLocation(lat, lon)
 
-    fun saveLanguage(lang: String) = localDataSource.saveLanguage(lang)
+    fun saveLanguage(lang: Language) = localDataSource.saveLanguage(lang)
+
 
 
     fun getTempUnit(): TempUnit = localDataSource.getTempUnit()
     fun getWindUnit(): WindUnit = localDataSource.getWindUnit()
     fun getLocationSource(): LocationSource = localDataSource.getLocationSource()
     fun getManualLocation(): Pair<Double, Double>? = localDataSource.getManualLocation()
-    fun getLanguage(): String  = localDataSource.getLanguage()
+    fun getLanguage(): Language = localDataSource.getLanguage()
 }
