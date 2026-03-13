@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
+import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.utils.LocationProvider
 import com.example.weather_forecast.utils.getCenterLocation
 import com.example.weather_forecast.utils.getTopBarLocation
@@ -29,21 +30,35 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
     private val _weatherUiState = MutableStateFlow<UiState<WeatherState>>(UiState.Idle)
     val weatherUiState: StateFlow<UiState<WeatherState>>
         get() = _weatherUiState
+    private val _locationSource = MutableStateFlow(weatherRepository.getLocationSource())
+    val locationSource: StateFlow<LocationSource>
+        get() = _locationSource
 
 
     fun checkLocationAndFetch() {
-        if (locationProvider.isLocationEnabled()) {
-            locationProvider.getFreshLocation { location ->
-                _locationState.value = location
-                fetchWeather(location.latitude, location.longitude , )
-            }
-        } else {
-            viewModelScope.launch {
-                _openLocationSettings.emit(Unit)
+        when (_locationSource.value) {
+            LocationSource.GPS -> fetchWithGps()
+            LocationSource.MAP -> {
+                val saved = weatherRepository.getManualLocation()
+                if (saved != null) {
+                    fetchWeather(saved.first, saved.second)
+                } else {
+                    fetchWithGps()
+                }
             }
         }
     }
 
+    private fun fetchWithGps() {
+        if (locationProvider.isLocationEnabled()) {
+            locationProvider.getFreshLocation { location ->
+                _locationState.value = location
+                fetchWeather(location.latitude, location.longitude)
+            }
+        } else {
+            viewModelScope.launch { _openLocationSettings.emit(Unit) }
+        }
+    }
 
 
     private fun fetchWeather(
@@ -84,7 +99,9 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
             }
         }
     }
-
+    fun updateLocationSource(src: LocationSource) {
+        _locationSource.value = src
+    }
 }
 
 

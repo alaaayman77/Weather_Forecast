@@ -64,10 +64,14 @@ class WeatherRepository (context: Context){
     fun saveTempUnit(unit: TempUnit) = localDataSource.saveTempUnit(unit)
     fun saveWindUnit(unit: WindUnit)  = localDataSource.saveWindUnit(unit)
     fun saveLocationSource(src: LocationSource) = localDataSource.saveLocationSource(src)
+    fun saveManualLocation(lat: Double, lon: Double) = localDataSource.saveManualLocation(lat, lon)
+
     fun saveLanguage(lang: String) = localDataSource.saveLanguage(lang)
+
 
     fun getTempUnit(): TempUnit = localDataSource.getTempUnit()
     fun getWindUnit(): WindUnit = localDataSource.getWindUnit()
     fun getLocationSource(): LocationSource = localDataSource.getLocationSource()
+    fun getManualLocation(): Pair<Double, Double>? = localDataSource.getManualLocation()
     fun getLanguage(): String  = localDataSource.getLanguage()
 }

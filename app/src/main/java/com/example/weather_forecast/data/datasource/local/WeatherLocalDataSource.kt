@@ -19,11 +19,25 @@ class WeatherLocalDataSource(context: Context) {
     fun saveTempUnit(unit: TempUnit) = prefs.edit().putString("temp_unit", unit.name).apply()
     fun saveWindUnit(unit: WindUnit) = prefs.edit().putString("wind_unit", unit.name).apply()
     fun saveLocationSource(src: LocationSource) = prefs.edit().putString("location_src", src.name).apply()
+
+    fun saveManualLocation(lat: Double, lon: Double) {
+        prefs.edit()
+            .putFloat("manual_lat", lat.toFloat())
+            .putFloat("manual_lon", lon.toFloat())
+            .apply()
+    }
+
+
     fun saveLanguage(lang: String) = prefs.edit().putString("language", lang).apply()
 
     fun getTempUnit(): TempUnit = TempUnit.valueOf(prefs.getString("temp_unit", TempUnit.CELSIUS.name)!!)
     fun getWindUnit(): WindUnit = WindUnit.valueOf(prefs.getString("wind_unit", WindUnit.MS.name)!!)
     fun getLocationSource(): LocationSource = LocationSource.valueOf(prefs.getString("location_src", LocationSource.GPS.name)!!)
+    fun getManualLocation(): Pair<Double, Double>? {
+        val lat = prefs.getFloat("manual_lat", Float.MIN_VALUE)
+        val lon = prefs.getFloat("manual_lon", Float.MIN_VALUE)
+        return if (lat == Float.MIN_VALUE) null else Pair(lat.toDouble(), lon.toDouble())
+    }
     fun getLanguage(): String = prefs.getString("language", "English (US)")!!
 
 

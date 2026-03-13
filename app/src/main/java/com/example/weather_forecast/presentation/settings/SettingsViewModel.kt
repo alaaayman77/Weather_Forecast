@@ -45,6 +45,9 @@ class SettingsViewModel(private val repository: WeatherRepository) : ViewModel()
         repository.saveLanguage(lang)
         _language.value = lang
     }
+    fun saveManualLocation(lat: Double, lon: Double) {
+        repository.saveManualLocation(lat, lon)
+    }
 }
 
 class SettingsViewModelFactory(private val repository: WeatherRepository) : ViewModelProvider.Factory {

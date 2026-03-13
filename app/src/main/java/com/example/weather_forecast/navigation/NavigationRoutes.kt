@@ -17,7 +17,8 @@ sealed class NavigationRoutes {
     @Serializable
     data class MapPickerRoute(
         val lat: Double,
-        val lon: Double
+        val lon: Double,
+        val isFromSettings: Boolean = false
     ) : NavigationRoutes()
     @Serializable
     data class FavouriteDetailsRoute(

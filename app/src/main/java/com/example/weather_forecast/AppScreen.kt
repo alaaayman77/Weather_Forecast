@@ -217,6 +217,9 @@ fun AppScreen(
                         LaunchedEffect(addState) {
                             if (addState is UiState.Success && !hasNavigatedBack) {
                                 hasNavigatedBack = true
+                                pickedLatLng?.let { latLng ->
+
+                                }
                                 navController.popBackStack()
                             }
                         }
@@ -242,12 +245,18 @@ fun AppScreen(
                             pickedName       = pickedName,
                             cameraState      = cameraState,
                             isAddingLocation = addState is UiState.Loading,
+                            isFromSettings  = route.isFromSettings,
                             addError         = (addState as? UiState.Error)?.message,
                             onMapTapped      = { mapPickerViewModel.onMapTapped(it) },
                             onPlacePicked    = { latLng, name -> mapPickerViewModel.onPlacePicked(latLng, name) },
                             onClearPin       = { mapPickerViewModel.clearPin() },
                             onLocationPicked = { lat, lng, name ->
                                 mapPickerViewModel.onLocationPicked(lat, lng, name, favouriteViewModel)
+                            },
+                            onLocationChosen = { lat, lon ->
+                                settingsViewModel.saveManualLocation(lat, lon)
+                                weatherViewModel.checkLocationAndFetch()
+                                navController.popBackStack()
                             },
                             onDismiss = {
                                 mapPickerViewModel.clearPin()
@@ -317,8 +326,19 @@ fun AppScreen(
                             windUnit = windUnit,
                             onWindUnitClick = { settingsViewModel.setWindUnit(it) },
                             locationSrc = locationSrc,
-                            onLocationSourceGPSClick = {settingsViewModel.setLocationSource(it)},
-                            onLocationSourceMAPClick = {settingsViewModel.setLocationSource(it)},
+                            onLocationSourceGPSClick = {
+                                settingsViewModel.setLocationSource(LocationSource.GPS)
+                                weatherViewModel.updateLocationSource(LocationSource.GPS)
+                                weatherViewModel.checkLocationAndFetch()
+                            },
+                            onLocationSourceMAPClick = {
+                                settingsViewModel.setLocationSource(LocationSource.MAP)
+                                weatherViewModel.updateLocationSource(LocationSource.MAP)
+                                val lat = weatherViewModel.locationState.value.latitude.takeIf { it != 0.0 } ?: 30.0444
+                                val lon = weatherViewModel.locationState.value.longitude.takeIf { it != 0.0 } ?: 31.2357
+                                mapPickerViewModel.clearPin()
+                                navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon, isFromSettings = true))
+                            },
                             language = language,
                             onLanguageClick = { settingsViewModel.setLanguage(it)}
                             )

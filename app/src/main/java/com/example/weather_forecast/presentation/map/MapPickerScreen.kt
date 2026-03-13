@@ -48,10 +48,12 @@ fun MapPickerScreen(
     cameraState:      CameraPositionState,
     isAddingLocation: Boolean,
     addError:         String?,
+    isFromSettings:    Boolean = false,
     onMapTapped:      (LatLng) -> Unit,
     onPlacePicked:    (LatLng, String) -> Unit,
     onClearPin:       () -> Unit,
     onLocationPicked: (lat: Double, lng: Double, name: String) -> Unit,
+    onLocationChosen:  (lat: Double, lng: Double) -> Unit ,
     onDismiss:        () -> Unit,
     onZoomIn : (CameraPositionState) -> Unit,
     onZoomOut : (CameraPositionState) -> Unit,
@@ -311,62 +313,55 @@ fun MapPickerScreen(
                                 modifier              = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-
                                 OutlinedButton(
                                     onClick  = onClearPin,
                                     enabled  = !isAddingLocation,
                                     modifier = Modifier.weight(1f).height(48.dp),
                                     shape    = RoundedCornerShape(14.dp),
                                     colors   = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.primary
                                     ),
-                                    border   = androidx.compose.foundation.BorderStroke(
+                                    border = androidx.compose.foundation.BorderStroke(
                                         1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
                                     )
                                 ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.close),
-                                        contentDescription = null,
-                                        modifier           = Modifier.size(14.dp)
-                                    )
+                                    Icon(painter = painterResource(R.drawable.close), contentDescription = null, modifier = Modifier.size(14.dp))
                                     Spacer(Modifier.width(6.dp))
-                                    Text(
-                                        "Clear Pin",
-                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold , fontSize = 10.sp)
-                                    )
+                                    Text("Clear Pin", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 10.sp))
                                 }
 
-                                Button(
-                                    onClick = {
-                                        onLocationPicked(latLng.latitude, latLng.longitude, pickedName)
-                                    },
-                                    enabled  = !isAddingLocation,
-                                    modifier = Modifier.weight(1.4f).height(48.dp),
-                                    shape    = RoundedCornerShape(14.dp),
-                                    colors   = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                    ),
-                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-                                ) {
-                                    if (isAddingLocation) {
-                                        CircularProgressIndicator(
-                                            modifier    = Modifier.size(18.dp),
-                                            color       = Color.White,
-                                            strokeWidth = 2.dp
-                                        )
-                                    } else {
-                                        Icon(
-                                            painter = painterResource(R.drawable.ic_heart),
-                                            contentDescription = null,
-                                            modifier           = Modifier.size(14.dp),
-                                            tint = Color.White
-                                        )
+                                // ← swap button based on source
+                                if (isFromSettings) {
+                                    Button(
+                                        onClick  = { pickedLatLng?.let { onLocationChosen(it.latitude, it.longitude) } },
+                                        modifier = Modifier.weight(1.4f).height(48.dp),
+                                        shape    = RoundedCornerShape(14.dp),
+                                        colors   = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                                    ) {
+                                        Icon(imageVector = Icons.Rounded.LocationOn, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.White)
                                         Spacer(Modifier.width(7.dp))
-                                        Text(
-                                            "Add to Favourites",
-                                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp)
-                                        )
+                                        Text("Choose Location", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp))
+                                    }
+                                } else {
+                                    Button(
+                                        onClick  = { onLocationPicked(latLng.latitude, latLng.longitude, pickedName) },
+                                        enabled  = !isAddingLocation,
+                                        modifier = Modifier.weight(1.4f).height(48.dp),
+                                        shape    = RoundedCornerShape(14.dp),
+                                        colors   = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                        ),
+                                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                                    ) {
+                                        if (isAddingLocation) {
+                                            CircularProgressIndicator(modifier = Modifier.size(18.dp), color = Color.White, strokeWidth = 2.dp)
+                                        } else {
+                                            Icon(painter = painterResource(R.drawable.ic_heart), contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.White)
+                                            Spacer(Modifier.width(7.dp))
+                                            Text("Add to Favourites", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp))
+                                        }
                                     }
                                 }
                             }
