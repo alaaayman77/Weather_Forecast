@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">Weather_Forecast</string>
+    <string name="settings">Settings</string>
+    <string name="location">Location</string>
+    <string name="use_gps">Use GPS</string>
+    <string name="use_gps_subtitle">Current location via satellite</string>
+    <string name="choose_from_map">Choose from Map</string>
+    <string name="choose_from_map_subtitle">Select manually on world map</string>
+    <string name="units">Units</string>
+    <string name="temperature">TEMPERATURE</string>
+    <string name="wind_speed">WIND SPEED</string>
+    <string name="language">Language</string>
+    <string name="good_morning">Good Morning</string>
+    <string name="good_afternoon">Good Afternoon</string>
+    <string name="good_evening">Good Evening</string>
+    <string name="good_night">Good Night</string>
+    <string name="hourly_forecast">HOURLY FORECAST</string>
+    <string name="weekly_forecast">7-DAY FORECAST</string>
+    <string name="today">Today</string>
+    <string name="feels_like">Feels like</string>
+    <string name="humid">HUMID</string>
+    <string name="pressure">PRESSURE</string>
+    <string name="wind">WIND</string>
+    <string name="cloud">CLOUD</string>
+    <string name="sunrise">SUNRISE</string>
+    <string name="sunset">SUNSET</string>
+
 </resources>

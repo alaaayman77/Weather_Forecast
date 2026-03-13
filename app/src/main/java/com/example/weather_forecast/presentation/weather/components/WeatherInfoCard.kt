@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.WeatherInfoItem
@@ -65,8 +66,9 @@ fun WeatherInfoCard(
 
             Text(
                 text = stat.value,
-                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold , color = MaterialTheme.colorScheme.secondary ),
+                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold , color = MaterialTheme.colorScheme.secondary , textDirection = TextDirection.Ltr),
                 color = Color.Black
+
             )
 
             Text(

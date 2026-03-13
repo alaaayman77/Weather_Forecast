@@ -12,12 +12,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
-
-
+import com.example.weather_forecast.utils.formatTemp
 
 
 @Composable
@@ -25,7 +26,9 @@ fun WeeklyForecastItem(
     weeklyWeatherForecast: WeeklyWeatherForecast,
     tempUnit: TempUnit,
     globalMin: Int = 0,
-    globalMax: Int = 40
+    globalMax: Int = 40,
+    language: Language
+
 ) {
     val range        = (globalMax - globalMin).coerceAtLeast(1)
     val lowFraction  = ((weeklyWeatherForecast.lowTemp  - globalMin).toFloat() / range).coerceIn(0f, 1f)
@@ -82,10 +85,12 @@ fun WeeklyForecastItem(
 
 
             Text(
-                text = "${weeklyWeatherForecast.lowTemp}${UnitConverter.tempSymbol(tempUnit)}",
+                text = "${formatTemp(UnitConverter.convertTemp(weeklyWeatherForecast.lowTemp.toDouble(), tempUnit), tempUnit,language)}",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
+                    textDirection = TextDirection.Ltr
                 )
+
             )
 
             Spacer(modifier = Modifier.width(6.dp))
@@ -120,10 +125,11 @@ fun WeeklyForecastItem(
 
 
             Text(
-                text = "${weeklyWeatherForecast.highTemp}${UnitConverter.tempSymbol(tempUnit)}",
+                text = "${formatTemp(UnitConverter.convertTemp(weeklyWeatherForecast.highTemp.toDouble(), tempUnit), tempUnit,language)}",
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    textDirection = TextDirection.Ltr
                 )
             )
         }

@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -138,7 +139,7 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
         }
         item {
             SectionCard {
-              WeeklyList(dailyList = dailyList , tempUnit)
+              WeeklyList(dailyList = dailyList , tempUnit , language)
             }
         }
 
@@ -148,7 +149,7 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
     }
 }
 @Composable
-fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit) {
+fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit , language: Language) {
     val days      = dailyList.take(7)
     val globalMin = days.minOfOrNull { UnitConverter.convertTemp(it.temp.min, tempUnit)  } ?: 0
     val globalMax = days.maxOfOrNull { UnitConverter.convertTemp(it.temp.max, tempUnit)} ?: 40
@@ -176,7 +177,8 @@ fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit) {
                 ),
                 tempUnit = tempUnit,
                 globalMin = globalMin,
-                globalMax = globalMax
+                globalMax = globalMax,
+                language = language
             )
         }
     }
@@ -344,7 +346,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
 
             WeatherDetailChip(
                 icon = Icons.Default.Home,
-                text = "Feels like ${formatTemp(UnitConverter.convertTemp(currentWeather.feels_like, tempUnit),tempUnit, language)}${UnitConverter.tempSymbol(tempUnit)}"
+                text = "${stringResource(R.string.feels_like) }${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit), tempUnit , language)}"
             )
             }
         }
@@ -403,14 +405,14 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
 @Composable
 fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUnit: WindUnit , language: Language) {
     val row1 = listOf(
-        WeatherInfoItem(R.drawable.ic_humid,    "${currentWeather.humidity}%",      "HUMID"),
-        WeatherInfoItem(R.drawable.ic_wind,     "${formatWind(currentWeather.wind_speed, windUnit, language)}","WIND"),
-        WeatherInfoItem(R.drawable.ic_pressure, "${currentWeather.pressure} hPa",   "PRESSURE"),
+        WeatherInfoItem(R.drawable.ic_humid,    "${formatNumber(currentWeather.humidity , language)}%",      stringResource(R.string.humid)),
+        WeatherInfoItem(R.drawable.ic_wind,     "${formatWind(currentWeather.wind_speed, windUnit, language)}",stringResource(R.string.wind)),
+        WeatherInfoItem(R.drawable.ic_pressure, "${formatNumber(currentWeather.pressure , language)} hPa",   stringResource(R.string.pressure)),
     )
     val row2 = listOf(
-        WeatherInfoItem(R.drawable.ic_cloud,   "${currentWeather.clouds}%",             "CLOUD"),
-        WeatherInfoItem(R.drawable.ic_sunrise, formatTime(currentWeather.sunrise),      "SUNRISE"),
-        WeatherInfoItem(R.drawable.ic_sunset,  formatTime(currentWeather.sunset),       "SUNSET"),
+        WeatherInfoItem(R.drawable.ic_cloud,   "${formatNumber(currentWeather.clouds , language)}%",stringResource(R.string.cloud)),
+        WeatherInfoItem(R.drawable.ic_sunrise, formatTime(currentWeather.sunrise),      stringResource(R.string.sunrise)),
+        WeatherInfoItem(R.drawable.ic_sunset,  formatTime(currentWeather.sunset),       stringResource(R.string.sunset)),
     )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         WeatherStatRow(row1)

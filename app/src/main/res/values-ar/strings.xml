@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">حاله الطقس</string>
+    <string name="settings">الإعدادات</string>
+    <string name="location">الموقع</string>
+    <string name="use_gps">استخدام GPS</string>
+    <string name="use_gps_subtitle">الموقع الحالي عبر الأقمار الصناعية</string>
+    <string name="choose_from_map">اختر من الخريطة</string>
+    <string name="choose_from_map_subtitle">اختر يدوياً على خريطة العالم</string>
+    <string name="units">الوحدات</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="wind_speed">سرعة الرياح</string>
+    <string name="language">اللغة</string>
+    <string name="good_morning">صباح الخير</string>
+    <string name="good_afternoon">مساء الخير</string>
+    <string name="good_evening">مساء النور</string>
+    <string name="good_night">تصبح على خير</string>
+    <string name="hourly_forecast">توقعات بالساعة</string>
+    <string name="weekly_forecast">توقعات ٧ أيام</string>
+    <string name="today">اليوم</string>
+    <string name="feels_like">يبدو كأنه</string>
+    <string name="humid">الرطوبه</string>
+    <string name="pressure">الضغط</string>
+    <string name="wind">الرياح</string>
+    <string name="cloud">السحاب</string>
+    <string name="sunrise">الشروق</string>
+    <string name="sunset">الغروب</string>
+</resources>

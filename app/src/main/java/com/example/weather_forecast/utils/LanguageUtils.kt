@@ -50,7 +50,7 @@ fun formatWind(ms: Double, unit: WindUnit, language: Language): String {
         WindUnit.KMH -> "%.1f".format(ms * 3.6)     to "km/h"
     }
     val number = formatNumber(value, language)
-    return if (language == Language.ARABIC) "$label $number" else "$number $label"
+    return "$number $label"
 }
 fun applyLocale(context: Context, language: Language) {
     val locale = getLocale(language)
