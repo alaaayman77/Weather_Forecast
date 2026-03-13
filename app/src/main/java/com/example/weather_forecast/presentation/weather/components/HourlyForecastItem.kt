@@ -12,14 +12,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.data.models.HourlyItem
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
+import com.example.weather_forecast.utils.formatNumber
+import com.example.weather_forecast.utils.formatTemp
 
 
 @Composable
-fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit: TempUnit) {
+fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit: TempUnit , language: Language) {
     val containerColor = if (isNow)
         MaterialTheme.colorScheme.primary
     else
@@ -48,9 +52,10 @@ fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit:
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = if (isNow) "Now" else hourlyItem.hour(),
-                style = MaterialTheme.typography.labelSmall.copy(
+                text = if (isNow) "Now" else formatNumber(hourlyItem.hour(),language),
+                style = MaterialTheme.typography.labelMedium.copy(
                     color = textColor,
+
                     fontWeight = if (isNow) FontWeight.Bold else FontWeight.Normal,
 
                 )
@@ -76,10 +81,11 @@ fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit:
             }
 
             Text(
-                text = "${UnitConverter.convertTemp(hourlyItem.temp, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
+                text = "${formatTemp(UnitConverter.convertTemp(hourlyItem.temp, tempUnit), tempUnit,language)}",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = textColor,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    textDirection = TextDirection.Ltr
 
                 )
             )

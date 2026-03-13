@@ -1,9 +1,11 @@
 package com.example.weather_forecast
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModelProvider
 import com.example.weather_forecast.data.WeatherRepository
@@ -24,6 +26,7 @@ import com.example.weather_forecast.presentation.weather.WeatherViewModelFactory
 import com.example.weather_forecast.utils.LocationProvider
 import com.example.weather_forecast.utils.NotificationPermissionHandler
 import com.example.weather_forecast.utils.PermissionHandler
+import com.example.weather_forecast.utils.applyLocale
 import com.google.android.gms.location.LocationServices
 
 class MainActivity : ComponentActivity() {
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var notificationPermissionHandler: NotificationPermissionHandler
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -83,7 +87,8 @@ class MainActivity : ComponentActivity() {
         notificationPermissionHandler = NotificationPermissionHandler(this).also {
             it.init()
         }
-
+        val repository = WeatherRepository(application)
+        applyLocale(this, repository.getLanguage())
         enableEdgeToEdge()
         setContent {
             AppScreen(

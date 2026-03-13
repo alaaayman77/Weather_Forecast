@@ -22,10 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weather_forecast.data.models.Language
+import com.example.weather_forecast.utils.formatNumber
 
 
 @Composable
-fun UvIndexCard(uvi: Double = 9.76) {
+fun UvIndexCard(uvi: Double = 9.76 , language : Language) {
     val (label, color) = when {
         uvi <= 2  -> "Low"      to Color(0xFF4CAF50)
         uvi <= 5  -> "Moderate" to Color(0xFFFFC107)
@@ -58,7 +60,7 @@ fun UvIndexCard(uvi: Double = 9.76) {
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = uvi.toInt().toString(),
+                        text = "${formatNumber( uvi.toInt().toString() , language)}",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontSize = 36.sp,
                             fontWeight = FontWeight.Bold,
@@ -70,7 +72,7 @@ fun UvIndexCard(uvi: Double = 9.76) {
                         style = MaterialTheme.typography.labelMedium.copy(color = color)
                     )
                 }
-                // Circular progress indicator
+
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.size(64.dp)) {
                     CircularProgressIndicator(
                         progress = { progress },
@@ -80,7 +82,7 @@ fun UvIndexCard(uvi: Double = 9.76) {
                         strokeWidth = 6.dp
                     )
                     Text(
-                        text = "${(progress * 100).toInt()}%",
+                        text = "${formatNumber((progress * 100).toInt() , language)}%",
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Bold

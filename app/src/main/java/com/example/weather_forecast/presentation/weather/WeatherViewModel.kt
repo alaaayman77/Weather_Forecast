@@ -104,6 +104,11 @@ class WeatherViewModel(private val locationProvider: LocationProvider , private 
     fun updateLocationSource(src: LocationSource) {
         _locationSource.value = src
     }
+
+    fun onLanguageChanged() {
+        _weatherUiState.value = UiState.Loading
+        checkLocationAndFetch()
+    }
 }
 
 

@@ -1,11 +1,13 @@
 package com.example.weather_forecast
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -40,11 +42,13 @@ import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 import com.example.weather_forecast.utils.AlertStatusReceiver
 import com.example.weather_forecast.utils.NotificationPermissionHandler
 import com.example.weather_forecast.utils.PermissionHandler
+import com.example.weather_forecast.utils.applyLocale
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.rememberCameraPositionState
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppScreen(
     weatherViewModel: WeatherViewModel,
@@ -137,7 +141,7 @@ fun AppScreen(
                         val uiState  by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(UiState.Idle)
                         val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
 
-
+                        val language    by settingsViewModel.language.collectAsStateWithLifecycle()
                         when (permissionState.value) {
                             PermissionUiState.Granted -> {
                                 LaunchedEffect(Unit) {
@@ -159,7 +163,8 @@ fun AppScreen(
                                     uiState  = uiState,
                                     location = location,
                                     tempUnit = tempUnit,
-                                    windUnit = windUnit
+                                    windUnit = windUnit,
+                                    language = language
                                 )
                             }
                             PermissionUiState.Denied -> {
@@ -284,7 +289,11 @@ fun AppScreen(
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
                             } else {
-                                context.registerReceiver(receiver, filter)
+                                context.registerReceiver(
+                                    receiver,
+                                    filter,
+                                    Context.RECEIVER_NOT_EXPORTED
+                                )
                             }
                             onDispose { context.unregisterReceiver(receiver) }
                         }
@@ -340,12 +349,16 @@ fun AppScreen(
                                 navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon, isFromSettings = true))
                             },
                             language = language,
-                            onLanguageClick = { settingsViewModel.setLanguage(it)}
+                            onLanguageClick = { settingsViewModel.setLanguage(it)
+                                weatherViewModel.onLanguageChanged()
+                                applyLocale(context, it)
+                                (context as? Activity)?.recreate() }
                             )
                     }
                     composable<NavigationRoutes.FavouriteDetailsRoute> {
                         val route    = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
                         val uiState by favouriteDetailsViewModel.uiState.collectAsState()
+                        val language    by settingsViewModel.language.collectAsStateWithLifecycle()
 
                         LaunchedEffect(route.lat, route.lon) {
                             favouriteDetailsViewModel.fetchWeather(route.lat, route.lon)
@@ -358,7 +371,8 @@ fun AppScreen(
                             uiState  = uiState,
                             onBack   = { navController.popBackStack() },
                             tempUnit = tempUnit,
-                            windUnit = windUnit
+                            windUnit = windUnit,
+                            language = language
                         )
                     }
                 }

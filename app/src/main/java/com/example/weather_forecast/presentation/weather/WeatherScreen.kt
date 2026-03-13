@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +29,7 @@ import com.example.weather_forecast.data.models.DailyItem
 import com.example.weather_forecast.data.models.HourlyItem
 import com.example.weather_forecast.data.models.WeatherInfoItem
 import com.example.weather_forecast.R
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 import com.example.weather_forecast.data.models.WindUnit
@@ -40,6 +42,9 @@ import com.example.weather_forecast.presentation.weather.components.UvIndexCard
 import com.example.weather_forecast.presentation.weather.components.WeatherInfoCard
 import com.example.weather_forecast.presentation.weather.components.WeeklyForecastItem
 import com.example.weather_forecast.ui.theme.lightGray
+import com.example.weather_forecast.utils.formatNumber
+import com.example.weather_forecast.utils.formatTemp
+import com.example.weather_forecast.utils.formatWind
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -52,6 +57,7 @@ fun WeatherScreen(
     location: Location?,
     tempUnit: TempUnit,
     windUnit: WindUnit,
+    language: Language
 ) {
     Box(modifier = modifier.fillMaxSize()
           .statusBarsPadding()) {
@@ -87,7 +93,8 @@ fun WeatherScreen(
                     topBarLocation = state.data.topBarLocation,
                     centerLocation = state.data.centerLocation,
                     tempUnit       = tempUnit,
-                    windUnit       = windUnit
+                    windUnit       = windUnit,
+                    language = language
                 )
             }
         }
@@ -97,7 +104,7 @@ fun WeatherScreen(
 
 @Composable
 fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  topBarLocation: String , centerLocation: String,   tempUnit: TempUnit,      // ← add
-                         windUnit: WindUnit,  ) {
+                         windUnit: WindUnit, language: Language ) {
     val context  = LocalContext.current
     LazyColumn(
         modifier = Modifier
@@ -107,11 +114,11 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
         contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp)
     ) {
         item { WeatherTopBar(currentWeather ,  topBarLocation ) }
-        item { WeatherCenterSection(currentWeather , centerLocation, tempUnit) }
-        item { WeatherInfoGrid(currentWeather ,tempUnit, windUnit) }
+        item { WeatherCenterSection(currentWeather , centerLocation, tempUnit , language) }
+        item { WeatherInfoGrid(currentWeather ,tempUnit, windUnit , language) }
         item {
             SectionCard {
-                HourlyForecastList(hourlyList = hourlyList, tempUnit)
+                HourlyForecastList(hourlyList = hourlyList, tempUnit,language)
             }
         }
         item {
@@ -127,7 +134,7 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
             )
         }
         item {
-            UvIndexCard(uvi = currentWeather.uvi)
+            UvIndexCard(uvi = currentWeather.uvi , language = language )
         }
         item {
             SectionCard {
@@ -273,7 +280,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
 }
 
 @Composable
-fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String ,  tempUnit: TempUnit, ) {
+fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String ,  tempUnit: TempUnit,language: Language ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -296,11 +303,12 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
         }
 
         Text(
-            text = "${UnitConverter.convertTemp(currentWeather.temp, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
+            text = "${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit), tempUnit , language)}",
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
-                fontSize = 72.sp
+                fontSize = 72.sp ,
+                textDirection = TextDirection.Ltr
             )
         )
 
@@ -317,12 +325,12 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TempPill(
                 label = "H",
-                value = "${UnitConverter.convertTemp(currentWeather.temp, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
+                value = "${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit),tempUnit ,language)}",
                 isHigh = true
             )
             TempPill(
                 label = "L",
-                value = "${UnitConverter.convertTemp(currentWeather.dew_point, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
+                value = "${formatTemp(UnitConverter.convertTemp(currentWeather.dew_point, tempUnit), tempUnit,language)}",
                 isHigh = false
             )
         }
@@ -336,7 +344,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
 
             WeatherDetailChip(
                 icon = Icons.Default.Home,
-                text = "Feels like ${UnitConverter.convertTemp(currentWeather.feels_like, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}"
+                text = "Feels like ${formatTemp(UnitConverter.convertTemp(currentWeather.feels_like, tempUnit),tempUnit, language)}${UnitConverter.tempSymbol(tempUnit)}"
             )
             }
         }
@@ -365,7 +373,8 @@ fun TempPill(label: String, value: String, isHigh: Boolean) {
                 text = "$label: $value",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = if (isHigh) MaterialTheme.colorScheme.primary else lightGray,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    textDirection = TextDirection.Ltr
                 )
             )
         }
@@ -392,10 +401,10 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
 }
 
 @Composable
-fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUnit: WindUnit) {
+fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUnit: WindUnit , language: Language) {
     val row1 = listOf(
         WeatherInfoItem(R.drawable.ic_humid,    "${currentWeather.humidity}%",      "HUMID"),
-        WeatherInfoItem(R.drawable.ic_wind,     "${UnitConverter.convertWind(currentWeather.wind_speed, windUnit)}", "WIND"),
+        WeatherInfoItem(R.drawable.ic_wind,     "${formatWind(currentWeather.wind_speed, windUnit, language)}","WIND"),
         WeatherInfoItem(R.drawable.ic_pressure, "${currentWeather.pressure} hPa",   "PRESSURE"),
     )
     val row2 = listOf(
@@ -424,7 +433,7 @@ private fun WeatherStatRow(stats: List<WeatherInfoItem>) {
 
 
 @Composable
-fun HourlyForecastList(hourlyList: List<HourlyItem>, tempUnit: TempUnit) {
+fun HourlyForecastList(hourlyList: List<HourlyItem>, tempUnit: TempUnit , language: Language) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "HOURLY FORECAST",
@@ -444,7 +453,8 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>, tempUnit: TempUnit) {
                 HourlyForecastItem(
                     hourlyItem = hourlyList[index],
                     isNow      = index == 0,
-                    tempUnit = tempUnit
+                    tempUnit = tempUnit,
+                    language= language
                 )
             }
         }
