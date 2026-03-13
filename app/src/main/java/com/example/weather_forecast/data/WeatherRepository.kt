@@ -6,8 +6,11 @@ import com.example.weather_forecast.data.datasource.remote.WeatherRemoteDataSour
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.data.models.OneCallResponse
+import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeatherAlert
+import com.example.weather_forecast.data.models.WindUnit
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
@@ -57,4 +60,14 @@ class WeatherRepository (context: Context){
     suspend fun deleteAlert(alertId: Int){
         return localDataSource.deleteAlert(alertId)
     }
+
+    fun saveTempUnit(unit: TempUnit) = localDataSource.saveTempUnit(unit)
+    fun saveWindUnit(unit: WindUnit)  = localDataSource.saveWindUnit(unit)
+    fun saveLocationSource(src: LocationSource) = localDataSource.saveLocationSource(src)
+    fun saveLanguage(lang: String) = localDataSource.saveLanguage(lang)
+
+    fun getTempUnit(): TempUnit = localDataSource.getTempUnit()
+    fun getWindUnit(): WindUnit = localDataSource.getWindUnit()
+    fun getLocationSource(): LocationSource = localDataSource.getLocationSource()
+    fun getLanguage(): String  = localDataSource.getLanguage()
 }

@@ -5,11 +5,27 @@ import com.example.weather_forecast.data.datasource.db.AppDatabase
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.LocationSource
+import com.example.weather_forecast.data.models.TempUnit
+import com.example.weather_forecast.data.models.WindUnit
 import kotlinx.coroutines.flow.Flow
 
 class WeatherLocalDataSource(context: Context) {
     private val favouritesDao: FavouritesDao = AppDatabase.getInstance(context).favouriteDao()
     private val alertsDao : AlertsDao = AppDatabase.getInstance(context).alertsDao()
+    private val prefs = context.getSharedPreferences("weather_prefs", Context.MODE_PRIVATE)
+
+
+    fun saveTempUnit(unit: TempUnit) = prefs.edit().putString("temp_unit", unit.name).apply()
+    fun saveWindUnit(unit: WindUnit) = prefs.edit().putString("wind_unit", unit.name).apply()
+    fun saveLocationSource(src: LocationSource) = prefs.edit().putString("location_src", src.name).apply()
+    fun saveLanguage(lang: String) = prefs.edit().putString("language", lang).apply()
+
+    fun getTempUnit(): TempUnit = TempUnit.valueOf(prefs.getString("temp_unit", TempUnit.CELSIUS.name)!!)
+    fun getWindUnit(): WindUnit = WindUnit.valueOf(prefs.getString("wind_unit", WindUnit.MS.name)!!)
+    fun getLocationSource(): LocationSource = LocationSource.valueOf(prefs.getString("location_src", LocationSource.GPS.name)!!)
+    fun getLanguage(): String = prefs.getString("language", "English (US)")!!
+
 
 
 
