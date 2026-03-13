@@ -17,6 +17,8 @@ import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetai
 import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.map.MapPickerViewModelFactory
 import com.example.weather_forecast.presentation.permission.PermissionViewModel
+import com.example.weather_forecast.presentation.settings.SettingsViewModel
+import com.example.weather_forecast.presentation.settings.SettingsViewModelFactory
 import com.example.weather_forecast.presentation.weather.WeatherViewModel
 import com.example.weather_forecast.presentation.weather.WeatherViewModelFactory
 import com.example.weather_forecast.utils.LocationProvider
@@ -33,6 +35,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var mapPickerViewModel          : MapPickerViewModel
     private lateinit var favouriteDetailsViewModel   : FavouriteDetailsViewModel
     private lateinit var alertViewModel   : AlertViewModel
+    private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var notificationPermissionHandler: NotificationPermissionHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +71,10 @@ class MainActivity : ComponentActivity() {
             this,
             AlertViewModelFactory(WeatherRepository(application) , application)
         ).get(AlertViewModel::class.java)
+        settingsViewModel = ViewModelProvider(
+            this,
+            SettingsViewModelFactory(WeatherRepository(application))
+        ).get(SettingsViewModel::class.java)
 
         permissionHandler = PermissionHandler(this).also {
             it.init(permissionViewModel)
@@ -87,7 +94,8 @@ class MainActivity : ComponentActivity() {
                 favouriteViewModel        = favouriteViewModel,
                 mapPickerViewModel        = mapPickerViewModel,
                 favouriteDetailsViewModel = favouriteDetailsViewModel,
-                alertViewModel = alertViewModel
+                alertViewModel = alertViewModel,
+                settingsViewModel = settingsViewModel
             )
 
 
