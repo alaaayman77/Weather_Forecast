@@ -194,6 +194,8 @@ fun AppScreen(
                                 val lon = location?.longitude ?: 31.2357
                                 navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon))
                             },
+                            tempUnit = tempUnit,
+                            windUnit = windUnit
 
 
                         ){ lat , lon ->

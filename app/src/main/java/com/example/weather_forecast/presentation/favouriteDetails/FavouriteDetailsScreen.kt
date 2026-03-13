@@ -16,6 +16,9 @@ import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.weather_forecast.data.models.TempUnit
+import com.example.weather_forecast.data.models.WindUnit
+
 import com.example.weather_forecast.presentation.weather.WeatherState
 
 
@@ -29,7 +32,9 @@ fun FavouriteDetailsScreen(
     lat: Double,
     lon: Double,
     onBack: () -> Unit,
-    uiState: UiState<WeatherState>
+    uiState: UiState<WeatherState>,
+    tempUnit: TempUnit,
+    windUnit: WindUnit,
 ) {
     Scaffold(
         containerColor = Color.Transparent,
@@ -68,10 +73,13 @@ fun FavouriteDetailsScreen(
             )
         }
     ) { innerPadding ->
+
         WeatherScreen(
             modifier = modifier.padding(innerPadding),
             uiState  = uiState,
-            location = null
+            location = null,
+            tempUnit = tempUnit,
+            windUnit =windUnit
         )
     }
 }

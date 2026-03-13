@@ -37,6 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.TempUnit
+import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.ui.theme.lightGray
 
 @Composable
@@ -45,6 +47,8 @@ fun FavouriteScreen(
     uiState: UiState<FavouriteState>,
     onAddLocation: () -> Unit,
     onRemove : (Double, Double) -> Unit,
+    tempUnit: TempUnit,
+    windUnit: WindUnit,
     onNavigateToDetails: (Double , Double) -> Unit,
 
 ) {
@@ -68,7 +72,9 @@ fun FavouriteScreen(
                 FavouriteScreenContent(
                     favourites = state.data.favourites,
                     onRemove   =onRemove,
-                    onNavigateToDetails = onNavigateToDetails
+                    tempUnit = tempUnit,
+                    windUnit = windUnit,
+                    onNavigateToDetails = onNavigateToDetails,
                 )
             }
         }
@@ -92,6 +98,8 @@ fun FavouriteScreen(
 fun FavouriteScreenContent(
     favourites: List<FavouriteEntity>,
     onRemove: (Double , Double)->Unit,
+    tempUnit: TempUnit,
+    windUnit: WindUnit,
     onNavigateToDetails : (Double , Double)-> Unit
 ) {
     LazyColumn(
@@ -110,6 +118,8 @@ fun FavouriteScreenContent(
                 FavouriteLocationItem(
                     item     = item,
                     onRemove = onRemove,
+                    tempUnit = tempUnit,
+                    windUnit = windUnit,
                     onNavigateToDetails = onNavigateToDetails
                 )
             }

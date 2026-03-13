@@ -15,19 +15,23 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.TempUnit
+import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.ui.theme.lightGray
 
 @Composable
 fun FavouriteLocationItem(
     item: FavouriteEntity,
     onRemove: (Double, Double) -> Unit,
+    tempUnit: TempUnit,
+    windUnit: WindUnit,
     onNavigateToDetails : (Double,Double)->Unit,
 ) {
     val current = item.oneCallResponse.current
     val daily   = item.oneCallResponse.daily.firstOrNull()
-    val temp             = (current.temp - 273.15).toInt()
-    val highTemp         = daily?.temp?.max?.let { (it - 273.15).toInt() } ?: temp
-    val lowTemp          = daily?.temp?.min?.let { (it - 273.15).toInt() } ?: temp
+
+    val highTemp         =  "${UnitConverter.convertTemp(daily?.temp?.max ?:0.0, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}"
+    val lowTemp          =  "${UnitConverter.convertTemp(daily?.temp?.min ?:0.0, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}"
     val weatherCondition = current.weather.firstOrNull()?.description
         ?.replaceFirstChar { it.uppercase() } ?: ""
     val iconUrl          = current.weather.firstOrNull()?.iconUrl()
@@ -89,7 +93,7 @@ fun FavouriteLocationItem(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text = "${temp}°",
+                            text =  "${UnitConverter.convertTemp(daily?.temp?.max ?:0.0, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
@@ -157,7 +161,7 @@ fun FavouriteLocationItem(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "${current.wind_speed} m/s",
+                            text =  "${UnitConverter.convertWind(current.wind_speed, windUnit)}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.SemiBold
@@ -171,7 +175,7 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
-                            text = "${highTemp}°",
+                            text = "${highTemp}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold
@@ -182,7 +186,7 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
-                            text = "${lowTemp}°",
+                            text = "${lowTemp}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold
