@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 
 
@@ -22,6 +23,7 @@ import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 @Composable
 fun WeeklyForecastItem(
     weeklyWeatherForecast: WeeklyWeatherForecast,
+    tempUnit: TempUnit,
     globalMin: Int = 0,
     globalMax: Int = 40
 ) {
@@ -80,7 +82,7 @@ fun WeeklyForecastItem(
 
 
             Text(
-                text = "${weeklyWeatherForecast.lowTemp}°",
+                text = "${weeklyWeatherForecast.lowTemp}${UnitConverter.tempSymbol(tempUnit)}",
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                 )
@@ -118,7 +120,7 @@ fun WeeklyForecastItem(
 
 
             Text(
-                text = "${weeklyWeatherForecast.highTemp}°",
+                text = "${weeklyWeatherForecast.highTemp}${UnitConverter.tempSymbol(tempUnit)}",
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.SemiBold

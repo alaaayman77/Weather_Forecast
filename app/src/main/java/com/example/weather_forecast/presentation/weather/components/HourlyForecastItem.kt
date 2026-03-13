@@ -11,15 +11,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.data.models.HourlyItem
-import com.example.weather_forecast.presentation.weather.toCelsius
+import com.example.weather_forecast.data.models.TempUnit
+
 
 @Composable
-fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false) {
+fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit: TempUnit) {
     val containerColor = if (isNow)
         MaterialTheme.colorScheme.primary
     else
@@ -76,7 +76,7 @@ fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false) {
             }
 
             Text(
-                text = "${hourlyItem.temp.toCelsius()}°",
+                text = "${UnitConverter.convertTemp(hourlyItem.temp, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = textColor,
                     fontWeight = FontWeight.SemiBold

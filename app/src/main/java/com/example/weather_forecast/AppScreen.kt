@@ -19,11 +19,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
+import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
 import com.example.weather_forecast.presentation.alerts.AlertScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsScreen
-import com.example.weather_forecast.presentation.SettingsScreen
+import com.example.weather_forecast.presentation.settings.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen
 import com.example.weather_forecast.presentation.alerts.AlertReceiver
 import com.example.weather_forecast.presentation.alerts.AlertViewModel
@@ -33,6 +34,7 @@ import com.example.weather_forecast.presentation.favourite.MapPickerScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModel
 import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.permission.*
+import com.example.weather_forecast.presentation.settings.SettingsViewModel
 import com.example.weather_forecast.presentation.weather.*
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 import com.example.weather_forecast.utils.AlertStatusReceiver
@@ -53,6 +55,7 @@ fun AppScreen(
     mapPickerViewModel : MapPickerViewModel,
     favouriteDetailsViewModel: FavouriteDetailsViewModel,
     alertViewModel : AlertViewModel,
+    settingsViewModel: SettingsViewModel
 ) {
     val navController : NavHostController  = rememberNavController()
     val context         = LocalContext.current
@@ -111,6 +114,8 @@ fun AppScreen(
                     }
                 }
             ) { innerPadding ->
+                val tempUnit by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
+                val windUnit by settingsViewModel.windUnit.collectAsStateWithLifecycle()
                 NavHost(
                     navController    = navController,
                     startDestination = NavigationRoutes.SplashRoute,
@@ -132,6 +137,7 @@ fun AppScreen(
                         val uiState  by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(UiState.Idle)
                         val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
 
+
                         when (permissionState.value) {
                             PermissionUiState.Granted -> {
                                 LaunchedEffect(Unit) {
@@ -152,6 +158,8 @@ fun AppScreen(
                                         .padding(innerPadding),
                                     uiState  = uiState,
                                     location = location,
+                                    tempUnit = tempUnit,
+                                    windUnit = windUnit
                                 )
                             }
                             PermissionUiState.Denied -> {
@@ -296,7 +304,22 @@ fun AppScreen(
                         )
                     }
                     composable<NavigationRoutes.SettingsRoute> {
-                        SettingsScreen(modifier = Modifier.padding(innerPadding))
+                        val tempUnit    by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
+                        val windUnit    by settingsViewModel.windUnit.collectAsStateWithLifecycle()
+                        val locationSrc by settingsViewModel.locationSource.collectAsStateWithLifecycle()
+                        val language    by settingsViewModel.language.collectAsStateWithLifecycle()
+                        SettingsScreen(
+                            modifier = Modifier.padding(innerPadding),
+                            tempUnit = tempUnit,
+                            onTempUnitClick = {settingsViewModel.setTempUnit(it)},
+                            windUnit = windUnit,
+                            onWindUnitClick = { settingsViewModel.setWindUnit(it) },
+                            locationSrc = locationSrc,
+                            onLocationSourceGPSClick = {settingsViewModel.setLocationSource(it)},
+                            onLocationSourceMAPClick = {settingsViewModel.setLocationSource(it)},
+                            language = language,
+                            onLanguageClick = { settingsViewModel.setLanguage(it)}
+                            )
                     }
                     composable<NavigationRoutes.FavouriteDetailsRoute> {
                         val route    = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
@@ -311,7 +334,9 @@ fun AppScreen(
                             lat      = route.lat,
                             lon      = route.lon,
                             uiState  = uiState,
-                            onBack   = { navController.popBackStack() }
+                            onBack   = { navController.popBackStack() },
+                            tempUnit = tempUnit,
+                            windUnit = windUnit
                         )
                     }
                 }

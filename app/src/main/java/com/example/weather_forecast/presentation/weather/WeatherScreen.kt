@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.rounded.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,7 +28,10 @@ import com.example.weather_forecast.data.models.DailyItem
 import com.example.weather_forecast.data.models.HourlyItem
 import com.example.weather_forecast.data.models.WeatherInfoItem
 import com.example.weather_forecast.R
+import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
+import com.example.weather_forecast.data.models.WindUnit
+
 
 import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
 import com.example.weather_forecast.presentation.weather.components.SectionCard
@@ -48,6 +50,8 @@ fun WeatherScreen(
     modifier: Modifier = Modifier,
     uiState: UiState<WeatherState>,
     location: Location?,
+    tempUnit: TempUnit,
+    windUnit: WindUnit,
 ) {
     Box(modifier = modifier.fillMaxSize()
           .statusBarsPadding()) {
@@ -81,7 +85,9 @@ fun WeatherScreen(
                     hourlyList  = state.data.oneCall.hourly,
                     dailyList   = uiState.data.oneCall.daily,
                     topBarLocation = state.data.topBarLocation,
-                    centerLocation = state.data.centerLocation
+                    centerLocation = state.data.centerLocation,
+                    tempUnit       = tempUnit,
+                    windUnit       = windUnit
                 )
             }
         }
@@ -90,7 +96,8 @@ fun WeatherScreen(
 
 
 @Composable
-fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  topBarLocation: String , centerLocation: String) {
+fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  topBarLocation: String , centerLocation: String,   tempUnit: TempUnit,      // ← add
+                         windUnit: WindUnit,  ) {
     val context  = LocalContext.current
     LazyColumn(
         modifier = Modifier
@@ -99,12 +106,12 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
         verticalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp)
     ) {
-        item { WeatherTopBar(currentWeather ,  topBarLocation) }
-        item { WeatherCenterSection(currentWeather , centerLocation) }
-        item { WeatherInfoGrid(currentWeather) }
+        item { WeatherTopBar(currentWeather ,  topBarLocation ) }
+        item { WeatherCenterSection(currentWeather , centerLocation, tempUnit) }
+        item { WeatherInfoGrid(currentWeather ,tempUnit, windUnit) }
         item {
             SectionCard {
-                HourlyForecastList(hourlyList = hourlyList)
+                HourlyForecastList(hourlyList = hourlyList, tempUnit)
             }
         }
         item {
@@ -124,7 +131,7 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
         }
         item {
             SectionCard {
-              WeeklyList(dailyList = dailyList)
+              WeeklyList(dailyList = dailyList , tempUnit)
             }
         }
 
@@ -134,10 +141,10 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
     }
 }
 @Composable
-fun WeeklyList(dailyList: List<DailyItem>) {
+fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit) {
     val days      = dailyList.take(7)
-    val globalMin = days.minOfOrNull { it.temp.min.toCelsius() } ?: 0
-    val globalMax = days.maxOfOrNull { it.temp.max.toCelsius() } ?: 40
+    val globalMin = days.minOfOrNull { UnitConverter.convertTemp(it.temp.min, tempUnit)  } ?: 0
+    val globalMax = days.maxOfOrNull { UnitConverter.convertTemp(it.temp.max, tempUnit)} ?: 40
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
@@ -154,12 +161,13 @@ fun WeeklyList(dailyList: List<DailyItem>) {
                 weeklyWeatherForecast = WeeklyWeatherForecast(
                     day       = if (index == 0) "Today" else day.dayName(),
                     icon      = Icons.Default.Home,
-                    lowTemp   = day.temp.min.toCelsius(),
-                    highTemp  = day.temp.max.toCelsius(),
+                    lowTemp   = UnitConverter.convertTemp(day.temp.min, tempUnit),
+                    highTemp  = UnitConverter.convertTemp(day.temp.max, tempUnit),
                     condition = day.weather.firstOrNull()?.description
                         ?.replaceFirstChar { it.uppercase() } ?: "",
                     iconUrl   = day.weather.firstOrNull()?.iconUrl()
                 ),
+                tempUnit = tempUnit,
                 globalMin = globalMin,
                 globalMax = globalMax
             )
@@ -265,7 +273,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
 }
 
 @Composable
-fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String) {
+fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String ,  tempUnit: TempUnit, ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -288,7 +296,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
         }
 
         Text(
-            text = "${currentWeather.temp.toCelsius()}°",
+            text = "${UnitConverter.convertTemp(currentWeather.temp, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
             style = MaterialTheme.typography.labelLarge.copy(
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
@@ -309,12 +317,12 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TempPill(
                 label = "H",
-                value = "${currentWeather.temp.toCelsius()}°",
+                value = "${UnitConverter.convertTemp(currentWeather.temp, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
                 isHigh = true
             )
             TempPill(
                 label = "L",
-                value = "${currentWeather.dew_point.toCelsius()}°",
+                value = "${UnitConverter.convertTemp(currentWeather.dew_point, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
                 isHigh = false
             )
         }
@@ -328,7 +336,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
 
             WeatherDetailChip(
                 icon = Icons.Default.Home,
-                text = "Feels like ${currentWeather.feels_like.toCelsius()}°"
+                text = "Feels like ${UnitConverter.convertTemp(currentWeather.feels_like, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}"
             )
             }
         }
@@ -384,10 +392,10 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
 }
 
 @Composable
-fun WeatherInfoGrid(currentWeather: CurrentWeather) {
+fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUnit: WindUnit) {
     val row1 = listOf(
         WeatherInfoItem(R.drawable.ic_humid,    "${currentWeather.humidity}%",      "HUMID"),
-        WeatherInfoItem(R.drawable.ic_wind,     "${currentWeather.wind_speed} m/s", "WIND"),
+        WeatherInfoItem(R.drawable.ic_wind,     "${UnitConverter.convertWind(currentWeather.wind_speed, windUnit)}", "WIND"),
         WeatherInfoItem(R.drawable.ic_pressure, "${currentWeather.pressure} hPa",   "PRESSURE"),
     )
     val row2 = listOf(
@@ -416,7 +424,7 @@ private fun WeatherStatRow(stats: List<WeatherInfoItem>) {
 
 
 @Composable
-fun HourlyForecastList(hourlyList: List<HourlyItem>) {
+fun HourlyForecastList(hourlyList: List<HourlyItem>, tempUnit: TempUnit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "HOURLY FORECAST",
@@ -435,7 +443,8 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>) {
             items(hourlyList.size) { index ->
                 HourlyForecastItem(
                     hourlyItem = hourlyList[index],
-                    isNow      = index == 0
+                    isNow      = index == 0,
+                    tempUnit = tempUnit
                 )
             }
         }
@@ -445,7 +454,6 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>) {
 
 
 
-fun Double.toCelsius() = (this - 273.15).toInt()
 fun formatTime(timestamp: Long?): String {
     if (timestamp == null) return "--"
     return SimpleDateFormat("hh:mm a", Locale.getDefault())

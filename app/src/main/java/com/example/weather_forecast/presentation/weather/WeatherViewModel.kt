@@ -94,4 +94,3 @@ class WeatherViewModelFactory(private val locationProvider: LocationProvider ,pr
     }
 }
 
-
