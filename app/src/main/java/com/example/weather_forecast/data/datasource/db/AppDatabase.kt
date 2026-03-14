@@ -13,14 +13,13 @@ import com.example.weather_forecast.utils.AlertsTypeConvertors
 import com.example.weather_forecast.utils.WeatherTypeConverters
 
 @Database(entities = [FavouriteEntity::class, AlertEntity::class], version = 1)
-@TypeConverters(WeatherTypeConverters::class , AlertsTypeConvertors::class)
+@TypeConverters(WeatherTypeConverters::class, AlertsTypeConvertors::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favouriteDao(): FavouritesDao
-    abstract fun alertsDao(): AlertsDao
+    abstract fun alertsDao()   : AlertsDao
 
     companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
+        @Volatile private var INSTANCE: AppDatabase? = null
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -28,7 +27,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "weather_db"
-                ).build().also { INSTANCE = it }
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
+                    .also { INSTANCE = it }
             }
         }
     }

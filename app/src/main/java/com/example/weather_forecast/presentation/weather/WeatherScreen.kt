@@ -37,6 +37,7 @@ import com.example.weather_forecast.data.models.WindUnit
 
 
 import com.example.weather_forecast.presentation.weather.components.HourlyForecastItem
+import com.example.weather_forecast.presentation.weather.components.LoadingIndicator
 import com.example.weather_forecast.presentation.weather.components.SectionCard
 import com.example.weather_forecast.presentation.weather.components.SunTimesCard
 import com.example.weather_forecast.presentation.weather.components.UvIndexCard
@@ -46,6 +47,7 @@ import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.utils.formatNumber
 import com.example.weather_forecast.utils.formatTemp
 import com.example.weather_forecast.utils.formatWind
+import com.google.android.material.loadingindicator.LoadingIndicator
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -65,9 +67,7 @@ fun WeatherScreen(
         when (val state =uiState) {
             is UiState.Idle,
             is UiState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                LoadingIndicator(modifier = Modifier.align(Alignment.Center))
             }
             is UiState.Error -> {
                 Column(

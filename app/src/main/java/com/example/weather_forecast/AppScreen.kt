@@ -279,15 +279,13 @@ fun AppScreen(
                             notificationPermissionHandler.requestIfNeeded()
                         }
 
+                        val uiState             by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
+                        val scheduledAlerts     by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
+                        val showBottomSheet     by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
+                        val showPermDialog      by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
+                        val alertStatuses       by alertViewModel.alertStatuses.collectAsStateWithLifecycle()
                         val showNotifPermDialog by alertViewModel.showNotifPermDialog.collectAsStateWithLifecycle()
-                        val uiState         by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
-                        val scheduledAlerts by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
 
-                        val showBottomSheet by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
-                        val showPermDialog  by alertViewModel.showPermDialog.collectAsStateWithLifecycle()
-                        val alertStatuses   by alertViewModel.alertStatuses.collectAsStateWithLifecycle()
-
-                        // register status receiver only while on this screen
                         DisposableEffect(Unit) {
                             val receiver = AlertStatusReceiver { alertId, status ->
                                 alertViewModel.updateAlertStatus(alertId, status)
@@ -296,35 +294,41 @@ fun AppScreen(
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
                             } else {
-                                context.registerReceiver(
-                                    receiver,
-                                    filter,
-                                    Context.RECEIVER_NOT_EXPORTED
-                                )
+                                context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
                             }
                             onDispose { context.unregisterReceiver(receiver) }
                         }
 
                         LaunchedEffect(location) {
-                            val lat = 40.1934
-                            val lon = -85.3864
+                            val lat = location?.latitude  ?: 30.0444
+                            val lon = location?.longitude ?: 31.2357
                             alertViewModel.fetchWeatherAlerts(lat, lon)
                         }
 
                         AlertScreen(
-                            modifier            = Modifier.padding(innerPadding),
-                            weatherAlertsState  = uiState,
-                            scheduledAlerts     = scheduledAlerts,
-                            alertStatuses       = alertStatuses,
-                            showBottomSheet     = showBottomSheet,
-                            showPermDialog      = showPermDialog,
-                            canScheduleExact    = alertViewModel.canScheduleExactAlarms(),
-                            onRetry             = { alertViewModel.fetchWeatherAlerts(40.1934, -85.3864) },
-                            onCancelAlert       = { alertViewModel.cancelAlert(it) },
-                            onScheduleAlert     = { type, startMillis, endMillis, startLabel, endLabel ->
-                                alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel)
+                            modifier                 = Modifier.padding(innerPadding),
+                            weatherAlertsState       = uiState,
+                            scheduledAlerts          = scheduledAlerts,
+                            alertStatuses            = alertStatuses,
+                            showBottomSheet          = showBottomSheet,
+                            showPermDialog           = showPermDialog,
+                            canScheduleExact         = alertViewModel.canScheduleExactAlarms(),
+                            onRetry                  = {
+                                val lat = location?.latitude  ?: 30.0444
+                                val lon = location?.longitude ?: 31.2357
+                                alertViewModel.fetchWeatherAlerts(lat, lon)
                             },
-
+                            onCancelAlert            = { alertViewModel.cancelAlert(it) },
+                            onScheduleAlert          = { type, startMillis, endMillis, startLabel, endLabel, mode, condition ->
+                                alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel, mode, condition)
+                            },
+                            onFabClicked             = {
+                                alertViewModel.onFabClicked(
+                                    isNotificationGranted = NotificationPermissionHandler.isGranted(context)
+                                )
+                            },
+                            onDismissSheet           = { alertViewModel.onDismissBottomSheet() },
+                            onDismissPermDialog      = { alertViewModel.onDismissPermDialog() },
                             showNotifPermDialog      = showNotifPermDialog,
                             onDismissNotifPermDialog = { alertViewModel.onDismissNotifPermDialog() },
                             onOpenNotifSettings      = {
@@ -333,14 +337,7 @@ fun AppScreen(
                                         data = Uri.fromParts("package", context.packageName, null)
                                     }
                                 )
-                            },
-                            onFabClicked = {
-                                alertViewModel.onFabClicked(
-                                    isNotificationGranted = NotificationPermissionHandler.isGranted(context)
-                                )
-                            },
-                            onDismissSheet      = { alertViewModel.onDismissBottomSheet() },
-                            onDismissPermDialog = { alertViewModel.onDismissPermDialog() }
+                            }
                         )
                     }
                     composable<NavigationRoutes.SettingsRoute> {

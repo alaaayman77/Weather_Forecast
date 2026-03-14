@@ -1,26 +1,12 @@
 package com.example.weather_forecast.presentation.alerts.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,17 +16,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.AlertEntity
+import com.example.weather_forecast.data.models.AlertMode
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.ui.theme.lightGray
+
 @Composable
 fun ScheduledAlertCard(
     item    : AlertEntity,
-
     onCancel: () -> Unit
 ) {
-    val timeRange = "${formatMillis(item.startMillis)} → ${formatMillis(item.endMillis)}"
-    val duration  = durationLabel(item.startMillis, item.endMillis)
-
     val statusText  = when (item.status) {
         AlertStatus.SCHEDULED -> "Scheduled"
         AlertStatus.ACTIVE    -> "Active"
@@ -48,10 +32,10 @@ fun ScheduledAlertCard(
         AlertStatus.CANCELLED -> "Cancelled"
     }
     val statusColor = when (item.status) {
-        AlertStatus.SCHEDULED -> Color.Blue
-        AlertStatus.ACTIVE    -> Color.Green
-        AlertStatus.DISMISSED -> Color.Yellow
-        AlertStatus.CANCELLED -> Color.Red
+        AlertStatus.SCHEDULED -> Color(0xFF1E88E5)
+        AlertStatus.ACTIVE    -> Color(0xFF43A047)
+        AlertStatus.DISMISSED -> Color(0xFFFFA000)
+        AlertStatus.CANCELLED -> Color(0xFFE53935)
     }
 
     Surface(
@@ -62,7 +46,6 @@ fun ScheduledAlertCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
@@ -71,7 +54,11 @@ fun ScheduledAlertCard(
                         .background(item.type.color.copy(alpha = 0.13f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(item.type.icon, null, tint = item.type.color, modifier = Modifier.size(24.dp))
+                    Icon(
+                        item.type.icon, null,
+                        tint     = item.type.color,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
 
                 Spacer(Modifier.width(12.dp))
@@ -85,7 +72,8 @@ fun ScheduledAlertCard(
                         )
                     )
                     Text(
-                        item.type.subtitle,
+                        if (item.mode == AlertMode.CUSTOM) "Condition-based alert"
+                        else item.type.subtitle,
                         style = MaterialTheme.typography.bodySmall.copy(
                             color    = lightGray,
                             fontSize = 11.sp
@@ -109,7 +97,11 @@ fun ScheduledAlertCard(
                 }
 
                 IconButton(onClick = onCancel, modifier = Modifier.size(36.dp)) {
-                    Icon(Icons.Default.Delete, "Cancel", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
+                    Icon(
+                        Icons.Default.Delete, "Cancel",
+                        tint     = Color(0xFFE53935),
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
             }
 
@@ -117,23 +109,69 @@ fun ScheduledAlertCard(
             HorizontalDivider(color = Color(0xFFE3F2FD), thickness = 1.dp)
             Spacer(Modifier.height(12.dp))
 
+            // Custom condition badge
+            if (item.mode == AlertMode.CUSTOM && item.customCondition != null) {
+                Surface(
+                    shape    = RoundedCornerShape(8.dp),
+                    color    = Color(0xFFE3F2FD),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
+                ) {
+                    Text(
+                        text     = "Watching: ${item.customCondition.emoji} ${item.customCondition.label}",
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        style    = MaterialTheme.typography.labelSmall.copy(
+                            color      = Color(0xFF1565C0),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize   = 11.sp
+                        )
+                    )
+                }
+            }
 
             Row(
                 modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment     = Alignment.CenterVertically
             ) {
-                TimeChip(label = "Start", time = formatMillis(item.startMillis), color = Color(0xFF1E88E5), modifier = Modifier.weight(1f))
-                Icon(Icons.Default.ArrowForward, null, tint = lightGray, modifier = Modifier.size(14.dp))
-                TimeChip(label = "End",   time = formatMillis(item.endMillis),   color = Color(0xFF43A047), modifier = Modifier.weight(1f))
-
+                TimeChip(
+                    label    = if (item.mode == AlertMode.CUSTOM) "From" else "Start",
+                    time     = formatMillis(item.startMillis),
+                    color    = Color(0xFF1E88E5),
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    Icons.Default.ArrowForward, null,
+                    tint     = lightGray,
+                    modifier = Modifier.size(14.dp)
+                )
+                TimeChip(
+                    label    = if (item.mode == AlertMode.CUSTOM) "Until" else "End",
+                    time     = formatMillis(item.endMillis),
+                    color    = Color(0xFF43A047),
+                    modifier = Modifier.weight(1f)
+                )
                 Surface(shape = RoundedCornerShape(10.dp), color = Color(0xFFF0F6FF)) {
                     Column(
                         modifier            = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Duration", style = MaterialTheme.typography.labelSmall.copy(color = lightGray, fontSize = 9.sp))
-                        Text(duration,   style = MaterialTheme.typography.labelMedium.copy(color = Color(0xFF0D2B4E), fontWeight = FontWeight.Bold, fontSize = 11.sp))
+                        Text(
+                            "Duration",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color    = lightGray,
+                                fontSize = 9.sp
+                            )
+                        )
+                        Text(
+                            durationLabel(item.startMillis, item.endMillis),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                color      = Color(0xFF0D2B4E),
+                                fontWeight = FontWeight.Bold,
+                                fontSize   = 11.sp
+                            )
+                        )
                     }
                 }
             }
@@ -142,7 +180,12 @@ fun ScheduledAlertCard(
 }
 
 @Composable
-private fun TimeChip(label: String, time: String, color: Color, modifier: Modifier = Modifier) {
+private fun TimeChip(
+    label   : String,
+    time    : String,
+    color   : Color,
+    modifier: Modifier = Modifier
+) {
     Surface(
         shape    = RoundedCornerShape(10.dp),
         color    = color.copy(alpha = 0.08f),
@@ -155,8 +198,8 @@ private fun TimeChip(label: String, time: String, color: Color, modifier: Modifi
             Text(
                 label,
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color    = color,
-                    fontSize = 9.sp,
+                    color      = color,
+                    fontSize   = 9.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             )
@@ -179,8 +222,8 @@ private fun formatMillis(millis: Long): String =
 private fun durationLabel(startMillis: Long, endMillis: Long): String {
     val diffMinutes = ((endMillis - startMillis) / 1000 / 60).toInt()
     return when {
-        diffMinutes < 60   -> "${diffMinutes}m"
-        diffMinutes % 60 == 0 -> "${diffMinutes / 60}h"
-        else               -> "${diffMinutes / 60}h ${diffMinutes % 60}m"
+        diffMinutes < 60          -> "${diffMinutes}m"
+        diffMinutes % 60 == 0     -> "${diffMinutes / 60}h"
+        else                      -> "${diffMinutes / 60}h ${diffMinutes % 60}m"
     }
 }

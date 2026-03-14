@@ -71,6 +71,8 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.ui.ui)
+    implementation(libs.material)
+    implementation(libs.androidx.work.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -108,5 +110,6 @@ dependencies {
     ksp("androidx.room:room-compiler:2.6.1")
 //    implementation("androidx.media3:media3-exoplayer:1.3.1")
 //    implementation("androidx.media3:media3-ui:1.3.1")
+    implementation("com.airbnb.android:lottie-compose:6.4.0")
 
 }

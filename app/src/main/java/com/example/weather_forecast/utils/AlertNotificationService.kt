@@ -22,10 +22,10 @@ import com.example.weather_forecast.data.models.AlertType
 
 class AlertNotificationService : Service() {
 
-    private var mediaPlayer: MediaPlayer? = null
-    private var vibrator: Vibrator? = null
-    private var currentAlertId : Int = -1
-    private var currentNotification : Notification? = null
+    private var mediaPlayer        : MediaPlayer?   = null
+    private var vibrator           : Vibrator?      = null
+    private var currentAlertId     : Int            = -1
+    private var currentNotification: Notification?  = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -45,20 +45,26 @@ class AlertNotificationService : Service() {
                 val alertType = intent.getStringExtra(AlertReceiver.EXTRA_ALERT_TYPE)
                     ?: AlertType.NOTIFICATION.name
                 val label     = intent.getStringExtra(AlertReceiver.EXTRA_LABEL) ?: "Weather Alert"
+                val alertMode = intent.getStringExtra(AlertReceiver.EXTRA_ALERT_MODE) ?: "SCHEDULED"
 
                 stopAlarm()
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-                broadcastStatusUpdate(alertId, AlertStatus.DISMISSED.name) //status dismiss
+                broadcastStatusUpdate(alertId, AlertStatus.DISMISSED.name)
 
-                // re-schedule for tomorrow on dismiss
-                val tomorrowMillis = System.currentTimeMillis() + 24 * 60 * 60 * 1000L
-                AlertScheduler(this).schedule(
-                    id              = alertId,
-                    type            = AlertType.valueOf(alertType),
-                    label           = label,
-                    triggerAtMillis = tomorrowMillis
-                )
-                Log.d(TAG, "Dismissed — rescheduled for tomorrow id=$alertId")
+                // Only reschedule tomorrow for SCHEDULED alerts, not CUSTOM
+                if (alertMode != "CUSTOM") {
+                    val tomorrowMillis = System.currentTimeMillis() + 24 * 60 * 60 * 1000L
+                    AlertScheduler(this).schedule(
+                        id              = alertId,
+                        type            = AlertType.valueOf(alertType),
+                        label           = label,
+                        triggerAtMillis = tomorrowMillis
+                    )
+                    Log.d(TAG, "Dismissed — rescheduled for tomorrow id=$alertId")
+                } else {
+                    Log.d(TAG, "Dismissed custom alert — not rescheduling id=$alertId")
+                }
+
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -68,47 +74,52 @@ class AlertNotificationService : Service() {
                 val alertType = intent.getStringExtra(AlertReceiver.EXTRA_ALERT_TYPE)
                     ?: AlertType.NOTIFICATION.name
                 val label     = intent.getStringExtra(AlertReceiver.EXTRA_LABEL) ?: "Weather Alert"
+                val alertMode = intent.getStringExtra(AlertReceiver.EXTRA_ALERT_MODE) ?: "SCHEDULED"
 
                 stopAlarm()
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
-                broadcastStatusUpdate(alertId, AlertStatus.CANCELLED.name) //status cancel
+                broadcastStatusUpdate(alertId, AlertStatus.CANCELLED.name)
 
-                AlertScheduler(this).cancel(
-                    id    = alertId,
-                    type  = AlertType.valueOf(alertType),
-                    label = label
-                )
-                Log.d(TAG, "Cancelled entirely id=$alertId")
+                // Only cancel alarm for SCHEDULED alerts
+                if (alertMode != "CUSTOM") {
+                    AlertScheduler(this).cancel(
+                        id    = alertId,
+                        type  = AlertType.valueOf(alertType),
+                        label = label
+                    )
+                }
+
+                Log.d(TAG, "Cancelled id=$alertId mode=$alertMode")
                 stopSelf()
                 return START_NOT_STICKY
             }
         }
 
-        val alertId = intent?.getIntExtra(AlertReceiver.EXTRA_ALERT_ID, startId) ?: startId
+        val alertId   = intent?.getIntExtra(AlertReceiver.EXTRA_ALERT_ID, startId) ?: startId
         val alertType = try {
             AlertType.valueOf(
                 intent?.getStringExtra(AlertReceiver.EXTRA_ALERT_TYPE)
                     ?: AlertType.NOTIFICATION.name
             )
         } catch (e: Exception) { AlertType.NOTIFICATION }
-        val label = intent?.getStringExtra(AlertReceiver.EXTRA_LABEL) ?: "Weather Alert"
-        Log.d(TAG, "   alertId=$alertId  type=$alertType  label=$label")
+        val label     = intent?.getStringExtra(AlertReceiver.EXTRA_LABEL) ?: "Weather Alert"
+        val alertMode = intent?.getStringExtra(AlertReceiver.EXTRA_ALERT_MODE) ?: "SCHEDULED"
+
+        Log.d(TAG, "alertId=$alertId type=$alertType mode=$alertMode label=$label")
 
         when (alertType) {
-            AlertType.ALERT        -> startAlertMode(alertId, alertType.name, label)
-            AlertType.NOTIFICATION -> startNotificationMode(alertId, alertType.name, label)
+            AlertType.ALERT        -> startAlertMode(alertId, alertType.name, label, alertMode)
+            AlertType.NOTIFICATION -> startNotificationMode(alertId, alertType.name, label, alertMode)
         }
 
         return START_STICKY
     }
 
-
-    private fun startAlertMode(alertId: Int, alertType: String, label: String) {
+    private fun startAlertMode(alertId: Int, alertType: String, label: String, alertMode: String) {
         Log.d(TAG, "startAlertMode id=$alertId")
 
-        val dismissIntent    = dismissPendingIntent(alertId, alertType, label)
-        val cancelIntent     = cancelPendingIntent(alertId, alertType, label)
-        //navigate to main activity
+        val dismissIntent    = dismissPendingIntent(alertId, alertType, label, alertMode)
+        val cancelIntent     = cancelPendingIntent(alertId, alertType, label, alertMode)
         val fullScreenIntent = PendingIntent.getActivity(
             this, alertId,
             Intent(this, MainActivity::class.java).apply {
@@ -154,7 +165,7 @@ class AlertNotificationService : Service() {
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setOngoing(true) //can't swipe away
+            .setOngoing(true)
             .setAutoCancel(false)
             .setOnlyAlertOnce(false)
             .setFullScreenIntent(fullScreenIntent, true)
@@ -176,14 +187,13 @@ class AlertNotificationService : Service() {
             }
 
         startForegroundCompat(alertId, notification)
-        broadcastStatusUpdate(alertId, AlertStatus.ACTIVE.name)  //status is active now
+        broadcastStatusUpdate(alertId, AlertStatus.ACTIVE.name)
 
         try { playRingtone() } catch (e: Exception) { Log.e(TAG, "playRingtone: ${e.message}", e) }
         try { vibrate()      } catch (e: Exception) { Log.e(TAG, "vibrate: ${e.message}", e)      }
     }
 
-
-    private fun startNotificationMode(alertId: Int, alertType: String, label: String) {
+    private fun startNotificationMode(alertId: Int, alertType: String, label: String, alertMode: String) {
         Log.d(TAG, "startNotificationMode id=$alertId")
 
         val notification = NotificationCompat.Builder(this, CHANNEL_NOTIFICATION)
@@ -204,14 +214,15 @@ class AlertNotificationService : Service() {
             .setOngoing(true)
             .setAutoCancel(false)
             .setSilent(true)
-            .addAction(0, "✓  Dismiss",      dismissPendingIntent(alertId, alertType, label))
-            .addAction(0, "✕  Cancel Alert", cancelPendingIntent(alertId, alertType, label))
+            .addAction(0, "✓  Dismiss",
+                dismissPendingIntent(alertId, alertType, label, alertMode))
+            .addAction(0, "✕  Cancel Alert",
+                cancelPendingIntent(alertId, alertType, label, alertMode))
             .build()
 
         startForegroundCompat(alertId, notification)
-        broadcastStatusUpdate(alertId, AlertStatus.ACTIVE.name)  //status active
+        broadcastStatusUpdate(alertId, AlertStatus.ACTIVE.name)
     }
-
 
     private fun broadcastStatusUpdate(alertId: Int, status: String) {
         val intent = Intent(AlertReceiver.ACTION_STATUS_UPDATE).apply {
@@ -224,7 +235,7 @@ class AlertNotificationService : Service() {
     }
 
     private fun startForegroundCompat(id: Int, notification: Notification) {
-        currentAlertId     = id
+        currentAlertId      = id
         currentNotification = notification
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -287,7 +298,12 @@ class AlertNotificationService : Service() {
         vibrator = null
     }
 
-    private fun dismissPendingIntent(alertId: Int, alertType: String, label: String): PendingIntent =
+    private fun dismissPendingIntent(
+        alertId  : Int,
+        alertType: String,
+        label    : String,
+        alertMode: String
+    ): PendingIntent =
         PendingIntent.getService(
             this, alertId,
             Intent(this, AlertNotificationService::class.java).apply {
@@ -295,11 +311,17 @@ class AlertNotificationService : Service() {
                 putExtra(AlertReceiver.EXTRA_ALERT_ID,   alertId)
                 putExtra(AlertReceiver.EXTRA_ALERT_TYPE, alertType)
                 putExtra(AlertReceiver.EXTRA_LABEL,      label)
+                putExtra(AlertReceiver.EXTRA_ALERT_MODE, alertMode)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-    private fun cancelPendingIntent(alertId: Int, alertType: String, label: String): PendingIntent =
+    private fun cancelPendingIntent(
+        alertId  : Int,
+        alertType: String,
+        label    : String,
+        alertMode: String
+    ): PendingIntent =
         PendingIntent.getService(
             this, alertId + 200_000,
             Intent(this, AlertNotificationService::class.java).apply {
@@ -307,6 +329,7 @@ class AlertNotificationService : Service() {
                 putExtra(AlertReceiver.EXTRA_ALERT_ID,   alertId)
                 putExtra(AlertReceiver.EXTRA_ALERT_TYPE, alertType)
                 putExtra(AlertReceiver.EXTRA_LABEL,      label)
+                putExtra(AlertReceiver.EXTRA_ALERT_MODE, alertMode)
             },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -319,7 +342,9 @@ class AlertNotificationService : Service() {
         nm.deleteNotificationChannel("channel_weather_notification")
 
         if (nm.getNotificationChannel(CHANNEL_ALERT) == null) {
-            NotificationChannel(CHANNEL_ALERT, "Weather Alerts", NotificationManager.IMPORTANCE_HIGH).apply {
+            NotificationChannel(
+                CHANNEL_ALERT, "Weather Alerts", NotificationManager.IMPORTANCE_HIGH
+            ).apply {
                 description          = "Full-screen alarm notifications with sound"
                 lightColor           = 0xFF1E88E5.toInt()
                 enableLights(true)
@@ -335,7 +360,9 @@ class AlertNotificationService : Service() {
         }
 
         if (nm.getNotificationChannel(CHANNEL_NOTIFICATION) == null) {
-            NotificationChannel(CHANNEL_NOTIFICATION, "Weather Notifications", NotificationManager.IMPORTANCE_HIGH).apply {
+            NotificationChannel(
+                CHANNEL_NOTIFICATION, "Weather Notifications", NotificationManager.IMPORTANCE_HIGH
+            ).apply {
                 description          = "Silent weather alert notifications"
                 lightColor           = 0xFF1E88E5.toInt()
                 enableLights(true)
@@ -354,8 +381,8 @@ class AlertNotificationService : Service() {
     }
 
     companion object {
-        private const val TAG              = "AlertNotifService"
-        const val CHANNEL_ALERT            = "channel_weather_alert_v2"
-        const val CHANNEL_NOTIFICATION     = "channel_weather_notification_v2"
+        private const val TAG          = "AlertNotifService"
+        const val CHANNEL_ALERT        = "channel_weather_alert_v2"
+        const val CHANNEL_NOTIFICATION = "channel_weather_notification_v2"
     }
 }

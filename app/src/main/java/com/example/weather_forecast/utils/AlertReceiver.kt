@@ -15,12 +15,14 @@ class AlertReceiver : BroadcastReceiver() {
         val alertId   = intent.getIntExtra(EXTRA_ALERT_ID, -1)
         val alertType = intent.getStringExtra(EXTRA_ALERT_TYPE) ?: AlertType.NOTIFICATION.name
         val label     = intent.getStringExtra(EXTRA_LABEL) ?: "Weather Alert"
-        Log.d(TAG, "   alertId=$alertId  type=$alertType  label=$label")
+        val alertMode = intent.getStringExtra(EXTRA_ALERT_MODE) ?: "SCHEDULED"
+        Log.d(TAG, "alertId=$alertId type=$alertType mode=$alertMode label=$label")
 
         val serviceIntent = Intent(context, AlertNotificationService::class.java).apply {
             putExtra(EXTRA_ALERT_ID,   alertId)
             putExtra(EXTRA_ALERT_TYPE, alertType)
             putExtra(EXTRA_LABEL,      label)
+            putExtra(EXTRA_ALERT_MODE, alertMode)
         }
 
         try {
@@ -32,13 +34,14 @@ class AlertReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        private const val TAG = "AlertReceiver"
-        const val EXTRA_ALERT_ID   = "extra_alert_id"
-        const val EXTRA_ALERT_TYPE = "extra_alert_type"
-        const val EXTRA_LABEL      = "extra_label"
-        const val ACTION_DISMISS   = "ACTION_DISMISS_ALERT"
-        const val ACTION_CANCEL = "ACTION_CANCEL_ALERT"
-        const val ACTION_STATUS_UPDATE = "ACTION_STATUS_UPDATE"
-        const val EXTRA_STATUS         = "extra_status"
+        private const val TAG              = "AlertReceiver"
+        const val EXTRA_ALERT_ID           = "extra_alert_id"
+        const val EXTRA_ALERT_TYPE         = "extra_alert_type"
+        const val EXTRA_LABEL              = "extra_label"
+        const val EXTRA_ALERT_MODE         = "extra_alert_mode"
+        const val ACTION_DISMISS           = "ACTION_DISMISS_ALERT"
+        const val ACTION_CANCEL            = "ACTION_CANCEL_ALERT"
+        const val ACTION_STATUS_UPDATE     = "ACTION_STATUS_UPDATE"
+        const val EXTRA_STATUS             = "extra_status"
     }
 }
