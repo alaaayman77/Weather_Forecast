@@ -104,10 +104,7 @@ class MainActivity : ComponentActivity() {
             )
 
 
-            // request notifications permission for android 13+
-            LaunchedEffect(Unit) {
-                notificationPermissionHandler.requestIfNeeded()
-            }
+
         }
     }
 

@@ -79,9 +79,7 @@ fun AppScreen(
     val tempUnit    by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
     val windUnit    by settingsViewModel.windUnit.collectAsStateWithLifecycle()
     val language    by settingsViewModel.language.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
-        notificationPermissionHandler.requestIfNeeded()
-    }
+
 
     Weather_ForecastTheme {
         Box(
@@ -277,6 +275,11 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.AlertRoute> {
+                        LaunchedEffect(Unit) {
+                            notificationPermissionHandler.requestIfNeeded()
+                        }
+
+                        val showNotifPermDialog by alertViewModel.showNotifPermDialog.collectAsStateWithLifecycle()
                         val uiState         by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
                         val scheduledAlerts by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
 
@@ -322,7 +325,20 @@ fun AppScreen(
                                 alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel)
                             },
 
-                            onFabClicked        = { alertViewModel.onFabClicked() },
+                            showNotifPermDialog      = showNotifPermDialog,
+                            onDismissNotifPermDialog = { alertViewModel.onDismissNotifPermDialog() },
+                            onOpenNotifSettings      = {
+                                context.startActivity(
+                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                    }
+                                )
+                            },
+                            onFabClicked = {
+                                alertViewModel.onFabClicked(
+                                    isNotificationGranted = NotificationPermissionHandler.isGranted(context)
+                                )
+                            },
                             onDismissSheet      = { alertViewModel.onDismissBottomSheet() },
                             onDismissPermDialog = { alertViewModel.onDismissPermDialog() }
                         )
