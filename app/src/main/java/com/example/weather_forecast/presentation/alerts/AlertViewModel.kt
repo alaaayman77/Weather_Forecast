@@ -42,6 +42,9 @@ class AlertViewModel(
     private val _showPermDialog = MutableStateFlow(false)
     val showPermDialog: StateFlow<Boolean> = _showPermDialog.asStateFlow()
 
+    private val _showNotifPermDialog = MutableStateFlow(false)
+    val showNotifPermDialog: StateFlow<Boolean> = _showNotifPermDialog.asStateFlow()
+
     private val _alertStatuses = MutableStateFlow<Map<Int, AlertStatus>>(emptyMap())
     val alertStatuses: StateFlow<Map<Int, AlertStatus>> = _alertStatuses.asStateFlow()
 init{
@@ -49,10 +52,14 @@ init{
 }
 
 
-    fun onFabClicked() {
-        if (!canScheduleExactAlarms()) _showPermDialog.value = true
-        else _showBottomSheet.value = true
+    fun onFabClicked(isNotificationGranted: Boolean) {
+        when {
+            !isNotificationGranted -> _showNotifPermDialog.value = true
+            !canScheduleExactAlarms() -> _showPermDialog.value = true
+            else -> _showBottomSheet.value = true
+        }
     }
+    fun onDismissNotifPermDialog() { _showNotifPermDialog.value = false }
 
     fun onDismissBottomSheet() { _showBottomSheet.value = false }
     fun onDismissPermDialog()  { _showPermDialog.value  = false }

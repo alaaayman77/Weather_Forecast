@@ -37,8 +37,7 @@
     <string name="favourite">Favourite Locations</string>
     <string name="no_favourite">No Favourite Locations Added Yet</string>
     <string name="tap_plus_favourite">Tap + to add more</string>
-    <string name="no_alerts">No Alerts Scheduled Yet</string>
-    <string name="tap_plus_alerts">Tap + to create your first alert</string>
+    <string name="no_alerts">No Alerts Scheduled Yet \n Tap + to create your first alert </string>
     <string name="celsius">Celsius (°C)</string>
     <string name="fahrenheit">Fahrenheit (°F)</string>
     <string name="kelvin">Kelvin (K)</string>

@@ -33,6 +33,7 @@ import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsContent
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.EmptyStateContent
+import com.example.weather_forecast.presentation.alerts.components.NotificationPermissionDialog
 import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 import com.example.weather_forecast.ui.theme.lightGray
@@ -55,6 +56,9 @@ fun AlertScreen(
     onFabClicked      : () -> Unit,
     onDismissSheet    : () -> Unit,
     onDismissPermDialog: () -> Unit,
+    showNotifPermDialog: Boolean,
+    onDismissNotifPermDialog: () -> Unit,
+    onOpenNotifSettings: () -> Unit,
 
 ) {
     val context    = LocalContext.current
@@ -99,7 +103,12 @@ fun AlertScreen(
             }
         )
     }
-
+    if (showNotifPermDialog) {
+        NotificationPermissionDialog(
+            onDismiss      = onDismissNotifPermDialog,
+            onOpenSettings = onOpenNotifSettings
+        )
+    }
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = onDismissSheet,
