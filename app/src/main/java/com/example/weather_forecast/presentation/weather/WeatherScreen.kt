@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -42,6 +44,7 @@ import com.example.weather_forecast.presentation.weather.components.SectionCard
 import com.example.weather_forecast.presentation.weather.components.SunTimesCard
 import com.example.weather_forecast.presentation.weather.components.UvIndexCard
 import com.example.weather_forecast.presentation.weather.components.WeatherInfoCard
+import com.example.weather_forecast.presentation.weather.components.WeatherVideoBackground
 import com.example.weather_forecast.presentation.weather.components.WeeklyForecastItem
 import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.utils.formatNumber
@@ -53,6 +56,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+
 @Composable
 fun WeatherScreen(
     modifier: Modifier = Modifier,
@@ -62,46 +66,68 @@ fun WeatherScreen(
     windUnit: WindUnit,
     language: Language
 ) {
-    Box(modifier = modifier.fillMaxSize()
-          .statusBarsPadding()) {
-        when (val state =uiState) {
-            is UiState.Idle,
-            is UiState.Loading -> {
-                LoadingIndicator(modifier = Modifier.align(Alignment.Center))
+    val weatherId = (uiState as? UiState.Success)
+        ?.data?.oneCall?.current?.weather?.firstOrNull()?.id
+    val dt = (uiState as? UiState.Success)
+        ?.data?.oneCall?.current?.dt
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        when (uiState) {
+            is UiState.Success -> {
+                WeatherVideoBackground(weatherId = weatherId, dt = dt)
             }
-            is UiState.Error -> {
-                Column(
-                    modifier = Modifier.align(Alignment.Center),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Something went wrong",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = uiState.message,
-                        style = MaterialTheme.typography.bodySmall.copy(color = lightGray)
+            else -> {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color(0xFF90CAF9),
+                                    Color(0xFFBBDEFB),
+                                    Color(0xFFE3F2FD)
+                                )
+                            )
+                        )
+                )
+            }
+        }
+
+        Box(modifier = modifier.statusBarsPadding()) {
+            when (val state = uiState) {
+                is UiState.Idle,
+                is UiState.Loading -> {
+                    LoadingIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+                is UiState.Error -> {
+                    Column(
+                        modifier            = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("Something went wrong", style = MaterialTheme.typography.titleMedium)
+                        Text(state.message, style = MaterialTheme.typography.bodySmall.copy(color = lightGray))
+                    }
+                }
+                is UiState.Success -> {
+                    WeatherScreenContent(
+                        location       = location,
+                        currentWeather = state.data.oneCall.current,
+                        hourlyList     = state.data.oneCall.hourly,
+                        dailyList      = state.data.oneCall.daily,
+                        topBarLocation = state.data.topBarLocation,
+                        centerLocation = state.data.centerLocation,
+                        tempUnit       = tempUnit,
+                        windUnit       = windUnit,
+                        language       = language
                     )
                 }
-            }
-            is UiState.Success -> {
-                WeatherScreenContent(
-                    location = location,
-                    currentWeather     = state.data.oneCall.current,
-                    hourlyList  = state.data.oneCall.hourly,
-                    dailyList   = uiState.data.oneCall.daily,
-                    topBarLocation = state.data.topBarLocation,
-                    centerLocation = state.data.centerLocation,
-                    tempUnit       = tempUnit,
-                    windUnit       = windUnit,
-                    language = language
-                )
             }
         }
     }
 }
-
 
 @Composable
 fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  topBarLocation: String , centerLocation: String,   tempUnit: TempUnit,      // ← add
@@ -206,7 +232,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
                     text = getGreeting(currentWeather.dt),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.primary
                     )
                 )
             }
@@ -395,12 +421,12 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
         Icon(
             painter = painterResource(R.drawable.thermometer),
             contentDescription = null,
-            tint = lightGray,
-            modifier = Modifier.size(14.dp)
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(18.dp)
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.labelMedium.copy(color = lightGray)
+            style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary , fontWeight = FontWeight.Bold )
         )
     }
 }

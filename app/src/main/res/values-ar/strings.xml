@@ -45,5 +45,19 @@
     <string name="wind_ms">متر/ث</string>
     <string name="wind_mph">ميل/ساعة</string>
     <string name="wind_kmh">كم/ساعة</string>
+    <string name="scheduled_alerts">التنبيهات المحددة</string>
+    <string name="new_weather_alert">اشعار طقس جديد</string>
+    <string name="scheduled">محدد</string>
+    <string name="custom_condition">شرط مخصص</string>
+    <string name="alert_type">نوع المنبه</string>
+    <string name="notification">اشعار</string>
+    <string name="alert">تنبيه</string>
+    <string name="time_range">تحديد الوقت</string>
+    <string name="start_time">البدء</string>
+    <string name="end_time">النهاية</string>
+    <string name="save_alert">حفظ المنبه</string>
+    <string name="cancel">الغاء</string>
+    <string name="notification_subtitle">تنبيه صامت</string>
+    <string name="alert_subtitle">صوت واهتزاز</string>
 
 </resources>

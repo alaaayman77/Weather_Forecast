@@ -37,7 +37,7 @@ fun WeatherInfoCard(
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.4f)
+            containerColor = Color.White.copy(alpha = 0.7f)
         ),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.6f))
     ) {

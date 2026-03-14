@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,6 +39,7 @@ import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 import com.example.weather_forecast.ui.theme.lightGray
 import java.util.*
+import com.example.weather_forecast.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -144,9 +146,11 @@ fun AddAlertSheetContent(
         verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         Text(
-            "New Weather Alert",
-            style    = MaterialTheme.typography.titleLarge.copy(
-                color = MaterialTheme.colorScheme.primary
+            stringResource(R.string.new_weather_alert),
+            style    = MaterialTheme.typography.labelLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 18.sp
+
             ),
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
         )
@@ -162,7 +166,7 @@ fun AddAlertSheetContent(
                 onClick  = { selectedTab = 0 },
                 text     = {
                     Text(
-                        "Scheduled",
+                        stringResource(R.string.scheduled),
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = if (selectedTab == 0) FontWeight.Bold
                             else FontWeight.Normal
@@ -175,7 +179,7 @@ fun AddAlertSheetContent(
                 onClick  = { selectedTab = 1 },
                 text     = {
                     Text(
-                        "Custom Condition",
+                        stringResource(R.string.custom_condition),
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = if (selectedTab == 1) FontWeight.Bold
                             else FontWeight.Normal
@@ -239,7 +243,7 @@ private fun ScheduledAlertTab(
             .padding(bottom = 24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text("Alert Type", style = MaterialTheme.typography.labelMedium.copy(color = lightGray))
+        Text(stringResource(R.string.alert_type), style = MaterialTheme.typography.labelMedium.copy(color = lightGray))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             AlertType.entries.forEach { type ->
                 AlertTypeCard(
@@ -251,10 +255,10 @@ private fun ScheduledAlertTab(
             }
         }
 
-        Text("Time Range", style = MaterialTheme.typography.labelMedium.copy(color = lightGray))
+        Text(stringResource(R.string.time_range), style = MaterialTheme.typography.labelMedium.copy(color = lightGray))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TimePickerField(
-                label    = "Start Time", value = startLabel, errorMsg = startError,
+                label    = stringResource(R.string.start_time), value = startLabel, errorMsg = startError,
                 onClick  = {
                     showPicker { h, m, l ->
                         if (isInThePast(h, m)) {
@@ -270,7 +274,7 @@ private fun ScheduledAlertTab(
                 modifier = Modifier.weight(1f)
             )
             TimePickerField(
-                label    = "End Time", value = endLabel, errorMsg = endError,
+                label    = stringResource(R.string.end_time), value = endLabel, errorMsg = endError,
                 onClick  = {
                     showPicker { h, m, l ->
                         when {
@@ -292,7 +296,7 @@ private fun ScheduledAlertTab(
                 shape    = RoundedCornerShape(14.dp),
                 colors   = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
                 border   = BorderStroke(1.5.dp, Color.Red)
-            ) { Text("Cancel", fontWeight = FontWeight.SemiBold) }
+            ) { Text(stringResource(R.string.cancel), fontWeight = FontWeight.SemiBold) }
 
             Button(
                 onClick = {
@@ -307,7 +311,7 @@ private fun ScheduledAlertTab(
                 colors   = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
-            ) { Text("Save Alert", fontWeight = FontWeight.SemiBold, color = Color.White) }
+            ) { Text(stringResource(R.string.save_alert), fontWeight = FontWeight.SemiBold, color = Color.White) }
         }
     }
 }

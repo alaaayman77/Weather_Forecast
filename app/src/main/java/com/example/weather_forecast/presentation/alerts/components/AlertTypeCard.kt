@@ -16,11 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.ui.theme.lightGray
-
+import com.example.weather_forecast.R
 @Composable
  fun AlertTypeCard(
     type: AlertType,
@@ -57,14 +58,14 @@ import com.example.weather_forecast.ui.theme.lightGray
                 modifier        = Modifier.size(26.dp)
             )
             Text(
-                text  = type.label,
+                text  = stringResource(type.labelRes),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                     color      = textColor
                 )
             )
             Text(
-                text  = type.subtitle,
+                text  = stringResource(type.subtitleRes),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color    = lightGray
                 )

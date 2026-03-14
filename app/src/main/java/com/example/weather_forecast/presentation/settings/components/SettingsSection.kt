@@ -11,12 +11,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
  fun SettingsSection(
-    icon: ImageVector,
+    icon: Int,
     title: String,
     content: @Composable () -> Unit
 ) {
@@ -26,7 +27,7 @@ import androidx.compose.ui.unit.dp
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                imageVector        = icon,
+                painter        = painterResource(icon),
                 contentDescription = null,
                 tint               = MaterialTheme.colorScheme.primary,
                 modifier           = Modifier.size(20.dp)
@@ -34,7 +35,7 @@ import androidx.compose.ui.unit.dp
             Text(
                 text  = title,
                 style = MaterialTheme.typography.titleMedium.copy(
-                    color      = MaterialTheme.colorScheme.secondary,
+                    color      = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             )

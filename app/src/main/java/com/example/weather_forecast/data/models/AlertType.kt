@@ -1,19 +1,22 @@
 package com.example.weather_forecast.data.models
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import com.example.weather_forecast.R
 
 enum class AlertType(
-    val label   : String,
-    val subtitle: String,
+    @StringRes val labelRes   : Int,
+    @StringRes val subtitleRes: Int,
     val icon    : ImageVector,
     val color   : Color
 ) {
-    NOTIFICATION("Notification", "Silent push alert", Icons.Default.Home, Color(0xFF42A5F5)),
-    ALERT       ("Alert",        "Sound + vibration", Icons.Default.Notifications,   Color(0xFFFF7043))
+    NOTIFICATION(R.string.notification, R.string.notification_subtitle, Icons.Default.Home, Color(0xFF42A5F5)),
+    ALERT       (R.string.alert,        R.string.alert_subtitle, Icons.Default.Notifications,   Color(0xFFFF7043))
 }
 
  enum class AlertTab(val label: String, val icon: ImageVector) {

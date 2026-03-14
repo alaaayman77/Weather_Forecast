@@ -51,20 +51,19 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppScreen(
-    weatherViewModel: WeatherViewModel,
-    permissionViewModel: PermissionViewModel,
-    permissionHandler: PermissionHandler,
-    notificationPermissionHandler : NotificationPermissionHandler,
-    favouriteViewModel: FavouriteViewModel,
-    mapPickerViewModel : MapPickerViewModel,
-    favouriteDetailsViewModel: FavouriteDetailsViewModel,
-    alertViewModel : AlertViewModel,
-    settingsViewModel: SettingsViewModel
+    weatherViewModel             : WeatherViewModel,
+    permissionViewModel          : PermissionViewModel,
+    permissionHandler            : PermissionHandler,
+    notificationPermissionHandler: NotificationPermissionHandler,
+    favouriteViewModel           : FavouriteViewModel,
+    mapPickerViewModel           : MapPickerViewModel,
+    favouriteDetailsViewModel    : FavouriteDetailsViewModel,
+    alertViewModel               : AlertViewModel,
+    settingsViewModel            : SettingsViewModel
 ) {
-    val navController : NavHostController  = rememberNavController()
+    val navController   = rememberNavController()
     val context         = LocalContext.current
     val permissionState = permissionViewModel.permissionState.collectAsState()
-
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute      = navBackStackEntry?.destination?.route
@@ -74,14 +73,13 @@ fun AppScreen(
             && !currentRoute.contains("MapPickerRoute")
             && !currentRoute.contains("FavouriteDetailsRoute")
 
-
     val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
-    val tempUnit    by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
-    val windUnit    by settingsViewModel.windUnit.collectAsStateWithLifecycle()
-    val language    by settingsViewModel.language.collectAsStateWithLifecycle()
-
+    val tempUnit by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
+    val windUnit by settingsViewModel.windUnit.collectAsStateWithLifecycle()
+    val language by settingsViewModel.language.collectAsStateWithLifecycle()
 
     Weather_ForecastTheme {
+        // ✅ Restored original light blue gradient — only WeatherScreen has video
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -99,19 +97,14 @@ fun AppScreen(
                 containerColor      = Color.Transparent,
                 contentWindowInsets = WindowInsets(0),
                 bottomBar = {
-
                     AnimatedVisibility(
                         visible = showBottomBar,
                         enter   = slideInVertically(initialOffsetY = { it }) + fadeIn(),
                         exit    = slideOutVertically(targetOffsetY = { it }) + fadeOut()
                     ) {
-                        BottomNavigationBar(
-                            currentRoute = currentRoute,
-                        ) { item ->
+                        BottomNavigationBar(currentRoute = currentRoute) { item ->
                             navController.navigate(item.route) {
-                                popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
-                                }
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState    = true
                             }
@@ -121,6 +114,7 @@ fun AppScreen(
             ) { innerPadding ->
                 val tempUnit by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
                 val windUnit by settingsViewModel.windUnit.collectAsStateWithLifecycle()
+
                 NavHost(
                     navController    = navController,
                     startDestination = NavigationRoutes.SplashRoute,
@@ -130,33 +124,30 @@ fun AppScreen(
                             navController.navigate(NavigationRoutes.WeatherRoute) {
                                 popUpTo(NavigationRoutes.SplashRoute) { inclusive = true }
                             }
-                            if (permissionHandler.checkPermissions()) {
+                            if (permissionHandler.checkPermissions())
                                 permissionViewModel.onPermissionAlreadyGranted()
-                            } else {
+                            else
                                 permissionHandler.requestPermissions()
-                            }
                         }
                     }
 
                     composable<NavigationRoutes.WeatherRoute> {
                         val uiState  by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(UiState.Idle)
                         val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
+                        val language by settingsViewModel.language.collectAsStateWithLifecycle()
 
-                        val language    by settingsViewModel.language.collectAsStateWithLifecycle()
                         when (permissionState.value) {
                             PermissionUiState.Granted -> {
                                 LaunchedEffect(Unit) {
                                     weatherViewModel.openLocationSettings.collect {
                                         context.startActivity(
-                                            Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS).apply {
-                                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                            }
+                                            Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                                                .apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK }
                                         )
                                     }
                                 }
-                                LaunchedEffect(Unit) {
-                                    weatherViewModel.checkLocationAndFetch()
-                                }
+                                LaunchedEffect(Unit) { weatherViewModel.checkLocationAndFetch() }
+
                                 WeatherScreen(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -168,22 +159,16 @@ fun AppScreen(
                                     language = language
                                 )
                             }
-                            PermissionUiState.Denied -> {
-                                PermissionRationaleScreen(
-                                    onRetry = { permissionHandler.requestPermissions() }
-                                )
-                            }
-                            PermissionUiState.PermanentlyDenied -> {
-                                PermissionDeniedScreen(
-                                    onOpenSettings = {
-                                        context.startActivity(
-                                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                                data = Uri.fromParts("package", context.packageName, null)
-                                            }
-                                        )
-                                    }
-                                )
-                            }
+                            PermissionUiState.Denied ->
+                                PermissionRationaleScreen(onRetry = { permissionHandler.requestPermissions() })
+                            PermissionUiState.PermanentlyDenied ->
+                                PermissionDeniedScreen(onOpenSettings = {
+                                    context.startActivity(
+                                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = Uri.fromParts("package", context.packageName, null)
+                                        }
+                                    )
+                                })
                             PermissionUiState.Checking -> LoadingScreen()
                         }
                     }
@@ -193,58 +178,43 @@ fun AppScreen(
                         FavouriteScreen(
                             modifier      = Modifier.padding(innerPadding),
                             uiState       = uiState,
-                            onRemove = { lat, lon -> favouriteViewModel.removeFavourite(lat, lon) },
+                            onRemove      = { lat, lon -> favouriteViewModel.removeFavourite(lat, lon) },
                             onAddLocation = {
                                 mapPickerViewModel.clearPin()
-                                val lat = location?.latitude ?: 30.0444
+                                val lat = location?.latitude  ?: 30.0444
                                 val lon = location?.longitude ?: 31.2357
                                 navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon))
                             },
                             tempUnit = tempUnit,
                             windUnit = windUnit,
                             language = language,
-
-
-                        ){ lat , lon ->
-                            navController.navigate(
-                                NavigationRoutes.FavouriteDetailsRoute(lat ,lon)
-                            )
+                        ) { lat, lon ->
+                            navController.navigate(NavigationRoutes.FavouriteDetailsRoute(lat, lon))
                         }
                     }
-
 
                     composable<NavigationRoutes.MapPickerRoute> {
                         val route        = it.toRoute<NavigationRoutes.MapPickerRoute>()
                         val pickedLatLng by mapPickerViewModel.pickedLatLng.collectAsStateWithLifecycle()
                         val pickedName   by mapPickerViewModel.pickedName.collectAsStateWithLifecycle()
                         val addState     by mapPickerViewModel.addState.collectAsStateWithLifecycle()
-
                         var hasNavigatedBack by remember { mutableStateOf(false) }
 
                         LaunchedEffect(addState) {
                             if (addState is UiState.Success && !hasNavigatedBack) {
                                 hasNavigatedBack = true
-                                pickedLatLng?.let { latLng ->
-
-                                }
                                 navController.popBackStack()
                             }
                         }
 
-                        val userLatLng = remember { LatLng(route.lat, route.lon) }
-
+                        val userLatLng  = remember { LatLng(route.lat, route.lon) }
                         val cameraState = rememberCameraPositionState {
                             position = CameraPosition.fromLatLngZoom(userLatLng, 12f)
                         }
 
-                        LaunchedEffect(Unit) {
-                            mapPickerViewModel.onMapTapped(userLatLng)
-                        }
-
+                        LaunchedEffect(Unit) { mapPickerViewModel.onMapTapped(userLatLng) }
                         LaunchedEffect(pickedLatLng) {
-                            pickedLatLng?.let { latLng ->
-                                cameraState.animate(CameraUpdateFactory.newLatLngZoom(latLng, 14f))
-                            }
+                            pickedLatLng?.let { cameraState.animate(CameraUpdateFactory.newLatLngZoom(it, 14f)) }
                         }
 
                         MapPickerScreen(
@@ -252,32 +222,25 @@ fun AppScreen(
                             pickedName       = pickedName,
                             cameraState      = cameraState,
                             isAddingLocation = addState is UiState.Loading,
-                            isFromSettings  = route.isFromSettings,
+                            isFromSettings   = route.isFromSettings,
                             addError         = (addState as? UiState.Error)?.message,
                             onMapTapped      = { mapPickerViewModel.onMapTapped(it) },
                             onPlacePicked    = { latLng, name -> mapPickerViewModel.onPlacePicked(latLng, name) },
                             onClearPin       = { mapPickerViewModel.clearPin() },
-                            onLocationPicked = { lat, lng, name ->
-                                mapPickerViewModel.onLocationPicked(lat, lng, name, favouriteViewModel)
-                            },
+                            onLocationPicked = { lat, lng, name -> mapPickerViewModel.onLocationPicked(lat, lng, name, favouriteViewModel) },
                             onLocationChosen = { lat, lon ->
                                 settingsViewModel.saveManualLocation(lat, lon)
                                 weatherViewModel.checkLocationAndFetch()
                                 navController.popBackStack()
                             },
-                            onDismiss = {
-                                mapPickerViewModel.clearPin()
-                                navController.popBackStack()
-                            },
-                            onZoomIn = { mapPickerViewModel.zoomIn(cameraState) },
-                            onZoomOut = { mapPickerViewModel.zoomOut(cameraState) }
+                            onDismiss  = { mapPickerViewModel.clearPin(); navController.popBackStack() },
+                            onZoomIn   = { mapPickerViewModel.zoomIn(cameraState) },
+                            onZoomOut  = { mapPickerViewModel.zoomOut(cameraState) }
                         )
                     }
 
                     composable<NavigationRoutes.AlertRoute> {
-                        LaunchedEffect(Unit) {
-                            notificationPermissionHandler.requestIfNeeded()
-                        }
+                        LaunchedEffect(Unit) { notificationPermissionHandler.requestIfNeeded() }
 
                         val uiState             by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
                         val scheduledAlerts     by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
@@ -291,18 +254,15 @@ fun AppScreen(
                                 alertViewModel.updateAlertStatus(alertId, status)
                             }
                             val filter = IntentFilter(AlertReceiver.ACTION_STATUS_UPDATE)
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
-                            } else {
-                                context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
-                            }
+                            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
                             onDispose { context.unregisterReceiver(receiver) }
                         }
 
                         LaunchedEffect(location) {
-                            val lat = location?.latitude  ?: 30.0444
-                            val lon = location?.longitude ?: 31.2357
-                            alertViewModel.fetchWeatherAlerts(lat, lon)
+                            alertViewModel.fetchWeatherAlerts(
+                                location?.latitude  ?: 30.0444,
+                                location?.longitude ?: 31.2357
+                            )
                         }
 
                         AlertScreen(
@@ -314,18 +274,17 @@ fun AppScreen(
                             showPermDialog           = showPermDialog,
                             canScheduleExact         = alertViewModel.canScheduleExactAlarms(),
                             onRetry                  = {
-                                val lat = location?.latitude  ?: 30.0444
-                                val lon = location?.longitude ?: 31.2357
-                                alertViewModel.fetchWeatherAlerts(lat, lon)
+                                alertViewModel.fetchWeatherAlerts(
+                                    location?.latitude  ?: 30.0444,
+                                    location?.longitude ?: 31.2357
+                                )
                             },
                             onCancelAlert            = { alertViewModel.cancelAlert(it) },
                             onScheduleAlert          = { type, startMillis, endMillis, startLabel, endLabel, mode, condition ->
                                 alertViewModel.scheduleAlert(type, startMillis, endMillis, startLabel, endLabel, mode, condition)
                             },
                             onFabClicked             = {
-                                alertViewModel.onFabClicked(
-                                    isNotificationGranted = NotificationPermissionHandler.isGranted(context)
-                                )
+                                alertViewModel.onFabClicked(NotificationPermissionHandler.isGranted(context))
                             },
                             onDismissSheet           = { alertViewModel.onDismissBottomSheet() },
                             onDismissPermDialog      = { alertViewModel.onDismissPermDialog() },
@@ -340,18 +299,19 @@ fun AppScreen(
                             }
                         )
                     }
+
                     composable<NavigationRoutes.SettingsRoute> {
                         val tempUnit    by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
                         val windUnit    by settingsViewModel.windUnit.collectAsStateWithLifecycle()
                         val locationSrc by settingsViewModel.locationSource.collectAsStateWithLifecycle()
                         val language    by settingsViewModel.language.collectAsStateWithLifecycle()
                         SettingsScreen(
-                            modifier = Modifier.padding(innerPadding),
-                            tempUnit = tempUnit,
-                            onTempUnitClick = {settingsViewModel.setTempUnit(it)},
-                            windUnit = windUnit,
+                            modifier        = Modifier.padding(innerPadding),
+                            tempUnit        = tempUnit,
+                            onTempUnitClick = { settingsViewModel.setTempUnit(it) },
+                            windUnit        = windUnit,
                             onWindUnitClick = { settingsViewModel.setWindUnit(it) },
-                            locationSrc = locationSrc,
+                            locationSrc     = locationSrc,
                             onLocationSourceGPSClick = {
                                 settingsViewModel.setLocationSource(LocationSource.GPS)
                                 weatherViewModel.updateLocationSource(LocationSource.GPS)
@@ -365,17 +325,20 @@ fun AppScreen(
                                 mapPickerViewModel.clearPin()
                                 navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon, isFromSettings = true))
                             },
-                            language = language,
-                            onLanguageClick = { settingsViewModel.setLanguage(it)
+                            language        = language,
+                            onLanguageClick = {
+                                settingsViewModel.setLanguage(it)
                                 weatherViewModel.onLanguageChanged()
                                 applyLocale(context, it)
-                                (context as? Activity)?.recreate() }
-                            )
+                                (context as? Activity)?.recreate()
+                            }
+                        )
                     }
+
                     composable<NavigationRoutes.FavouriteDetailsRoute> {
                         val route    = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
                         val uiState by favouriteDetailsViewModel.uiState.collectAsState()
-                        val language    by settingsViewModel.language.collectAsStateWithLifecycle()
+                        val language by settingsViewModel.language.collectAsStateWithLifecycle()
 
                         LaunchedEffect(route.lat, route.lon) {
                             favouriteDetailsViewModel.fetchWeather(route.lat, route.lon)

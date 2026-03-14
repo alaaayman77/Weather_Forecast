@@ -33,9 +33,9 @@ fun SunTimesCard(
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.35f)
+            containerColor = Color.White.copy(alpha = 0.7f)
         ),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.55f))
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.9f))
     ) {
         Column(modifier = Modifier.padding(32.dp)) {
 

@@ -109,8 +109,8 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
-//    implementation("androidx.media3:media3-exoplayer:1.3.1")
-//    implementation("androidx.media3:media3-ui:1.3.1")
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
     implementation("com.airbnb.android:lottie-compose:6.4.0")
     // JUnit
     testImplementation("junit:junit:4.13.2")

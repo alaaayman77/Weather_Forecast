@@ -44,6 +44,20 @@
     <string name="wind_ms">m/s</string>
     <string name="wind_mph">mph</string>
     <string name="wind_kmh">km/h</string>
+    <string name="scheduled_alerts">Scheduled Alerts</string>
+    <string name="new_weather_alert">New Weather Alert</string>
+    <string name="scheduled">Scheduled</string>
+    <string name="custom_condition">Custom Condition</string>
+    <string name="alert_type">Alert Type</string>
+    <string name="notification">Notification</string>
+    <string name="alert">Alert</string>
+    <string name="time_range">Time Range</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="save_alert">Save Alert</string>
+    <string name="cancel">Cancel</string>
+    <string name="notification_subtitle">Silent push alert</string>
+    <string name="alert_subtitle">Sound + vibration</string>
 
 
 

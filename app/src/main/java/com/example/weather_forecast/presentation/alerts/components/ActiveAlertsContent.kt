@@ -43,7 +43,7 @@ fun ActiveAlertsContent(
         ) {
             item {
                 Spacer(Modifier.height(4.dp))
-                SectionHeader("Scheduled Alerts", Color(0xFF1E88E5))
+                SectionHeader(stringResource(R.string.scheduled_alerts))
             }
             items(scheduledAlerts, key = { it.id }) { item ->
                 ScheduledAlertCard(

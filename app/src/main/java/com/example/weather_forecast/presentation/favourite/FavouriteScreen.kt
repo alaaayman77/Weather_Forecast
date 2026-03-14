@@ -173,8 +173,9 @@ fun FavouriteHeader(locationCount: Int = 0, language: Language) {
                     Text(
                         text  = stringResource(R.string.favourite),
                         style = MaterialTheme.typography.titleMedium.copy(
-                            color      = MaterialTheme.colorScheme.onBackground,
+                            color      = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp,
                             letterSpacing = 0.2.sp
                         )
                     )

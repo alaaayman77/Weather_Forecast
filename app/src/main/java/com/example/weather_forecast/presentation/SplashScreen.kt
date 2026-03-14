@@ -11,7 +11,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.R
 import kotlinx.coroutines.delay
 
@@ -72,7 +74,7 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
 
             Text(
                 text = "Your daily forecast",
-                style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary),
+                style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.primary , fontSize = 32.sp , fontWeight = FontWeight.Bold),
                 modifier = Modifier.alpha(textAlpha.value),
 
             )

@@ -23,7 +23,7 @@ fun SectionCard(
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.35f)
+            containerColor = Color.White.copy(alpha = 0.7f)
         ),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.55f))
     ) {

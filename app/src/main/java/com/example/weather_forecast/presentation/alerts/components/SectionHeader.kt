@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
- fun SectionHeader(title: String, color: Color) {
+ fun SectionHeader(title: String) {
     Text(
         text     = title,
         style    = MaterialTheme.typography.labelLarge.copy(
-            color = color, fontWeight = FontWeight.Bold, fontSize = 13.sp
+            color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 24.sp
         ),
         modifier = Modifier.padding(vertical = 4.dp)
     )

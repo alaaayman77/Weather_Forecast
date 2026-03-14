@@ -43,8 +43,8 @@ fun UvIndexCard(uvi: Double = 9.76 , language : Language) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(0.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.35f)),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.55f))
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.7f)),
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.9f))
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
@@ -73,7 +73,7 @@ fun UvIndexCard(uvi: Double = 9.76 , language : Language) {
                     )
                     Text(
                         text = label,
-                        style = MaterialTheme.typography.labelMedium.copy(color = color)
+                        style = MaterialTheme.typography.labelMedium.copy(color = color , fontSize = 20.sp , fontWeight = FontWeight.Bold)
                     )
                 }
 

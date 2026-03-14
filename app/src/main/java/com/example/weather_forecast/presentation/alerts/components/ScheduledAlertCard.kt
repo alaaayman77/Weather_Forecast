@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,7 +66,7 @@ fun ScheduledAlertCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        item.type.label,
+                        stringResource( item.type.labelRes),
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color      = Color(0xFF0D2B4E)
@@ -73,7 +74,7 @@ fun ScheduledAlertCard(
                     )
                     Text(
                         if (item.mode == AlertMode.CUSTOM) "Condition-based alert"
-                        else item.type.subtitle,
+                        else stringResource( item.type.subtitleRes),
                         style = MaterialTheme.typography.bodySmall.copy(
                             color    = lightGray,
                             fontSize = 11.sp

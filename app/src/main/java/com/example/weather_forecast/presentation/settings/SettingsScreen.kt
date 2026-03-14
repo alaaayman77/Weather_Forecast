@@ -19,12 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.data.models.LocationSource
-import com.example.weather_forecast.presentation.settings.components.InfoCard
 import com.example.weather_forecast.presentation.settings.components.LocationOptionCard
 import com.example.weather_forecast.presentation.settings.components.SettingsSection
 import com.example.weather_forecast.presentation.settings.components.UnitChip
@@ -60,15 +58,15 @@ fun SettingsScreen(
     ) {
         Text(
             text  =stringResource(R.string.settings),
-            style = MaterialTheme.typography.titleLarge.copy(
-                color      = MaterialTheme.colorScheme.secondary,
+            style = MaterialTheme.typography.labelLarge.copy(
+                color      = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
-                fontSize   = 22.sp
+                fontSize   = 24.sp
             ),
             modifier = Modifier.padding(top = 8.dp)
         )
 
-        SettingsSection(icon = Icons.Rounded.LocationOn, title = stringResource(R.string.location)) {
+        SettingsSection(icon = R.drawable.ic_location, title = stringResource(R.string.location)) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 LocationOptionCard(
                     title    = stringResource(R.string.use_gps),
@@ -86,7 +84,7 @@ fun SettingsScreen(
         }
 
 
-        SettingsSection(icon = Icons.Rounded.Settings, title = stringResource(R.string.units)) {
+        SettingsSection(icon = R.drawable.ic_unit, title = stringResource(R.string.units)) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -142,7 +140,7 @@ fun SettingsScreen(
         }
 
 
-        SettingsSection(icon = Icons.Default.Home, title =stringResource(R.string.language)) {
+        SettingsSection(icon = R.drawable.ic_globe, title =stringResource(R.string.language)) {
             Box {
                 Surface(
                     modifier       = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { langExpanded = true },
@@ -183,7 +181,7 @@ fun SettingsScreen(
                 }
             }
         }
-        InfoCard()
+
         Spacer(Modifier.height(16.dp))
     }
 }
