@@ -15,9 +15,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.ui.theme.lightGray
+import com.example.weather_forecast.utils.formatTemp
 
 @Composable
 fun FavouriteLocationItem(
@@ -26,12 +28,13 @@ fun FavouriteLocationItem(
     tempUnit: TempUnit,
     windUnit: WindUnit,
     onNavigateToDetails : (Double,Double)->Unit,
+    language : Language
 ) {
     val current = item.oneCallResponse.current
     val daily   = item.oneCallResponse.daily.firstOrNull()
 
-    val highTemp         =  "${UnitConverter.convertTemp(daily?.temp?.max ?:0.0, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}"
-    val lowTemp          =  "${UnitConverter.convertTemp(daily?.temp?.min ?:0.0, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}"
+    val highTemp         =  "${formatTemp(UnitConverter.convertTemp(daily?.temp?.max ?:0.0, tempUnit), tempUnit , language)}"
+    val lowTemp          =   "${formatTemp(UnitConverter.convertTemp(daily?.temp?.min ?:0.0, tempUnit), tempUnit , language)}"
     val weatherCondition = current.weather.firstOrNull()?.description
         ?.replaceFirstChar { it.uppercase() } ?: ""
     val iconUrl          = current.weather.firstOrNull()?.iconUrl()
@@ -93,7 +96,7 @@ fun FavouriteLocationItem(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text =  "${UnitConverter.convertTemp(daily?.temp?.max ?:0.0, tempUnit)}${UnitConverter.tempSymbol(tempUnit)}",
+                            text = highTemp,
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,

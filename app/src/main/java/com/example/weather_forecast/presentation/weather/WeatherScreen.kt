@@ -156,11 +156,13 @@ fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit , language: Langu
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = "7-DAY FORECAST",
-            style = MaterialTheme.typography.labelMedium.copy(
+            text = stringResource(R.string.weekly_forecast),
+            style = MaterialTheme.typography.labelLarge.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
-                letterSpacing = 1.5.sp
+                letterSpacing = 1.5.sp,
+                fontSize = 18.sp
+
             ),
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -326,12 +328,12 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TempPill(
-                label = "H",
+                label = stringResource(R.string.H),
                 value = "${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit),tempUnit ,language)}",
                 isHigh = true
             )
             TempPill(
-                label = "L",
+                label = stringResource(R.string.L),
                 value = "${formatTemp(UnitConverter.convertTemp(currentWeather.dew_point, tempUnit), tempUnit,language)}",
                 isHigh = false
             )
@@ -376,7 +378,7 @@ fun TempPill(label: String, value: String, isHigh: Boolean) {
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = if (isHigh) MaterialTheme.colorScheme.primary else lightGray,
                     fontWeight = FontWeight.Bold,
-                    textDirection = TextDirection.Ltr
+
                 )
             )
         }
@@ -397,7 +399,7 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
+            style = MaterialTheme.typography.labelMedium.copy(color = lightGray)
         )
     }
 }
@@ -438,11 +440,12 @@ private fun WeatherStatRow(stats: List<WeatherInfoItem>) {
 fun HourlyForecastList(hourlyList: List<HourlyItem>, tempUnit: TempUnit , language: Language) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "HOURLY FORECAST",
+            text = stringResource(R.string.hourly_forecast),
             style = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold,
-                letterSpacing = 1.5.sp
+                letterSpacing = 1.5.sp,
+                fontSize = 18.sp
             ),
             modifier = Modifier.padding(bottom = 12.dp)
         )
@@ -485,11 +488,12 @@ fun formatDateTime(timestamp: Long?): String {
         .format(Date(timestamp * 1000))
 }
 
+@Composable
 fun getGreeting(timestamp: Long?): String = when (hourOf(timestamp)) {
-    in 5..11  -> "Good Morning"
-    in 12..16 -> "Good Afternoon"
-    in 17..20 -> "Good Evening"
-    else      -> "Good Night"
+    in 5..11  -> stringResource(R.string.good_morning)
+    in 12..16 ->  stringResource(R.string.good_afternoon)
+    in 17..20 ->  stringResource(R.string.good_evening)
+    else      ->  stringResource(R.string.good_evening)
 }
 
 private fun hourOf(timestamp: Long?): Int {

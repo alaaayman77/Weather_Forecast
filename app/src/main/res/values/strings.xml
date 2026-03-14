@@ -16,6 +16,8 @@
     <string name="good_night">Good Night</string>
     <string name="hourly_forecast">HOURLY FORECAST</string>
     <string name="weekly_forecast">7-DAY FORECAST</string>
+    <string name="sun_times">SUN TIMES</string>
+    <string name="uv_index">UV INDEX</string>
     <string name="today">Today</string>
     <string name="feels_like">Feels like</string>
     <string name="humid">HUMID</string>
@@ -24,5 +26,7 @@
     <string name="cloud">CLOUD</string>
     <string name="sunrise">SUNRISE</string>
     <string name="sunset">SUNSET</string>
+    <string name="H">H</string>
+    <string name="L">L</string>
 
 </resources>

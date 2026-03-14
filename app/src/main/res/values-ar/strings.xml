@@ -25,4 +25,8 @@
     <string name="cloud">السحاب</string>
     <string name="sunrise">الشروق</string>
     <string name="sunset">الغروب</string>
+    <string name="sun_times">اوقات الشمس</string>
+    <string name="uv_index">مؤشر الاشعة فوق البنفسجية</string>
+    <string name="H">ع</string>
+    <string name="L">ص</string>
 </resources>

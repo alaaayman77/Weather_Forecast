@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,12 +40,13 @@ fun SunTimesCard(
         Column(modifier = Modifier.padding(32.dp)) {
 
             Text(
-                text = "SUN TIMES",
+                text = stringResource(R.string.sun_times),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
                     letterSpacing = 1.5.sp,
-                    fontFamily = Poppins
+                    fontFamily = Poppins,
+                    fontSize = 18.sp
                 ),
                 modifier = Modifier.padding(bottom = 24.dp)
             )
@@ -114,7 +116,7 @@ fun SunTimesCard(
 
                     )
                     Text(
-                        text = "SUNRISE",
+                        text = stringResource(R.string.sunrise),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
                             letterSpacing = 1.sp,
@@ -143,7 +145,7 @@ fun SunTimesCard(
 
                         )
                     Text(
-                        text = "SUNSET",
+                        text = stringResource(R.string.sunset),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
                             letterSpacing = 1.sp,

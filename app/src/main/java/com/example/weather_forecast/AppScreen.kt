@@ -76,6 +76,9 @@ fun AppScreen(
 
 
     val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
+    val tempUnit    by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
+    val windUnit    by settingsViewModel.windUnit.collectAsStateWithLifecycle()
+    val language    by settingsViewModel.language.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         notificationPermissionHandler.requestIfNeeded()
     }
@@ -200,7 +203,8 @@ fun AppScreen(
                                 navController.navigate(NavigationRoutes.MapPickerRoute(lat, lon))
                             },
                             tempUnit = tempUnit,
-                            windUnit = windUnit
+                            windUnit = windUnit,
+                            language = language,
 
 
                         ){ lat , lon ->

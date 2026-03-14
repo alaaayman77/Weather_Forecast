@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.FavouriteEntity
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.ui.theme.lightGray
@@ -49,9 +50,10 @@ fun FavouriteScreen(
     onRemove : (Double, Double) -> Unit,
     tempUnit: TempUnit,
     windUnit: WindUnit,
+    language : Language,
     onNavigateToDetails: (Double , Double) -> Unit,
 
-) {
+    ) {
     Box(modifier = modifier.fillMaxSize()
         .statusBarsPadding()) {
         when (val state = uiState) {
@@ -75,6 +77,7 @@ fun FavouriteScreen(
                     tempUnit = tempUnit,
                     windUnit = windUnit,
                     onNavigateToDetails = onNavigateToDetails,
+                    language = language
                 )
             }
         }
@@ -100,7 +103,8 @@ fun FavouriteScreenContent(
     onRemove: (Double , Double)->Unit,
     tempUnit: TempUnit,
     windUnit: WindUnit,
-    onNavigateToDetails : (Double , Double)-> Unit
+    onNavigateToDetails : (Double , Double)-> Unit,
+    language: Language
 ) {
     LazyColumn(
         modifier = Modifier
@@ -120,7 +124,8 @@ fun FavouriteScreenContent(
                     onRemove = onRemove,
                     tempUnit = tempUnit,
                     windUnit = windUnit,
-                    onNavigateToDetails = onNavigateToDetails
+                    onNavigateToDetails = onNavigateToDetails,
+                    language = language
                 )
             }
         }
@@ -192,7 +197,7 @@ fun FavouriteHeader(locationCount: Int = 0) {
             }
         }
 
-        // ── Subtle divider ────────────────────────────────────────────────────
+
         HorizontalDivider(
             thickness = 0.5.dp,
             color     = MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.WeatherInfoItem
+import com.example.weather_forecast.ui.theme.lightGray
 
 
 @Composable
@@ -73,8 +74,9 @@ fun WeatherInfoCard(
 
             Text(
                 text = stat.label,
-                fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                fontSize = 14.sp,
+
+                color = lightGray,
                 letterSpacing = 1.2.sp,
                 fontWeight = FontWeight.Medium
             )

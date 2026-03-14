@@ -12,7 +12,11 @@ import com.example.weather_forecast.utils.getTopBarLocation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class FavouriteDetailsViewModel(
     private val weatherRepository: WeatherRepository,
@@ -22,41 +26,40 @@ class FavouriteDetailsViewModel(
     private val _uiState = MutableStateFlow<UiState<WeatherState>>(UiState.Idle)
     val uiState: StateFlow<UiState<WeatherState>> get() = _uiState
 
-    fun fetchWeather(
+     fun fetchWeather(
         lat: Double,
         lon: Double,
         apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
     ) {
+        val lang = weatherRepository.getLanguage()
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
-            try {
-                val response = weatherRepository.getOneCallResponse(lat, lon, apiKey)
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        _uiState.value = UiState.Success(WeatherState(oneCall = body))
-                        launch(Dispatchers.IO) {
-                            val topBar  = getTopBarLocation(app, lat, lon)
-                            val center  = getCenterLocation(app, lat, lon)
-                            val current = _uiState.value
-                            if (current is UiState.Success) {
-                                _uiState.value = UiState.Success(
-                                    current.data.copy(
-                                        topBarLocation = topBar,
-                                        centerLocation = center
-                                    )
+
+            flow {
+                emit(weatherRepository.getOneCallResponse(lat, lon, apiKey, lang))
+            }
+                .onStart { _uiState.value = UiState.Loading }
+                .catch { ex -> _uiState.value = UiState.Error(ex.message ?: "Unknown error") }
+                .collect { response ->
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null) {
+                            _uiState.value = UiState.Loading
+                            val topBar = withContext(Dispatchers.IO) { getTopBarLocation(app, lat, lon) }
+                            val center = withContext(Dispatchers.IO) { getCenterLocation(app, lat, lon) }
+                            _uiState.value = UiState.Success(
+                                WeatherState(
+                                    oneCall        = body,
+                                    topBarLocation = topBar,
+                                    centerLocation = center
                                 )
-                            }
+                            )
+                        } else {
+                            _uiState.value = UiState.Error("Empty response")
                         }
                     } else {
-                        _uiState.value = UiState.Error("Empty response")
+                        _uiState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
                     }
-                } else {
-                    _uiState.value = UiState.Error("Error ${response.code()}: ${response.message()}")
                 }
-            } catch (ex: Exception) {
-                _uiState.value = UiState.Error(ex.message ?: "Unknown error")
-            }
         }
     }
 }

@@ -19,9 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.utils.formatNumber
 
@@ -46,11 +48,13 @@ fun UvIndexCard(uvi: Double = 9.76 , language : Language) {
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text(
-                text = "UV INDEX",
+                text = stringResource(R.string.uv_index),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
-                    letterSpacing = 1.5.sp
+                    letterSpacing = 1.5.sp,
+                    fontSize = 18.sp
+
                 )
             )
             Row(
