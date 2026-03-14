@@ -38,7 +38,7 @@ fun formatNumber(number: Double, language: Language): String =
 fun formatTemp(value: Int, unit: TempUnit, language: Language): String {
     val number = formatNumber(value, language)
     val symbol = UnitConverter.tempSymbol(unit)
-    return "$number$symbol"
+    return "$number $symbol"
 }
 
 
@@ -50,7 +50,7 @@ fun formatWind(ms: Double, unit: WindUnit, language: Language): String {
         WindUnit.KMH -> "%.1f".format(ms * 3.6)     to "km/h"
     }
     val number = formatNumber(value, language)
-    return "$number $label"
+    return "$number \t $label"
 }
 fun applyLocale(context: Context, language: Language) {
     val locale = getLocale(language)

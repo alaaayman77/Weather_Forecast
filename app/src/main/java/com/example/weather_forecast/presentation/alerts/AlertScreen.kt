@@ -29,6 +29,7 @@ import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertTab
 import com.example.weather_forecast.data.models.AlertType
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.presentation.alerts.components.ActiveAlertsContent
 import com.example.weather_forecast.presentation.alerts.components.AlarmPermissionDialog
 import com.example.weather_forecast.presentation.alerts.components.EmptyStateContent
@@ -53,7 +54,8 @@ fun AlertScreen(
 
     onFabClicked      : () -> Unit,
     onDismissSheet    : () -> Unit,
-    onDismissPermDialog: () -> Unit
+    onDismissPermDialog: () -> Unit,
+
 ) {
     val context    = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -69,7 +71,8 @@ fun AlertScreen(
                     scheduledAlerts    = scheduledAlerts,
                     alertStatuses      = alertStatuses,
                     onCancelScheduled  = onCancelAlert,
-                    onRetry            = onRetry
+                    onRetry            = onRetry,
+
                 )
 
 

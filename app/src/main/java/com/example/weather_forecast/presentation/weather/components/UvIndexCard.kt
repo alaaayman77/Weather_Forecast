@@ -31,11 +31,11 @@ import com.example.weather_forecast.utils.formatNumber
 @Composable
 fun UvIndexCard(uvi: Double = 9.76 , language : Language) {
     val (label, color) = when {
-        uvi <= 2  -> "Low"      to Color(0xFF4CAF50)
-        uvi <= 5  -> "Moderate" to Color(0xFFFFC107)
-        uvi <= 7  -> "High"     to Color(0xFFFF9800)
-        uvi <= 10 -> "Very High" to Color(0xFFF44336)
-        else      -> "Extreme"  to Color(0xFF9C27B0)
+        uvi <= 2  -> stringResource(R.string.low)      to Color(0xFF4CAF50)
+        uvi <= 5  -> stringResource(R.string.moderate) to Color(0xFFFFC107)
+        uvi <= 7  -> stringResource(R.string.high)     to Color(0xFFFF9800)
+        uvi <= 10 -> stringResource(R.string.very_high)  to Color(0xFFF44336)
+        else      -> stringResource(R.string.extreme)   to Color(0xFF9C27B0)
     }
     val progress = (uvi / 11f).coerceIn(0.0, 1.0).toFloat()
 

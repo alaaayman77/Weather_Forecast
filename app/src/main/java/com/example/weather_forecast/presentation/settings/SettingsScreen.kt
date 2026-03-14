@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +30,7 @@ import com.example.weather_forecast.presentation.settings.components.SettingsSec
 import com.example.weather_forecast.presentation.settings.components.UnitChip
 import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.utils.getDisplayName
+import com.example.weather_forecast.R
 
 
 @Composable
@@ -57,7 +59,7 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Text(
-            text  = "Settings",
+            text  =stringResource(R.string.settings),
             style = MaterialTheme.typography.titleLarge.copy(
                 color      = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,
@@ -66,17 +68,17 @@ fun SettingsScreen(
             modifier = Modifier.padding(top = 8.dp)
         )
 
-        SettingsSection(icon = Icons.Rounded.LocationOn, title = "Location") {
+        SettingsSection(icon = Icons.Rounded.LocationOn, title = stringResource(R.string.location)) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 LocationOptionCard(
-                    title    = "Use GPS",
-                    subtitle = "Current location via satellite",
+                    title    = stringResource(R.string.use_gps),
+                    subtitle = stringResource(R.string.use_gps_subtitle),
                     selected = locationSrc == LocationSource.GPS,
                     onClick  = { onLocationSourceGPSClick(LocationSource.GPS) }
                 )
                 LocationOptionCard(
-                    title    = "Choose from Map",
-                    subtitle = "Select manually on world map",
+                    title    =stringResource(R.string.choose_from_map),
+                    subtitle =stringResource(R.string.choose_from_map_subtitle),
                     selected = locationSrc == LocationSource.MAP,
                     onClick  = { onLocationSourceMAPClick(LocationSource.MAP) }
                 )
@@ -84,12 +86,12 @@ fun SettingsScreen(
         }
 
 
-        SettingsSection(icon = Icons.Rounded.Settings, title = "Units") {
+        SettingsSection(icon = Icons.Rounded.Settings, title = stringResource(R.string.units)) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text  = "TEMPERATURE",
+                        text  = stringResource(R.string.temperature),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = lightGray, letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold
                         )
@@ -102,9 +104,9 @@ fun SettingsScreen(
                         TempUnit.entries.forEach { unit ->
                             UnitChip(
                                 label = when (unit) {
-                                    TempUnit.CELSIUS    -> "Celsius (°C)"
-                                    TempUnit.FAHRENHEIT -> "Fahrenheit (°F)"
-                                    TempUnit.KELVIN     -> "Kelvin (K)"
+                                    TempUnit.CELSIUS    ->stringResource(R.string.celsius)
+                                    TempUnit.FAHRENHEIT -> stringResource(R.string.fahrenheit)
+                                    TempUnit.KELVIN     -> stringResource(R.string.kelvin)
                                 },
                                 selected = tempUnit == unit,
                                 onClick  = { onTempUnitClick(unit) }
@@ -117,7 +119,7 @@ fun SettingsScreen(
 
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text  = "WIND SPEED",
+                        text  = stringResource(R.string.wind_speed),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = lightGray, letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold
                         )
@@ -126,9 +128,9 @@ fun SettingsScreen(
                         WindUnit.entries.forEach { unit ->
                             UnitChip(
                                 label = when (unit) {
-                                    WindUnit.MS  -> "m/s"
-                                    WindUnit.MPH -> "mph"
-                                    WindUnit.KMH -> "km/h"
+                                    WindUnit.MS  -> stringResource(R.string.wind_ms)
+                                    WindUnit.MPH -> stringResource(R.string.wind_mph)
+                                    WindUnit.KMH -> stringResource(R.string.wind_kmh)
                                 },
                                 selected = windUnit == unit,
                                 onClick  = {onWindUnitClick(unit)}
@@ -140,7 +142,7 @@ fun SettingsScreen(
         }
 
 
-        SettingsSection(icon = Icons.Default.Home, title = "Language") {
+        SettingsSection(icon = Icons.Default.Home, title =stringResource(R.string.language)) {
             Box {
                 Surface(
                     modifier       = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).clickable { langExpanded = true },

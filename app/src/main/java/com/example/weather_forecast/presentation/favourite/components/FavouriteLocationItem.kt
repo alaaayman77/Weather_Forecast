@@ -9,7 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -19,6 +21,7 @@ import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.ui.theme.lightGray
+import com.example.weather_forecast.utils.formatNumber
 import com.example.weather_forecast.utils.formatTemp
 
 @Composable
@@ -100,13 +103,16 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.secondary,
+                                textDirection = TextDirection.Ltr
+
                             )
                         )
                         Text(
                             text = weatherCondition,
                             style = MaterialTheme.typography.labelMedium.copy(
-                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
+
                             )
                         )
                     }
@@ -145,10 +151,11 @@ fun FavouriteLocationItem(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text = "${current.humidity}%",
+                            text ="${formatNumber(current.humidity , language)}%",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                textDirection = TextDirection.Ltr
                             )
                         )
                     }
@@ -164,35 +171,38 @@ fun FavouriteLocationItem(
                             modifier = Modifier.size(16.dp)
                         )
                         Text(
-                            text =  "${UnitConverter.convertWind(current.wind_speed, windUnit)}",
+                            text =  "${formatNumber(UnitConverter.convertWind(current.wind_speed, windUnit) ,  language)}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                textDirection = TextDirection.Ltr
                             )
                         )
                     }
 
                     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text = "H ",
+                            text = stringResource(R.string.H),
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
                             text = "${highTemp}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                textDirection = TextDirection.Ltr
                             )
                         )
                         Text(
-                            text = " L ",
+                            text = stringResource(R.string.L),
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
                             text = "${lowTemp}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                textDirection = TextDirection.Ltr
                             )
                         )
                     }

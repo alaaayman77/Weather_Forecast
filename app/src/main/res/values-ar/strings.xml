@@ -29,4 +29,21 @@
     <string name="uv_index">مؤشر الاشعة فوق البنفسجية</string>
     <string name="H">ع</string>
     <string name="L">ص</string>
+    <string name="now">الان</string>
+    <string name="low">منخفض</string>
+    <string name="moderate">متوسط</string>
+    <string name="high">مرتفع</string>
+    <string name="very_high">مرتفع جدا</string>
+    <string name="extreme">شديد الخطورة</string>
+    <string name="favourite">المواقع المفضلة</string>
+    <string name="no_favourite">لم تتم إضافة مواقع مفضلة بعد</string>
+    <string name="tap_plus_favourite">اضغط على + لإضافة المزيد</string>
+    <string name="no_alerts">لا توجد تنبيهات مجدولة بعد\nاضغط على + لإنشاء أول تنبيه</string>
+    <string name="celsius">سيلسيوس (°م)</string>
+    <string name="fahrenheit">فهرنهايت (°ف)</string>
+    <string name="kelvin">كلفن (ك)</string>
+    <string name="wind_ms">متر/ث</string>
+    <string name="wind_mph">ميل/ساعة</string>
+    <string name="wind_kmh">كم/ساعة</string>
+
 </resources>

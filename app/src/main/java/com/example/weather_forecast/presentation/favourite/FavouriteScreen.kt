@@ -33,7 +33,9 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
+
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.FavouriteEntity
@@ -41,6 +43,8 @@ import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.ui.theme.lightGray
+import com.example.weather_forecast.R
+import com.example.weather_forecast.utils.formatNumber
 
 @Composable
 fun FavouriteScreen(
@@ -113,7 +117,7 @@ fun FavouriteScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
     ) {
-        item { FavouriteHeader(locationCount = favourites.size) }
+        item { FavouriteHeader(locationCount = favourites.size , language) }
 
         if (favourites.isEmpty()) {
             item { FavouriteEmptyState() }
@@ -132,7 +136,7 @@ fun FavouriteScreenContent(
     }
 }
 @Composable
-fun FavouriteHeader(locationCount: Int = 0) {
+fun FavouriteHeader(locationCount: Int = 0, language: Language) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -167,7 +171,7 @@ fun FavouriteHeader(locationCount: Int = 0) {
 
                 Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
                     Text(
-                        text  = "Favourite Locations",
+                        text  = stringResource(R.string.favourite),
                         style = MaterialTheme.typography.titleMedium.copy(
                             color      = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Bold,
@@ -178,7 +182,7 @@ fun FavouriteHeader(locationCount: Int = 0) {
                 }
             }
 
-            // Count badge — only shown when there are locations
+
             if (locationCount > 0) {
                 Surface(
                     shape = RoundedCornerShape(20.dp),
@@ -186,7 +190,7 @@ fun FavouriteHeader(locationCount: Int = 0) {
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.20f))
                 ) {
                     Text(
-                        text     = locationCount.toString(),
+                        text     = formatNumber( locationCount.toString() , language ),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         style    = MaterialTheme.typography.labelMedium.copy(
                             color      = MaterialTheme.colorScheme.primary,
@@ -225,13 +229,13 @@ fun FavouriteEmptyState() {
                 tint               = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
             )
             Text(
-                text  = "No favourite locations yet",
+                text  = stringResource(R.string.no_favourite),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
                 )
             )
             Text(
-                text  = "Tap + to add one",
+                text  =stringResource(R.string.tap_plus_favourite),
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
                 )

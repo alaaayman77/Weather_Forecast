@@ -28,5 +28,24 @@
     <string name="sunset">SUNSET</string>
     <string name="H">H</string>
     <string name="L">L</string>
+    <string name="now">Now</string>
+    <string name="low">Low</string>
+    <string name="moderate">Moderate</string>
+    <string name="high">High</string>
+    <string name="very_high">Very high</string>
+    <string name="extreme">Extreme</string>
+    <string name="favourite">Favourite Locations</string>
+    <string name="no_favourite">No Favourite Locations Added Yet</string>
+    <string name="tap_plus_favourite">Tap + to add more</string>
+    <string name="no_alerts">No Alerts Scheduled Yet</string>
+    <string name="tap_plus_alerts">Tap + to create your first alert</string>
+    <string name="celsius">Celsius (°C)</string>
+    <string name="fahrenheit">Fahrenheit (°F)</string>
+    <string name="kelvin">Kelvin (K)</string>
+    <string name="wind_ms">m/s</string>
+    <string name="wind_mph">mph</string>
+    <string name="wind_kmh">km/h</string>
+
+
 
 </resources>

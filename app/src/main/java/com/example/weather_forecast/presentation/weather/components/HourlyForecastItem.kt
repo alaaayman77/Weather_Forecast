@@ -11,10 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.HourlyItem
 import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
@@ -52,7 +54,7 @@ fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit:
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = if (isNow) "Now" else formatNumber(hourlyItem.hour(),language),
+                text = if (isNow) stringResource(R.string.now)else formatNumber(hourlyItem.hour(),language),
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = textColor,
 

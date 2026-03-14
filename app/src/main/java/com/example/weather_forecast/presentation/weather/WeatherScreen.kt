@@ -169,7 +169,7 @@ fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit , language: Langu
         days.forEachIndexed { index, day ->
             WeeklyForecastItem(
                 weeklyWeatherForecast = WeeklyWeatherForecast(
-                    day       = if (index == 0) "Today" else day.dayName(),
+                    day       = if (index == 0) stringResource(R.string.today)  else day.dayName(),
                     icon      = Icons.Default.Home,
                     lowTemp   = UnitConverter.convertTemp(day.temp.min, tempUnit),
                     highTemp  = UnitConverter.convertTemp(day.temp.max, tempUnit),
@@ -348,7 +348,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
 
             WeatherDetailChip(
                 icon = Icons.Default.Home,
-                text = "${stringResource(R.string.feels_like) }${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit), tempUnit , language)}"
+                text = "${stringResource(R.string.feels_like) } \t ${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit), tempUnit , language)}"
             )
             }
         }
@@ -378,6 +378,7 @@ fun TempPill(label: String, value: String, isHigh: Boolean) {
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = if (isHigh) MaterialTheme.colorScheme.primary else lightGray,
                     fontWeight = FontWeight.Bold,
+
 
                 )
             )

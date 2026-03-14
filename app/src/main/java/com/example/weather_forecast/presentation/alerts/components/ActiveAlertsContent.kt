@@ -9,10 +9,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.weather_forecast.R
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
+import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.presentation.weather.AlertState
 import com.example.weather_forecast.presentation.weather.UiState
 
@@ -23,11 +27,13 @@ fun ActiveAlertsContent(
     scheduledAlerts   : List<AlertEntity>,
     alertStatuses     : Map<Int, AlertStatus>,
     onCancelScheduled : (AlertEntity) -> Unit,
-    onRetry           : () -> Unit
+    onRetry           : () -> Unit,
+
 ) {
     if (scheduledAlerts.isEmpty()) {
         EmptyStateContent(
-            message = "No alerts scheduled yet.\nTap + to create your first alert."
+            message = stringResource(R.string.no_alerts),
+
         )
     } else {
         LazyColumn(
