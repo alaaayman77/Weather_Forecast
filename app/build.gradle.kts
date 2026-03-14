@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.ui)
     implementation(libs.material)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.compose.remote.creation.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -111,5 +112,14 @@ dependencies {
 //    implementation("androidx.media3:media3-exoplayer:1.3.1")
 //    implementation("androidx.media3:media3-ui:1.3.1")
     implementation("com.airbnb.android:lottie-compose:6.4.0")
+    // JUnit
+    testImplementation("junit:junit:4.13.2")
+
+    // Kotlin Coroutines Testing
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+
+    // Hamcrest (for assertThat)
+    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("io.mockk:mockk:1.13.10")
 
 }

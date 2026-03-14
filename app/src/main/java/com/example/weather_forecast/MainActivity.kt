@@ -9,6 +9,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.ViewModelProvider
 import com.example.weather_forecast.data.WeatherRepository
+import com.example.weather_forecast.data.datasource.local.WeatherLocalDataSource
+import com.example.weather_forecast.data.datasource.remote.WeatherRemoteDataSource
 import com.example.weather_forecast.presentation.alerts.AlertViewModel
 import com.example.weather_forecast.presentation.alerts.AlertViewModelFactory
 
@@ -41,10 +43,14 @@ class MainActivity : ComponentActivity() {
     private lateinit var settingsViewModel: SettingsViewModel
     private lateinit var notificationPermissionHandler: NotificationPermissionHandler
 
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+         val localDataSource = WeatherLocalDataSource(application)
 
+         val remoteDataSource = WeatherRemoteDataSource()
         val locationProvider = LocationProvider(
             application,
             LocationServices.getFusedLocationProviderClient(this)
@@ -54,30 +60,30 @@ class MainActivity : ComponentActivity() {
 
         weatherViewModel = ViewModelProvider(
             this,
-            WeatherViewModelFactory(locationProvider, WeatherRepository(application), application)
+            WeatherViewModelFactory(locationProvider, WeatherRepository(remoteDataSource , localDataSource), application)
         ).get(WeatherViewModel::class.java)
 
         favouriteViewModel = ViewModelProvider(
             this,
-            FavouriteViewModelFactory(WeatherRepository(application))
+            FavouriteViewModelFactory(WeatherRepository(remoteDataSource , localDataSource))
         ).get(FavouriteViewModel::class.java)
 
         mapPickerViewModel = ViewModelProvider(
             this,
-            MapPickerViewModelFactory(application, WeatherRepository(application))
+            MapPickerViewModelFactory(application, WeatherRepository(remoteDataSource , localDataSource))
         ).get(MapPickerViewModel::class.java)
 
         favouriteDetailsViewModel = ViewModelProvider(
             this,
-            FavouriteDetailsViewModelFactory(WeatherRepository(application), application)
+            FavouriteDetailsViewModelFactory(WeatherRepository(remoteDataSource , localDataSource), application)
         ).get(FavouriteDetailsViewModel::class.java)
         alertViewModel = ViewModelProvider(
             this,
-            AlertViewModelFactory(WeatherRepository(application) , application)
+            AlertViewModelFactory(WeatherRepository(remoteDataSource , localDataSource) , application)
         ).get(AlertViewModel::class.java)
         settingsViewModel = ViewModelProvider(
             this,
-            SettingsViewModelFactory(WeatherRepository(application))
+            SettingsViewModelFactory(WeatherRepository(remoteDataSource , localDataSource))
         ).get(SettingsViewModel::class.java)
 
         permissionHandler = PermissionHandler(this).also {
@@ -87,7 +93,7 @@ class MainActivity : ComponentActivity() {
         notificationPermissionHandler = NotificationPermissionHandler(this).also {
             it.init()
         }
-        val repository = WeatherRepository(application)
+        val repository = WeatherRepository(remoteDataSource , localDataSource)
         applyLocale(this, repository.getLanguage())
         enableEdgeToEdge()
         setContent {

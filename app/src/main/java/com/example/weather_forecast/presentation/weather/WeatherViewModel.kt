@@ -96,9 +96,9 @@ class WeatherViewModel(
                             )
 
                             // Check custom condition alerts after state is set
-                            val owmId       = body.current.weather.firstOrNull()?.id
-                            val description = body.current.weather.firstOrNull()?.description ?: ""
-                            val tempKelvin  = body.current.temp
+                            val owmId       = body.current?.weather?.firstOrNull()?.id
+                            val description = body.current?.weather?.firstOrNull()?.description ?: ""
+                            val tempKelvin  = body.current?.temp?:0.0
                             if (owmId != null) {
                                 checkCustomAlerts(owmId, tempKelvin, description)
                             }
