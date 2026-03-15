@@ -80,7 +80,7 @@ class AlertNotificationService : Service() {
                 ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
                 broadcastStatusUpdate(alertId, AlertStatus.CANCELLED.name)
 
-                // Only cancel alarm for SCHEDULED alerts
+
                 if (alertMode != "CUSTOM") {
                     AlertScheduler(this).cancel(
                         id    = alertId,

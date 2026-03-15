@@ -1,6 +1,6 @@
 package com.example.weather_forecast.data.datasource.local
 
-import com.example.weather_forecast.data.LocalDataSource
+import com.example.weather_forecast.data.datasource.local.LocalDataSource
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.FavouriteEntity

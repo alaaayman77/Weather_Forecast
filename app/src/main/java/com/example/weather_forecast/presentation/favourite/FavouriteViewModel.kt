@@ -1,15 +1,13 @@
 package com.example.weather_forecast.presentation.favourite
 
-import com.example.weather_forecast.presentation.weather.FavouriteState
+import com.example.weather_forecast.presentation.FavouriteState
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavHostController
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.FavouriteEntity
-import com.example.weather_forecast.navigation.NavigationRoutes
-import com.example.weather_forecast.presentation.weather.UiState
+import com.example.weather_forecast.presentation.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch

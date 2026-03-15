@@ -5,8 +5,8 @@ import com.example.weather_forecast.data.models.CurrentWeather
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.OneCallResponse
 import com.example.weather_forecast.data.models.WeatherCondition
-import com.example.weather_forecast.presentation.weather.FavouriteState
-import com.example.weather_forecast.presentation.weather.UiState
+import com.example.weather_forecast.presentation.FavouriteState
+import com.example.weather_forecast.presentation.UiState
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk

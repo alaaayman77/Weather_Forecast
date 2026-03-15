@@ -11,6 +11,8 @@ import com.example.weather_forecast.data.models.AlertMode
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.CustomCondition
 import com.example.weather_forecast.data.models.LocationSource
+import com.example.weather_forecast.presentation.UiState
+import com.example.weather_forecast.presentation.WeatherState
 import com.example.weather_forecast.presentation.alerts.AlertNotificationService
 import com.example.weather_forecast.presentation.alerts.AlertReceiver
 import com.example.weather_forecast.utils.LocationProvider
@@ -89,7 +91,7 @@ class WeatherViewModel(
 
                             _weatherUiState.value = UiState.Success(
                                 WeatherState(
-                                    oneCall        = body,
+                                    oneCall = body,
                                     topBarLocation = topBar,
                                     centerLocation = center
                                 )
@@ -121,7 +123,7 @@ class WeatherViewModel(
 
             weatherRepository.getAllAlerts().first().filter { alert ->
                 alert.mode            == AlertMode.CUSTOM      &&
-                        alert.status          == AlertStatus.SCHEDULED && // ← ONLY scheduled, never re-fire dismissed/cancelled
+                        alert.status          == AlertStatus.SCHEDULED &&
                         alert.customCondition != null                  &&
                         nowMillis in alert.startMillis..alert.endMillis
             }.forEach { alert ->
@@ -148,7 +150,6 @@ class WeatherViewModel(
                         androidx.core.content.ContextCompat.startForegroundService(app, it)
                     }
 
-                    // ── Only set ACTIVE once, don't touch dismissed/cancelled ──
                     weatherRepository.updateStatus(alert.id, AlertStatus.ACTIVE)
                 }
             }

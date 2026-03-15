@@ -18,19 +18,19 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
 import com.example.weather_forecast.data.models.LocationSource
 import com.example.weather_forecast.navigation.BottomNavigationBar
 import com.example.weather_forecast.navigation.NavigationRoutes
-import com.example.weather_forecast.presentation.alerts.AlertScreen
-import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsScreen
-import com.example.weather_forecast.presentation.settings.SettingsScreen
+import com.example.weather_forecast.presentation.alerts.view.AlertScreen
+import com.example.weather_forecast.presentation.favouriteDetails.view.FavouriteDetailsScreen
+import com.example.weather_forecast.presentation.settings.view.SettingsScreen
 import com.example.weather_forecast.presentation.SplashScreen
+import com.example.weather_forecast.presentation.UiState
 import com.example.weather_forecast.presentation.alerts.AlertReceiver
 import com.example.weather_forecast.presentation.alerts.AlertViewModel
-import com.example.weather_forecast.presentation.favourite.FavouriteScreen
+import com.example.weather_forecast.presentation.favourite.view.FavouriteScreen
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.MapPickerScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModel
@@ -38,6 +38,7 @@ import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.permission.*
 import com.example.weather_forecast.presentation.settings.SettingsViewModel
 import com.example.weather_forecast.presentation.weather.*
+import com.example.weather_forecast.presentation.weather.view.WeatherScreen
 import com.example.weather_forecast.ui.theme.Weather_ForecastTheme
 import com.example.weather_forecast.utils.AlertStatusReceiver
 import com.example.weather_forecast.utils.NotificationPermissionHandler
@@ -132,7 +133,8 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.WeatherRoute> {
-                        val uiState  by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(UiState.Idle)
+                        val uiState  by weatherViewModel.weatherUiState.collectAsStateWithLifecycle(
+                            UiState.Idle)
                         val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
                         val language by settingsViewModel.language.collectAsStateWithLifecycle()
 
@@ -152,7 +154,7 @@ fun AppScreen(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(innerPadding),
-                                    uiState  = uiState,
+                                    uiState = uiState,
                                     location = location,
                                     tempUnit = tempUnit,
                                     windUnit = windUnit,
@@ -174,7 +176,8 @@ fun AppScreen(
                     }
 
                     composable<NavigationRoutes.FavouriteRoute> {
-                        val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle(UiState.Idle)
+                        val uiState by favouriteViewModel.uiState.collectAsStateWithLifecycle(
+                            UiState.Idle)
                         FavouriteScreen(
                             modifier      = Modifier.padding(innerPadding),
                             uiState       = uiState,
@@ -242,7 +245,8 @@ fun AppScreen(
                     composable<NavigationRoutes.AlertRoute> {
                         LaunchedEffect(Unit) { notificationPermissionHandler.requestIfNeeded() }
 
-                        val uiState             by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(UiState.Idle)
+                        val uiState             by alertViewModel.weatherAlertsState.collectAsStateWithLifecycle(
+                            UiState.Idle)
                         val scheduledAlerts     by alertViewModel.scheduledAlerts.collectAsStateWithLifecycle()
                         val showBottomSheet     by alertViewModel.showBottomSheet.collectAsStateWithLifecycle()
                         val showPermDialog      by alertViewModel.showPermDialog.collectAsStateWithLifecycle()

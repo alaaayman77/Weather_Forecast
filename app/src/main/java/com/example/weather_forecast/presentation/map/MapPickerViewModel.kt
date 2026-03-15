@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
-import com.example.weather_forecast.presentation.weather.UiState
+import com.example.weather_forecast.presentation.UiState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places

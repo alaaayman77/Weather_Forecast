@@ -1,7 +1,7 @@
 package com.example.weather_forecast.data.datasource.remote
 
 
-import com.example.weather_forecast.data.RemoteDataSource
+import com.example.weather_forecast.data.datasource.remote.RemoteDataSource
 import com.example.weather_forecast.data.models.OneCallResponse
 import com.example.weather_forecast.data.network.Network
 import com.example.weather_forecast.data.network.WeatherService

@@ -1,7 +1,7 @@
 package com.example.weather_forecast.data.datasource.local
 
 import android.content.Context
-import com.example.weather_forecast.data.LocalDataSource
+import com.example.weather_forecast.data.datasource.local.LocalDataSource
 import com.example.weather_forecast.data.datasource.db.AppDatabase
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertStatus

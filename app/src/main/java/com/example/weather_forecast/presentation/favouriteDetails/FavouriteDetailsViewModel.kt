@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weather_forecast.data.WeatherRepository
-import com.example.weather_forecast.presentation.weather.UiState
-import com.example.weather_forecast.presentation.weather.WeatherState
+import com.example.weather_forecast.presentation.UiState
+import com.example.weather_forecast.presentation.WeatherState
 import com.example.weather_forecast.utils.getCenterLocation
 import com.example.weather_forecast.utils.getTopBarLocation
 import kotlinx.coroutines.Dispatchers

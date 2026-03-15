@@ -11,8 +11,8 @@ import com.example.weather_forecast.data.models.AlertMode
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.AlertType
 import com.example.weather_forecast.data.models.CustomCondition
-import com.example.weather_forecast.presentation.weather.AlertState
-import com.example.weather_forecast.presentation.weather.UiState
+import com.example.weather_forecast.presentation.AlertState
+import com.example.weather_forecast.presentation.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
