@@ -1,5 +1,6 @@
 package com.example.weather_forecast.presentation.settings
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weather_forecast.data.WeatherRepository
@@ -25,11 +26,15 @@ class SettingsViewModel(private val repository: WeatherRepository) : ViewModel()
 
     private val _language = MutableStateFlow(repository.getLanguage())
     val language: StateFlow<Language> get() = _language
+    init {
+        Log.d("Settings", "Initial tempUnit = ${repository.getTempUnit()}")
+    }
 
     fun setTempUnit(unit: TempUnit) {
-        repository.saveTempUnit(unit) //save to prefs
+        repository.saveTempUnit(unit)
         _tempUnit.value = unit
     }
+
 
     fun setWindUnit(unit: WindUnit) {
         repository.saveWindUnit(unit)

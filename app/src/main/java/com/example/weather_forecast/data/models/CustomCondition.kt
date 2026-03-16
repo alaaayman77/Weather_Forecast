@@ -52,8 +52,8 @@ enum class CustomCondition(
         "Low Temp < 0°", "Temperature drops below 0°C", "🥶", emptyList()
     );
 
-    fun matches(owmId: Int, tempKelvin: Double): Boolean {
-        val tempCelsius = tempKelvin - 273.15
+
+    fun matches(owmId: Int, tempCelsius: Double): Boolean {
         if (this == HIGH_TEMP) return tempCelsius >= 40.0
         if (this == LOW_TEMP)  return tempCelsius <= 0.0
         return owmIdRange.any { owmId in it }

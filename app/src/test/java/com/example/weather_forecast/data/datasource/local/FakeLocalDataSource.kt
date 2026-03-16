@@ -26,12 +26,20 @@ class FakeLocalDataSource(
     override fun saveWindUnit(unit: WindUnit)                 { windUnit = unit }
     override fun saveLocationSource(src: LocationSource)      { locationSource = src }
     override fun saveLanguage(lang: Language)                 { language = lang }
+    override fun saveOnboarded(done: Boolean) {
+        TODO("Not yet implemented")
+    }
+
     override fun saveManualLocation(lat: Double, lon: Double) { manualLocation = Pair(lat, lon) }
 
     override fun getTempUnit()       : TempUnit              = tempUnit
     override fun getWindUnit()       : WindUnit              = windUnit
     override fun getLocationSource() : LocationSource        = locationSource
     override fun getLanguage()       : Language              = language
+    override fun isOnboarded(): Boolean {
+        TODO("Not yet implemented")
+    }
+
     override fun getManualLocation() : Pair<Double, Double>? = manualLocation
 
     override suspend fun addFavourite(item: FavouriteEntity) {
@@ -69,6 +77,14 @@ class FakeLocalDataSource(
     }
 
     override suspend fun deleteAlert(alertId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun saveCurrentWeather(json: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCurrentWeather(): String? {
         TODO("Not yet implemented")
     }
 

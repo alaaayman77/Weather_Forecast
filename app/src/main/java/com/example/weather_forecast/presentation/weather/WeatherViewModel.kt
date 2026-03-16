@@ -107,8 +107,8 @@ class WeatherViewModel(
 
                         val owmId       = body.current?.weather?.firstOrNull()?.id
                         val description = body.current?.weather?.firstOrNull()?.description ?: ""
-                        val tempKelvin  = body.current?.temp ?: 0.0
-                        if (owmId != null) checkCustomAlerts(owmId, tempKelvin, description)
+                        val tempCelsius  = body.current?.temp ?: 0.0
+                        if (owmId != null) checkCustomAlerts(owmId, tempCelsius, description)
 
                     } else {
                         tryLoadCache(lat, lon, "Empty response")
@@ -147,7 +147,7 @@ class WeatherViewModel(
 
 
 
-    private fun checkCustomAlerts(owmId: Int, tempKelvin: Double, description: String) {
+    private fun checkCustomAlerts(owmId: Int, tempCelsius: Double, description: String) {
         viewModelScope.launch {
             val nowMillis = System.currentTimeMillis()
 
@@ -157,16 +157,16 @@ class WeatherViewModel(
                         alert.customCondition != null                  &&
                         nowMillis in alert.startMillis..alert.endMillis
             }.forEach { alert ->
-                val conditionMet = alert.customCondition!!.matches(owmId, tempKelvin)
+                val conditionMet = alert.customCondition!!.matches(owmId, tempCelsius)
                 Log.d("CustomAlert", "alert=${alert.id} condition=${alert.customCondition} met=$conditionMet")
 
                 if (conditionMet) {
-                    val tempCelsius = (tempKelvin - 273.15).toInt()
+                    val tempDisplay = tempCelsius.toInt()
                     val label = when (alert.customCondition) {
                         CustomCondition.HIGH_TEMP ->
-                            "🌡️ High temp alert! Currently ${tempCelsius}°C"
+                            "🌡️ High temp alert! Currently ${tempDisplay}°C"
                         CustomCondition.LOW_TEMP  ->
-                            "🥶 Low temp alert! Currently ${tempCelsius}°C"
+                            "🥶 Low temp alert! Currently ${tempDisplay}°C"
                         else ->
                             "${alert.customCondition.emoji} ${description.replaceFirstChar { it.uppercase() }} detected in your area!"
                     }
