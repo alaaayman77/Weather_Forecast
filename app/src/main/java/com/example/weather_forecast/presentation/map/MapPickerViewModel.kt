@@ -5,6 +5,7 @@ import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.weather_forecast.BuildConfig
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
@@ -36,7 +37,7 @@ class MapPickerViewModel(
 
     init {
         if (!Places.isInitialized()) {
-            Places.initialize(app, "AIzaSyCJLsLgqW_MrzD7861dn16hNxVpfxCqxfU")
+            Places.initialize(app, BuildConfig.GOOGLE_API)
         }
     }
 
@@ -101,7 +102,7 @@ class MapPickerViewModel(
         lng: Double,
         name: String,
         favouriteViewModel: FavouriteViewModel,
-        apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
+        apiKey: String = BuildConfig.OPEN_WEATHER_API_KEY
     ) {
         viewModelScope.launch {
             _addState.value = UiState.Loading

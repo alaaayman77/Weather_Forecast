@@ -135,7 +135,7 @@ fun AppScreen(
                     navController    = navController,
                     startDestination = NavigationRoutes.SplashRoute,
                 ) {
-                    // 1. SplashRoute — remove permission handling entirely
+
                     composable<NavigationRoutes.SplashRoute> {
                         SplashScreen {
                             val destination = if (onBoardingViewModel.isOnboarded())

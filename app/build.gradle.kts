@@ -1,3 +1,4 @@
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +7,11 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
 android {
     namespace = "com.example.weather_forecast"
     compileSdk {
@@ -23,7 +29,12 @@ android {
         buildConfigField(
             "String",
             "OPEN_WEATHER_API_KEY",
-            "\"${project.properties["OPEN_WEATHER_API_KEY"]}\""
+            "\"${localProperties.getProperty("OPEN_WEATHER_API_KEY", "")}\""  // ← fix this
+        )
+        buildConfigField(
+            "String",
+            "GOOGLE_API",
+            "\"${localProperties.getProperty("GOOGLE_API", "")}\""
         )
 
     }
@@ -47,6 +58,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+
     }
 }
 

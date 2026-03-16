@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.weather_forecast.BuildConfig
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.AlertEntity
 import com.example.weather_forecast.data.models.AlertMode
@@ -23,7 +24,7 @@ class AlertViewModel(
     private val app              : Application
 ) : ViewModel() {
 
-    private val apiKey    = "3ec08632a7a945e6408e9414cd1fab66"
+    private val apiKey    = BuildConfig.OPEN_WEATHER_API_KEY
     private val scheduler = AlertScheduler(app)
 
     private val _weatherAlertsState = MutableStateFlow<UiState<AlertState>>(UiState.Idle)
@@ -121,12 +122,12 @@ class AlertViewModel(
             customCondition = customCondition
         )
 
-        // Only schedule alarm for SCHEDULED mode
+
         if (mode == AlertMode.SCHEDULED) {
             scheduler.schedule(id, type, label, startMillis)
             scheduler.scheduleDismiss(id, endMillis)
         }
-        // CUSTOM mode is checked in WeatherViewModel on every weather fetch
+
 
         viewModelScope.launch { weatherRepository.insertAlert(item) }
     }

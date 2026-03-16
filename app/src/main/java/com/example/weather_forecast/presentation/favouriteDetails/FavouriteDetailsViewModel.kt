@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.weather_forecast.BuildConfig
 import com.example.weather_forecast.data.WeatherRepository
 import com.example.weather_forecast.data.models.OneCallResponse
 import com.example.weather_forecast.presentation.UiState
@@ -34,7 +35,7 @@ class FavouriteDetailsViewModel(
 
     private val gson = Gson()
 
-    fun fetchWeather(lat: Double, lon: Double, apiKey: String = "3ec08632a7a945e6408e9414cd1fab66") {
+    fun fetchWeather(lat: Double, lon: Double, apiKey: String = BuildConfig.OPEN_WEATHER_API_KEY) {
         val lang = weatherRepository.getLanguage()
         viewModelScope.launch {
             _uiState.value = UiState.Loading
