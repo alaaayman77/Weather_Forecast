@@ -23,7 +23,7 @@ A modern Android weather application built with Kotlin and Jetpack Compose, feat
 ### 📍 Location
 - **GPS mode** — automatically fetches weather for your current location
 - **Map mode** — manually pick any location on a Google Maps picker
-- Reverse geocoding for human-readable location names in both the top bar and center section
+- Reverse geocoding for human-readable location names 
 
 ### 🔔 Alerts
 - Schedule weather alerts with start and end times
@@ -187,11 +187,6 @@ presentation/weather/view/
     └── WeeklyForecastItem     # Single daily row with bar
 ```
 
-
-
-
-
-
 ## 🗺️ Offline Support
 
 When a network request fails (IOException or non-2xx response), the app:
@@ -200,9 +195,6 @@ When a network request fails (IOException or non-2xx response), the app:
 3. If no cache → shows an error state with the failure message
 
 
-
-
-
 ## 📬 Contact
 
-Made with ☕ and Kotlin. If you find a bug or have a feature request, open an issue on GitHub.
+Made with Kotlin. If you find a bug or have a feature request, open an issue on GitHub.
