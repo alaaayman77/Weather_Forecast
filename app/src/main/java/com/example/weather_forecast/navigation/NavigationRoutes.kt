@@ -15,6 +15,8 @@ sealed class NavigationRoutes {
     @Serializable
     object  SplashRoute : NavigationRoutes()
     @Serializable
+    object OnboardingRoute : NavigationRoutes()
+    @Serializable
     data class MapPickerRoute(
         val lat: Double,
         val lon: Double,

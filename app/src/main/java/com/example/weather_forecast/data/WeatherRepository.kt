@@ -70,7 +70,7 @@ class WeatherRepository (private val remoteDataSource: RemoteDataSource,
     fun saveManualLocation(lat: Double, lon: Double) = localDataSource.saveManualLocation(lat, lon)
 
     fun saveLanguage(lang: Language) = localDataSource.saveLanguage(lang)
-
+    fun saveOnboarded(done: Boolean) = localDataSource.saveOnboarded(done)
 
 
     fun getTempUnit(): TempUnit = localDataSource.getTempUnit()
@@ -78,4 +78,6 @@ class WeatherRepository (private val remoteDataSource: RemoteDataSource,
     fun getLocationSource(): LocationSource = localDataSource.getLocationSource()
     fun getManualLocation(): Pair<Double, Double>? = localDataSource.getManualLocation()
     fun getLanguage(): Language = localDataSource.getLanguage()
+
+    fun isOnboarded(): Boolean = localDataSource.isOnboarded()
 }

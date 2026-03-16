@@ -20,6 +20,8 @@ import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetai
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModelFactory
 import com.example.weather_forecast.presentation.map.MapPickerViewModel
 import com.example.weather_forecast.presentation.map.MapPickerViewModelFactory
+import com.example.weather_forecast.presentation.onboarding.OnBoardingViewModel
+import com.example.weather_forecast.presentation.onboarding.OnBoardingViewModelFactory
 import com.example.weather_forecast.presentation.permission.PermissionViewModel
 import com.example.weather_forecast.presentation.settings.SettingsViewModel
 import com.example.weather_forecast.presentation.settings.SettingsViewModelFactory
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var favouriteDetailsViewModel   : FavouriteDetailsViewModel
     private lateinit var alertViewModel   : AlertViewModel
     private lateinit var settingsViewModel: SettingsViewModel
+    private lateinit var onBoardingViewModel : OnBoardingViewModel
     private lateinit var notificationPermissionHandler: NotificationPermissionHandler
 
 
@@ -85,6 +88,11 @@ class MainActivity : ComponentActivity() {
             this,
             SettingsViewModelFactory(WeatherRepository(remoteDataSource , localDataSource))
         ).get(SettingsViewModel::class.java)
+        
+        onBoardingViewModel = ViewModelProvider(
+            this,
+            OnBoardingViewModelFactory(WeatherRepository(remoteDataSource , localDataSource))
+        ).get(OnBoardingViewModel::class.java)
 
         permissionHandler = PermissionHandler(this).also {
             it.init(permissionViewModel)
@@ -106,7 +114,8 @@ class MainActivity : ComponentActivity() {
                 mapPickerViewModel        = mapPickerViewModel,
                 favouriteDetailsViewModel = favouriteDetailsViewModel,
                 alertViewModel = alertViewModel,
-                settingsViewModel = settingsViewModel
+                settingsViewModel = settingsViewModel,
+                onBoardingViewModel = onBoardingViewModel
             )
 
 

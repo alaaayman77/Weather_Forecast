@@ -382,7 +382,7 @@ private fun AddAlertFab(modifier: Modifier = Modifier, onClick: () -> Unit) {
     FloatingActionButton(
         onClick        = onClick,
         modifier       = modifier,
-        containerColor = Color(0xFF1E88E5),
+        containerColor = MaterialTheme.colorScheme.primary,
         contentColor   = Color.White,
         shape          = CircleShape,
         elevation      = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)

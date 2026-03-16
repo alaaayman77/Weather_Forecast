@@ -15,11 +15,13 @@ interface LocalDataSource {
     fun saveLocationSource(src: LocationSource)
     fun saveManualLocation(lat: Double, lon: Double)
     fun saveLanguage(lang: Language)
+    fun saveOnboarded(done: Boolean)
     fun getTempUnit(): TempUnit
     fun getWindUnit(): WindUnit
     fun getLocationSource(): LocationSource
     fun getManualLocation(): Pair<Double, Double>?
     fun getLanguage(): Language
+    fun isOnboarded(): Boolean
 
     suspend fun addFavourite(item: FavouriteEntity)
 
@@ -31,4 +33,6 @@ interface LocalDataSource {
     suspend fun insertAlert(alert: AlertEntity)
     suspend fun updateStatus(alertId: Int, status: AlertStatus)
     suspend fun deleteAlert(alertId: Int)
+
+
 }

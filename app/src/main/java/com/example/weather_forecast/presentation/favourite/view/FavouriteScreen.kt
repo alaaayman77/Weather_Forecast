@@ -28,6 +28,7 @@ import com.example.weather_forecast.presentation.favourite.view.components.Favou
 import com.example.weather_forecast.presentation.FavouriteState
 import com.example.weather_forecast.presentation.UiState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,14 +36,18 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.R
+import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.utils.formatNumber
 
 @Composable
@@ -90,7 +95,8 @@ fun FavouriteScreen(
             modifier       = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.primary,
+            shape          = CircleShape,
         ) {
             Icon(
                 imageVector        = Icons.Default.LocationOn,
@@ -119,7 +125,7 @@ fun FavouriteScreenContent(
         item { FavouriteHeader(locationCount = favourites.size , language) }
 
         if (favourites.isEmpty()) {
-            item { FavouriteEmptyState() }
+            item { FavouriteEmptyState( modifier = Modifier.fillParentMaxHeight()) }
         } else {
             items(favourites) { item ->
                 FavouriteLocationItem(
@@ -211,34 +217,48 @@ fun FavouriteHeader(locationCount: Int = 0, language: Language) {
 
 
 @Composable
-fun FavouriteEmptyState() {
+fun FavouriteEmptyState(modifier: Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 80.dp),
+        modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
+
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier            = Modifier.padding(horizontal = 40.dp)
         ) {
-            Icon(
-                imageVector        = Icons.Default.LocationOn,
-                contentDescription = null,
-                modifier           = Modifier.size(56.dp),
-                tint               = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+            Box(
+                modifier = Modifier
+                    .size(96.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(listOf(Color(0xFFE3F2FD), Color(0xFFBBDEFB)))
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector        = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier           = Modifier.size(44.dp),
+                    tint               = MaterialTheme.colorScheme.primary
+                )
+            }
+            Text(
+                text      = stringResource(R.string.no_favourite),
+                style     = MaterialTheme.typography.bodyMedium.copy(
+                    color      = MaterialTheme.colorScheme.primary,
+                    lineHeight = 21.sp
+                ),
+                textAlign = TextAlign.Center
             )
             Text(
-                text  = stringResource(R.string.no_favourite),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
-                )
-            )
-            Text(
-                text  =stringResource(R.string.tap_plus_favourite),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
-                )
+                text      = stringResource(R.string.tap_plus_favourite),
+                style     = MaterialTheme.typography.labelSmall.copy(
+                    color      = MaterialTheme.colorScheme.primary,
+                    lineHeight = 18.sp
+                ),
+                textAlign = TextAlign.Center
             )
         }
     }

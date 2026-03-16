@@ -47,7 +47,7 @@ fun EmptyStateContent(message: String) {
             Text(
                 text      = message,
                 style     = MaterialTheme.typography.bodyMedium.copy(
-                    color = lightGray,  lineHeight = 21.sp
+                    color = MaterialTheme.colorScheme.primary,  lineHeight = 21.sp
                 ),
                 textAlign = TextAlign.Center
             )

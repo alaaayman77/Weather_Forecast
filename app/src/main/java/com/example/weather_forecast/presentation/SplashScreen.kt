@@ -3,7 +3,6 @@ package com.example.weather_forecast.presentation
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -11,9 +10,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.R
 import kotlinx.coroutines.delay
 
@@ -59,11 +56,10 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
         )
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.drawable.logo2),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
@@ -72,12 +68,6 @@ fun SplashScreen(onSplashFinished: () -> Unit) {
                     .alpha(alpha.value)
             )
 
-            Text(
-                text = "Your daily forecast",
-                style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.primary , fontSize = 32.sp , fontWeight = FontWeight.Bold),
-                modifier = Modifier.alpha(textAlpha.value),
-
-            )
         }
     }
 }

@@ -74,6 +74,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.compose.remote.creation.core)
+    implementation(libs.foundation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -121,5 +122,8 @@ dependencies {
     // Hamcrest (for assertThat)
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("io.mockk:mockk:1.13.10")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
+
 
 }

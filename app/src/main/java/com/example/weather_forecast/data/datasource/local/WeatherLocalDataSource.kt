@@ -28,6 +28,9 @@ class WeatherLocalDataSource(context: Context) : LocalDataSource {
             .putFloat("manual_lon", lon.toFloat())
             .apply()
     }
+    override fun saveOnboarded(done: Boolean) =
+        prefs.edit().putBoolean("onboarded", done).apply()
+
 
 
     override fun saveLanguage(lang: Language) = prefs.edit().putString("language", lang.name).apply()
@@ -42,7 +45,8 @@ class WeatherLocalDataSource(context: Context) : LocalDataSource {
     }
     override fun getLanguage(): Language = Language.valueOf(prefs.getString("language", Language.ENGLISH.name)!!)
 
-
+    override fun isOnboarded(): Boolean =
+        prefs.getBoolean("onboarded", false)
 
 
    override fun getAllFavourites(): Flow<List<FavouriteEntity>> {

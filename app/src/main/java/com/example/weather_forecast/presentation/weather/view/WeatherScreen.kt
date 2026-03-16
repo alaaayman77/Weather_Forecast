@@ -2,6 +2,7 @@ package com.example.weather_forecast.presentation.weather.view
 
 import android.location.Location
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +40,8 @@ import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.presentation.UiState
 import com.example.weather_forecast.presentation.WeatherState
+import com.example.weather_forecast.presentation.weather.view.components.LoadingIndicator
+import com.example.weather_forecast.presentation.weather.view.components.WeatherVideoBackground
 
 
 import com.example.weather_forecast.ui.theme.lightGray
@@ -68,7 +72,7 @@ fun WeatherScreen(
 
         when (uiState) {
             is UiState.Success -> {
-                _root_ide_package_.com.example.weather_forecast.presentation.weather.view.components.WeatherVideoBackground(
+              WeatherVideoBackground(
                     weatherId = weatherId,
                     dt = dt
                 )
@@ -78,16 +82,15 @@ fun WeatherScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    Color(0xFF90CAF9),
-                                    Color(0xFFBBDEFB),
-                                    Color(0xFFE3F2FD)
-                                )
-                            )
-                        )
-                )
+
+                ){
+                    Image(
+                        painter           = painterResource(id = R.drawable.img),
+                        contentDescription = null,
+                        contentScale      = ContentScale.Crop,
+                        modifier          = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
 
@@ -95,7 +98,7 @@ fun WeatherScreen(
             when (val state = uiState) {
                 is UiState.Idle,
                 is UiState.Loading -> {
-                    _root_ide_package_.com.example.weather_forecast.presentation.weather.view.components.LoadingIndicator(
+                 LoadingIndicator(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
@@ -513,11 +516,6 @@ fun formatDate(timestamp: Long?): String {
 }
 
 
-fun formatDateTime(timestamp: Long?): String {
-    if (timestamp == null) return "--"
-    return SimpleDateFormat("EEEE, dd MMM  •  hh:mm a", Locale.getDefault())
-        .format(Date(timestamp * 1000))
-}
 
 @Composable
 fun getGreeting(timestamp: Long?): String = when (hourOf(timestamp)) {

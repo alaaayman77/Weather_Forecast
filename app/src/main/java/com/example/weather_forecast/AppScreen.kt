@@ -9,14 +9,19 @@ import android.os.Build
 import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.*
 import androidx.navigation.toRoute
@@ -35,6 +40,8 @@ import com.example.weather_forecast.presentation.favourite.FavouriteViewModel
 import com.example.weather_forecast.presentation.favourite.MapPickerScreen
 import com.example.weather_forecast.presentation.favouriteDetails.FavouriteDetailsViewModel
 import com.example.weather_forecast.presentation.map.MapPickerViewModel
+import com.example.weather_forecast.presentation.onboarding.OnBoardingViewModel
+import com.example.weather_forecast.presentation.onboarding.OnboardingScreen
 import com.example.weather_forecast.presentation.permission.*
 import com.example.weather_forecast.presentation.settings.SettingsViewModel
 import com.example.weather_forecast.presentation.weather.*
@@ -60,7 +67,8 @@ fun AppScreen(
     mapPickerViewModel           : MapPickerViewModel,
     favouriteDetailsViewModel    : FavouriteDetailsViewModel,
     alertViewModel               : AlertViewModel,
-    settingsViewModel            : SettingsViewModel
+    settingsViewModel            : SettingsViewModel,
+    onBoardingViewModel : OnBoardingViewModel
 ) {
     val navController   = rememberNavController()
     val context         = LocalContext.current
@@ -73,6 +81,8 @@ fun AppScreen(
             && !currentRoute.contains("SplashRoute")
             && !currentRoute.contains("MapPickerRoute")
             && !currentRoute.contains("FavouriteDetailsRoute")
+            && !currentRoute.contains("OnboardingRoute")
+
 
     val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
     val tempUnit by settingsViewModel.tempUnit.collectAsStateWithLifecycle()
@@ -80,21 +90,26 @@ fun AppScreen(
     val language by settingsViewModel.language.collectAsStateWithLifecycle()
 
     Weather_ForecastTheme {
-        // ✅ Restored original light blue gradient — only WeatherScreen has video
+
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF90CAF9),
-                            Color(0xFFBBDEFB),
-                            Color(0xFFE3F2FD)
-                        )
-                    )
-                )
-        ) {
+        )  {            Image(
+                painter           = painterResource(id = R.drawable.img),
+                contentDescription = null,
+                contentScale      = ContentScale.Crop,
+                modifier          = Modifier.fillMaxSize()
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x66000000))
+            )
+
             Scaffold(
+
                 containerColor      = Color.Transparent,
                 contentWindowInsets = WindowInsets(0),
                 bottomBar = {
@@ -120,16 +135,35 @@ fun AppScreen(
                     navController    = navController,
                     startDestination = NavigationRoutes.SplashRoute,
                 ) {
+                    // 1. SplashRoute — remove permission handling entirely
                     composable<NavigationRoutes.SplashRoute> {
                         SplashScreen {
-                            navController.navigate(NavigationRoutes.WeatherRoute) {
+                            val destination = if (onBoardingViewModel.isOnboarded())
+                                NavigationRoutes.WeatherRoute
+                            else
+                                NavigationRoutes.OnboardingRoute
+
+                            navController.navigate(destination) {
                                 popUpTo(NavigationRoutes.SplashRoute) { inclusive = true }
                             }
-                            if (permissionHandler.checkPermissions())
-                                permissionViewModel.onPermissionAlreadyGranted()
-                            else
-                                permissionHandler.requestPermissions()
+                            // ← removed permission check from here
                         }
+                    }
+
+// 2. OnboardingRoute — trigger permission after onboarding finishes
+                    composable<NavigationRoutes.OnboardingRoute> {
+                        OnboardingScreen(
+                            onFinished = {
+                                onBoardingViewModel.setOnboarded()
+                                if (permissionHandler.checkPermissions())
+                                    permissionViewModel.onPermissionAlreadyGranted()
+                                else
+                                    permissionHandler.requestPermissions()
+                                navController.navigate(NavigationRoutes.WeatherRoute) {
+                                    popUpTo(NavigationRoutes.OnboardingRoute) { inclusive = true }
+                                }
+                            }
+                        )
                     }
 
                     composable<NavigationRoutes.WeatherRoute> {

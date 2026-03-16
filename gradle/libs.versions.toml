@@ -23,6 +23,7 @@ androidxUi = "1.10.5"
 material = "1.13.0"
 workRuntimeKtx = "2.11.1"
 remoteCreationCore = "1.0.0-alpha06"
+androidxFoundation = "1.10.5"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +55,7 @@ androidx-compose-ui-ui = { group = "androidx.compose.ui", name = "ui", version.r
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workRuntimeKtx" }
 androidx-compose-remote-creation-core = { group = "androidx.compose.remote", name = "remote-creation-core", version.ref = "remoteCreationCore" }
+foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "androidxFoundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
