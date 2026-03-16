@@ -12,6 +12,8 @@ val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
     localProperties.load(localPropertiesFile.inputStream())
 }
+val openWeatherApiKey = localProperties.getProperty("OPEN_WEATHER_API_KEY", "")
+val googleApiKey = localProperties.getProperty("GOOGLE_API", "")
 android {
     namespace = "com.example.weather_forecast"
     compileSdk {
@@ -36,7 +38,7 @@ android {
             "GOOGLE_API",
             "\"${localProperties.getProperty("GOOGLE_API", "")}\""
         )
-
+        manifestPlaceholders["GOOGLE_API"] = googleApiKey
     }
 
     buildTypes {
