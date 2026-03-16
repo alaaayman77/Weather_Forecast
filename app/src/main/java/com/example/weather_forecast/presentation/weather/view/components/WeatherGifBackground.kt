@@ -26,7 +26,7 @@ import com.example.weather_forecast.R
 import java.util.Calendar
 
 @Composable
-fun WeatherVideoBackground(weatherId: Int?, dt: Long?) {
+fun WeatherVideoBackground(weatherId: Int?, dt: Long? , timezone :String) {
     if (weatherId == null) {
         val isNight = Calendar.getInstance().get(Calendar.HOUR_OF_DAY).let { it < 6 || it >= 20 }
         Box(
@@ -43,7 +43,7 @@ fun WeatherVideoBackground(weatherId: Int?, dt: Long?) {
     }
 
     val context  = LocalContext.current
-    val videoRes = getWeatherVideoRes(weatherId, dt)
+    val videoRes = getWeatherVideoRes(weatherId, dt , timezone)
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
@@ -121,12 +121,15 @@ private fun scaleToFill(view: TextureView, videoSize: VideoSize, viewW: Int, vie
     view.setTransform(matrix)
 }
 
-fun getWeatherVideoRes(weatherId: Int?, dt: Long?): Int {
-    val hour    = if (dt != null)
-        Calendar.getInstance().apply { timeInMillis = dt * 1000 }.get(Calendar.HOUR_OF_DAY)
-    else
-        Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-    val isNight = hour < 6 || hour >= 20
+fun getWeatherVideoRes(weatherId: Int?, dt: Long?, timezone: String = ""): Int {
+    val cal = Calendar.getInstance().apply {
+        if (timezone.isNotEmpty())
+            timeZone = java.util.TimeZone.getTimeZone(timezone)
+        if (dt != null)
+            timeInMillis = dt * 1000
+    }
+    val hour    = cal.get(Calendar.HOUR_OF_DAY)
+    val isNight = hour < 6 || hour >= 18
 
     return when (weatherId) {
         800         -> if (isNight) R.raw.clear_night  else R.raw.clear_day

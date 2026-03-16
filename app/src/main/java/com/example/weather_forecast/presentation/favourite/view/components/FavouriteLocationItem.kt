@@ -36,13 +36,13 @@ fun FavouriteLocationItem(
     language : Language
 ) {
     val current = item.oneCallResponse.current
-    val daily   = item.oneCallResponse.daily.firstOrNull()
 
-    val highTemp         =  "${formatTemp(UnitConverter.convertTemp(daily?.temp?.max ?:0.0, tempUnit), tempUnit , language)}"
-    val lowTemp          =   "${formatTemp(UnitConverter.convertTemp(daily?.temp?.min ?:0.0, tempUnit), tempUnit , language)}"
+
+    val currentTemp         =  "${formatTemp(UnitConverter.convertTemp(current?.temp ?:0.0, tempUnit), tempUnit , language)}"
+    val lowTemp          =   "${formatTemp(UnitConverter.convertTemp(current?.dew_point ?:0.0, tempUnit), tempUnit , language)}"
     val weatherCondition = current.weather.firstOrNull()?.description
         ?.replaceFirstChar { it.uppercase() } ?: ""
-    val iconUrl          = current.weather.firstOrNull()?.iconUrl()
+    val iconCode = current.weather.firstOrNull()?.icon
 
     Card(
         shape = RoundedCornerShape(24.dp),
@@ -101,7 +101,7 @@ fun FavouriteLocationItem(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
-                            text = highTemp,
+                            text = "${currentTemp}",
                             style = MaterialTheme.typography.labelLarge.copy(
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.Bold,
@@ -121,7 +121,7 @@ fun FavouriteLocationItem(
 
 
                     WeatherGifImage(
-                        gifRes   = getWeatherGif(iconUrl),
+                        gifRes   = getWeatherGif(iconCode),
                         modifier = Modifier.size(40.dp)
                     )
                 }
@@ -185,7 +185,7 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
-                            text = "${highTemp}",
+                            text = "${currentTemp}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold,
@@ -197,7 +197,7 @@ fun FavouriteLocationItem(
                             style = MaterialTheme.typography.labelSmall.copy(color = lightGray)
                         )
                         Text(
-                            text = "${lowTemp}",
+                            text ="${lowTemp}",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Bold,

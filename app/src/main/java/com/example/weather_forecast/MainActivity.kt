@@ -27,6 +27,7 @@ import com.example.weather_forecast.presentation.settings.SettingsViewModel
 import com.example.weather_forecast.presentation.settings.SettingsViewModelFactory
 import com.example.weather_forecast.presentation.weather.WeatherViewModel
 import com.example.weather_forecast.presentation.weather.WeatherViewModelFactory
+import com.example.weather_forecast.presentation.weather.view.components.LottiePreloader
 import com.example.weather_forecast.utils.LocationProvider
 import com.example.weather_forecast.utils.NotificationPermissionHandler
 import com.example.weather_forecast.utils.PermissionHandler
@@ -51,6 +52,7 @@ class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LottiePreloader.preload(this)
          val localDataSource = WeatherLocalDataSource(application)
 
          val remoteDataSource = WeatherRemoteDataSource()
@@ -93,10 +95,13 @@ class MainActivity : ComponentActivity() {
             this,
             OnBoardingViewModelFactory(WeatherRepository(remoteDataSource , localDataSource))
         ).get(OnBoardingViewModel::class.java)
-
+        permissionViewModel.resolveInitialState(
+            PermissionHandler(this).checkPermissions()
+        )
         permissionHandler = PermissionHandler(this).also {
             it.init(permissionViewModel)
         }
+
 
         notificationPermissionHandler = NotificationPermissionHandler(this).also {
             it.init()

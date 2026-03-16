@@ -80,4 +80,6 @@ class WeatherRepository (private val remoteDataSource: RemoteDataSource,
     fun getLanguage(): Language = localDataSource.getLanguage()
 
     fun isOnboarded(): Boolean = localDataSource.isOnboarded()
+    fun saveCurrentWeather(json: String) = localDataSource.saveCurrentWeather(json)
+    fun getCurrentWeather(): String?     = localDataSource.getCurrentWeather()
 }

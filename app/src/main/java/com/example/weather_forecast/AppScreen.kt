@@ -146,11 +146,11 @@ fun AppScreen(
                             navController.navigate(destination) {
                                 popUpTo(NavigationRoutes.SplashRoute) { inclusive = true }
                             }
-                            // ← removed permission check from here
+
                         }
                     }
 
-// 2. OnboardingRoute — trigger permission after onboarding finishes
+
                     composable<NavigationRoutes.OnboardingRoute> {
                         OnboardingScreen(
                             onFinished = {
@@ -171,6 +171,13 @@ fun AppScreen(
                             UiState.Idle)
                         val location by weatherViewModel.locationState.collectAsStateWithLifecycle()
                         val language by settingsViewModel.language.collectAsStateWithLifecycle()
+                        val isOffline by weatherViewModel.isOffline.collectAsStateWithLifecycle()
+                        LaunchedEffect(Unit) {
+                            if (permissionHandler.checkPermissions())
+                                permissionViewModel.onPermissionAlreadyGranted()
+                            else
+                                permissionHandler.requestPermissions()
+                        }
 
                         when (permissionState.value) {
                             PermissionUiState.Granted -> {
@@ -192,7 +199,8 @@ fun AppScreen(
                                     location = location,
                                     tempUnit = tempUnit,
                                     windUnit = windUnit,
-                                    language = language
+                                    language = language,
+                                    isOffline = isOffline
                                 )
                             }
                             PermissionUiState.Denied ->
@@ -377,20 +385,21 @@ fun AppScreen(
                         val route    = it.toRoute<NavigationRoutes.FavouriteDetailsRoute>()
                         val uiState by favouriteDetailsViewModel.uiState.collectAsState()
                         val language by settingsViewModel.language.collectAsStateWithLifecycle()
-
+                        val isOffline by weatherViewModel.isOffline.collectAsStateWithLifecycle()
                         LaunchedEffect(route.lat, route.lon) {
                             favouriteDetailsViewModel.fetchWeather(route.lat, route.lon)
                         }
 
                         FavouriteDetailsScreen(
                             modifier = Modifier.padding(innerPadding),
-                            lat      = route.lat,
-                            lon      = route.lon,
-                            uiState  = uiState,
-                            onBack   = { navController.popBackStack() },
+                            lat = route.lat,
+                            lon = route.lon,
+                            uiState = uiState,
+                            onBack = { navController.popBackStack() },
                             tempUnit = tempUnit,
                             windUnit = windUnit,
-                            language = language
+                            language = language,
+                            isOffline = isOffline,
                         )
                     }
                 }

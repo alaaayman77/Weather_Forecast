@@ -11,6 +11,7 @@ import com.example.weather_forecast.data.models.AlertMode
 import com.example.weather_forecast.data.models.AlertStatus
 import com.example.weather_forecast.data.models.CustomCondition
 import com.example.weather_forecast.data.models.LocationSource
+import com.example.weather_forecast.data.models.OneCallResponse
 import com.example.weather_forecast.presentation.UiState
 import com.example.weather_forecast.presentation.WeatherState
 import com.example.weather_forecast.presentation.alerts.AlertNotificationService
@@ -18,6 +19,7 @@ import com.example.weather_forecast.presentation.alerts.AlertReceiver
 import com.example.weather_forecast.utils.LocationProvider
 import com.example.weather_forecast.utils.getCenterLocation
 import com.example.weather_forecast.utils.getTopBarLocation
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class WeatherViewModel(
     private val locationProvider  : LocationProvider,
@@ -48,6 +51,11 @@ class WeatherViewModel(
     private val _locationSource = MutableStateFlow(weatherRepository.getLocationSource())
     val locationSource: StateFlow<LocationSource> get() = _locationSource
 
+    private val _isOffline = MutableStateFlow(false)
+    val isOffline: StateFlow<Boolean> get() = _isOffline
+
+    private val gson = Gson()
+
     fun checkLocationAndFetch() {
         when (_locationSource.value) {
             LocationSource.GPS -> fetchWithGps()
@@ -66,55 +74,76 @@ class WeatherViewModel(
                 fetchWeather(location.latitude, location.longitude)
             }
         } else {
-            viewModelScope.launch { _openLocationSettings.emit(Unit) }
+            viewModelScope.launch {
+                _weatherUiState.value = UiState.Idle
+                _openLocationSettings.emit(Unit) }
         }
     }
 
-    private fun fetchWeather(
-        lat   : Double,
-        lon   : Double,
-        apiKey: String = "3ec08632a7a945e6408e9414cd1fab66"
-    ) {
+     fun fetchWeather(lat: Double, lon: Double, apiKey: String = "3ec08632a7a945e6408e9414cd1fab66") {
         val lang = weatherRepository.getLanguage()
         viewModelScope.launch {
-            flow {
-                emit(weatherRepository.getOneCallResponse(lat, lon, apiKey, lang))
-            }
-                .onStart { _weatherUiState.value = UiState.Loading }
-                .catch  { ex -> _weatherUiState.value = UiState.Error(ex.message ?: "Unknown error") }
-                .collect { response ->
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        if (body != null) {
-                            val topBar = withContext(Dispatchers.IO) { getTopBarLocation(app, lat, lon) }
-                            val center = withContext(Dispatchers.IO) { getCenterLocation(app, lat, lon) }
+            _weatherUiState.value = UiState.Loading
 
-                            _weatherUiState.value = UiState.Success(
-                                WeatherState(
-                                    oneCall = body,
-                                    topBarLocation = topBar,
-                                    centerLocation = center
-                                )
+            try {
+                val response = weatherRepository.getOneCallResponse(lat, lon, apiKey, lang)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    if (body != null) {
+                        weatherRepository.saveCurrentWeather(gson.toJson(body))
+                        _isOffline.value = false
+
+                        val topBar = withContext(Dispatchers.IO) { getTopBarLocation(app, lat, lon) }
+                        val center = withContext(Dispatchers.IO) { getCenterLocation(app, lat, lon) }
+
+                        _weatherUiState.value = UiState.Success(
+                            WeatherState(
+                                oneCall        = body,
+                                topBarLocation = topBar,
+                                centerLocation = center
                             )
+                        )
 
-                            // Check custom condition alerts after state is set
-                            val owmId       = body.current?.weather?.firstOrNull()?.id
-                            val description = body.current?.weather?.firstOrNull()?.description ?: ""
-                            val tempKelvin  = body.current?.temp?:0.0
-                            if (owmId != null) {
-                                checkCustomAlerts(owmId, tempKelvin, description)
-                            }
+                        val owmId       = body.current?.weather?.firstOrNull()?.id
+                        val description = body.current?.weather?.firstOrNull()?.description ?: ""
+                        val tempKelvin  = body.current?.temp ?: 0.0
+                        if (owmId != null) checkCustomAlerts(owmId, tempKelvin, description)
 
-                        } else {
-                            _weatherUiState.value = UiState.Error("Empty response")
-                        }
                     } else {
-                        _weatherUiState.value =
-                            UiState.Error("Error ${response.code()}: ${response.message()}")
+                        tryLoadCache(lat, lon, "Empty response")
                     }
+                } else {
+                    tryLoadCache(lat, lon, "Error ${response.code()}: ${response.message()}")
                 }
+            } catch (e: IOException) {
+
+                tryLoadCache(lat, lon, e.message ?: "No internet connection")
+            } catch (e: Exception) {
+                tryLoadCache(lat, lon, e.message ?: "Unknown error")
+            }
         }
     }
+
+    private suspend fun tryLoadCache(lat: Double, lon: Double, error: String) {
+        val cachedJson = weatherRepository.getCurrentWeather()
+        if (cachedJson != null) {
+            val cached = gson.fromJson(cachedJson, OneCallResponse::class.java)
+            val topBar = withContext(Dispatchers.IO) { getTopBarLocation(app, lat, lon) }
+            val center = withContext(Dispatchers.IO) { getCenterLocation(app, lat, lon) }
+            _isOffline.value      = true
+            _weatherUiState.value = UiState.Success(
+                WeatherState(
+                    oneCall        = cached,
+                    topBarLocation = topBar,
+                    centerLocation = center
+                )
+            )
+        } else {
+            _isOffline.value      = false
+            _weatherUiState.value = UiState.Error(error)
+        }
+    }
+
 
 
     private fun checkCustomAlerts(owmId: Int, tempKelvin: Double, description: String) {

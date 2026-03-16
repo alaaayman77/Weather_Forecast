@@ -2,12 +2,14 @@ package com.example.weather_forecast.presentation.weather.view.components
 
 
 
+import android.content.Context
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.airbnb.lottie.LottieCompositionFactory
 import com.airbnb.lottie.compose.*
 import com.example.weather_forecast.R
 
@@ -28,4 +30,9 @@ fun LoadingIndicator(
         progress    = { progress },
         modifier    = modifier.size(size)
     )
+}
+object LottiePreloader {
+    fun preload(context: Context) {
+        LottieCompositionFactory.fromRawRes(context, R.raw.loading)
+    }
 }

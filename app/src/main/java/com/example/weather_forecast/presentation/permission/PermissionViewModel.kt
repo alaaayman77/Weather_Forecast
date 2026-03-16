@@ -26,4 +26,13 @@ class PermissionViewModel : ViewModel() {
     fun onPermissionAlreadyGranted() {
         _permissionState.value = PermissionUiState.Granted
     }
+
+    fun resolveInitialState(isGranted: Boolean) {
+        if (_permissionState.value == PermissionUiState.Checking) {
+            _permissionState.value = if (isGranted)
+                PermissionUiState.Granted
+            else
+                PermissionUiState.Denied
+        }
+    }
 }

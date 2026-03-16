@@ -41,6 +41,10 @@ import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.presentation.UiState
 import com.example.weather_forecast.presentation.WeatherState
 import com.example.weather_forecast.presentation.weather.view.components.LoadingIndicator
+import com.example.weather_forecast.presentation.weather.view.components.OfflineBanner
+import com.example.weather_forecast.presentation.weather.view.components.SectionCard
+import com.example.weather_forecast.presentation.weather.view.components.SunTimesCard
+import com.example.weather_forecast.presentation.weather.view.components.UvIndexCard
 import com.example.weather_forecast.presentation.weather.view.components.WeatherGifImage
 import com.example.weather_forecast.presentation.weather.view.components.WeatherVideoBackground
 
@@ -63,12 +67,14 @@ fun WeatherScreen(
     location: Location?,
     tempUnit: TempUnit,
     windUnit: WindUnit,
-    language: Language
+    language: Language,
+    isOffline   : Boolean,
 ) {
     val weatherId = (uiState as? UiState.Success)
         ?.data?.oneCall?.current?.weather?.firstOrNull()?.id
     val dt = (uiState as? UiState.Success)
         ?.data?.oneCall?.current?.dt
+    val timezone = (uiState as? UiState.Success)?.data?.oneCall?.timezone ?: ""
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -76,7 +82,8 @@ fun WeatherScreen(
             is UiState.Success -> {
               WeatherVideoBackground(
                     weatherId = weatherId,
-                    dt = dt
+                    dt = dt,
+                  timezone = timezone
                 )
             }
             else -> {
@@ -115,17 +122,21 @@ fun WeatherScreen(
                     }
                 }
                 is UiState.Success -> {
-                    WeatherScreenContent(
-                        location       = location,
-                        currentWeather = state.data.oneCall.current,
-                        hourlyList     = state.data.oneCall.hourly,
-                        dailyList      = state.data.oneCall.daily,
-                        topBarLocation = state.data.topBarLocation,
-                        centerLocation = state.data.centerLocation,
-                        tempUnit       = tempUnit,
-                        windUnit       = windUnit,
-                        language       = language
-                    )
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (isOffline) OfflineBanner()
+                        WeatherScreenContent(
+                            location       = location,
+                            currentWeather = state.data.oneCall.current,
+                            hourlyList     = state.data.oneCall.hourly,
+                            dailyList      = state.data.oneCall.daily,
+                            topBarLocation = state.data.topBarLocation,
+                            centerLocation = state.data.centerLocation,
+                            tempUnit       = tempUnit,
+                            windUnit       = windUnit,
+                            language       = language,
+                            timezone       = state.data.oneCall.timezone ?: "",
+                        )
+                    }
                 }
             }
         }
@@ -134,8 +145,8 @@ fun WeatherScreen(
 
 @Composable
 fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, hourlyList: List<HourlyItem>, dailyList: List<DailyItem> ,  topBarLocation: String , centerLocation: String,   tempUnit: TempUnit,      // ← add
-                         windUnit: WindUnit, language: Language ) {
-    val context  = LocalContext.current
+                         windUnit: WindUnit, language: Language,   timezone: String = "" ) {
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -143,34 +154,35 @@ fun WeatherScreenContent(location: Location?, currentWeather: CurrentWeather, ho
         verticalArrangement = Arrangement.spacedBy(20.dp),
         contentPadding = PaddingValues(top = 8.dp, bottom = 0.dp)
     ) {
-        item { WeatherTopBar(currentWeather ,  topBarLocation ) }
+        item { WeatherTopBar(currentWeather ,  topBarLocation , timezone) }
         item { WeatherCenterSection(currentWeather , centerLocation, tempUnit , language) }
-        item { WeatherInfoGrid(currentWeather ,tempUnit, windUnit , language) }
+        item { WeatherInfoGrid(currentWeather ,tempUnit, windUnit , language , timezone) }
         item {
-            _root_ide_package_.com.example.weather_forecast.presentation.weather.view.components.SectionCard {
+      SectionCard {
                 HourlyForecastList(hourlyList = hourlyList, tempUnit, language)
             }
         }
         item {
-            _root_ide_package_.com.example.weather_forecast.presentation.weather.view.components.SunTimesCard(
-                sunriseText = formatTime(currentWeather.sunrise),
-                sunsetText = formatTime(currentWeather.sunset),
+            SunTimesCard(
+                sunriseText = formatTime(currentWeather.sunrise, timezone),
+                sunsetText  = formatTime(currentWeather.sunset, timezone),
                 progress = run {
                     val now = System.currentTimeMillis() / 1000
                     ((now - currentWeather.sunrise).toFloat() /
                             (currentWeather.sunset - currentWeather.sunrise))
                         .coerceIn(0f, 1f)
-                }
+                },
+
             )
         }
         item {
-            _root_ide_package_.com.example.weather_forecast.presentation.weather.view.components.UvIndexCard(
+           UvIndexCard(
                 uvi = currentWeather.uvi,
                 language = language
             )
         }
         item {
-            _root_ide_package_.com.example.weather_forecast.presentation.weather.view.components.SectionCard {
+          SectionCard {
                 WeeklyList(dailyList = dailyList, tempUnit, language)
             }
         }
@@ -219,7 +231,7 @@ fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit , language: Langu
     }
 }
 @Composable
-fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
+fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String,   timezone: String ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -236,7 +248,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
             ) {
 
                 Text(
-                    text = getGreeting(currentWeather.dt),
+                    text = getGreeting(currentWeather.dt , timezone),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -255,7 +267,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
                 ) {
                     Text(
-                        text = formatDate(currentWeather.dt),
+                        text = formatDate(currentWeather.dt , timezone),
                         modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.primary,
@@ -275,7 +287,7 @@ fun WeatherTopBar(currentWeather: CurrentWeather, topBarLocation: String) {
 
 
                 Text(
-                    text = formatTime(currentWeather.dt),
+                    text = formatTime(currentWeather.dt , timezone),
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = lightGray,
                         fontWeight = FontWeight.SemiBold
@@ -340,7 +352,7 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
         Text(
             text = "${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit), tempUnit , language)}",
             style = MaterialTheme.typography.labelLarge.copy(
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 fontSize = 72.sp ,
                 textDirection = TextDirection.Ltr
@@ -437,7 +449,7 @@ fun WeatherDetailChip(icon: ImageVector, text: String) {
 }
 
 @Composable
-fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUnit: WindUnit , language: Language) {
+fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUnit: WindUnit , language: Language, timezone : String) {
     val row1 = listOf(
         WeatherInfoItem(R.drawable.ic_humid,    "${formatNumber(currentWeather.humidity , language)}%",      stringResource(R.string.humid)),
         WeatherInfoItem(R.drawable.ic_wind,     "${formatWind(currentWeather.wind_speed, windUnit, language)}",stringResource(R.string.wind)),
@@ -445,8 +457,8 @@ fun WeatherInfoGrid(currentWeather: CurrentWeather, tempUnit: TempUnit , windUni
     )
     val row2 = listOf(
         WeatherInfoItem(R.drawable.ic_cloud,   "${formatNumber(currentWeather.clouds , language)}%",stringResource(R.string.cloud)),
-        WeatherInfoItem(R.drawable.ic_sunrise, formatTime(currentWeather.sunrise),      stringResource(R.string.sunrise)),
-        WeatherInfoItem(R.drawable.ic_sunset,  formatTime(currentWeather.sunset),       stringResource(R.string.sunset)),
+        WeatherInfoItem(R.drawable.ic_sunrise,  formatTime(currentWeather.sunrise,  timezone),      stringResource(R.string.sunrise)),
+        WeatherInfoItem(R.drawable.ic_sunset,   formatTime(currentWeather.sunset,  timezone),       stringResource(R.string.sunset)),
     )
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         WeatherStatRow(row1)
@@ -504,26 +516,42 @@ fun HourlyForecastList(hourlyList: List<HourlyItem>, tempUnit: TempUnit , langua
 
 
 
-fun formatTime(timestamp: Long?): String {
+fun formatTime(timestamp: Long?, timezone: String = ""): String {
     if (timestamp == null) return "--"
-    return SimpleDateFormat("hh:mm a", Locale.getDefault())
-        .format(Date(timestamp * 1000))
+    val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    if (timezone.isNotEmpty()) {
+        sdf.timeZone = java.util.TimeZone.getTimeZone(timezone)
+    }
+    return sdf.format(Date(timestamp * 1000))
 }
 
-fun formatDate(timestamp: Long?): String {
+fun formatDate(timestamp: Long?, timezone: String = ""): String {
     if (timestamp == null) return "--"
-    return SimpleDateFormat("EEE, dd MMM", Locale.getDefault())
-        .format(Date(timestamp * 1000))
+    val sdf = SimpleDateFormat("EEE, dd MMM", Locale.getDefault())
+    if (timezone.isNotEmpty()) {
+        sdf.timeZone = java.util.TimeZone.getTimeZone(timezone)
+    }
+    return sdf.format(Date(timestamp * 1000))
 }
 
 
 
 @Composable
-fun getGreeting(timestamp: Long?): String = when (hourOf(timestamp)) {
+fun getGreeting(timestamp: Long?, timezone: String = ""): String = when (hourOf(timestamp, timezone)) {
     in 5..11  -> stringResource(R.string.good_morning)
-    in 12..16 ->  stringResource(R.string.good_afternoon)
-    in 17..20 ->  stringResource(R.string.good_evening)
-    else      ->  stringResource(R.string.good_evening)
+    in 12..16 -> stringResource(R.string.good_afternoon)
+    in 17..20 -> stringResource(R.string.good_evening)
+    else      -> stringResource(R.string.good_evening)
+}
+
+private fun hourOf(timestamp: Long?, timezone: String = ""): Int {
+    val cal = Calendar.getInstance().apply {
+        if (timezone.isNotEmpty())
+            timeZone = java.util.TimeZone.getTimeZone(timezone)
+        if (timestamp != null)
+            timeInMillis = timestamp * 1000
+    }
+    return cal.get(Calendar.HOUR_OF_DAY)
 }
 
 private fun hourOf(timestamp: Long?): Int {

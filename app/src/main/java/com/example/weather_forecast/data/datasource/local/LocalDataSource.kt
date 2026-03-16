@@ -33,6 +33,8 @@ interface LocalDataSource {
     suspend fun insertAlert(alert: AlertEntity)
     suspend fun updateStatus(alertId: Int, status: AlertStatus)
     suspend fun deleteAlert(alertId: Int)
+    fun saveCurrentWeather(json: String)
+    fun getCurrentWeather(): String?
 
 
 }

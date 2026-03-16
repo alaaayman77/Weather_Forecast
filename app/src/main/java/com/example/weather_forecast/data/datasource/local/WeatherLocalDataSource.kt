@@ -35,6 +35,8 @@ class WeatherLocalDataSource(context: Context) : LocalDataSource {
 
     override fun saveLanguage(lang: Language) = prefs.edit().putString("language", lang.name).apply()
 
+    override fun saveCurrentWeather(json: String) =
+        prefs.edit().putString("cached_weather", json).apply()
     override fun getTempUnit(): TempUnit = TempUnit.valueOf(prefs.getString("temp_unit", TempUnit.CELSIUS.name)!!)
     override fun getWindUnit(): WindUnit = WindUnit.valueOf(prefs.getString("wind_unit", WindUnit.MS.name)!!)
     override fun getLocationSource(): LocationSource = LocationSource.valueOf(prefs.getString("location_src", LocationSource.GPS.name)!!)
@@ -47,11 +49,14 @@ class WeatherLocalDataSource(context: Context) : LocalDataSource {
 
     override fun isOnboarded(): Boolean =
         prefs.getBoolean("onboarded", false)
-
+    override fun getCurrentWeather(): String? =
+        prefs.getString("cached_weather", null)
 
    override fun getAllFavourites(): Flow<List<FavouriteEntity>> {
         return favouritesDao.getAllFavourites()
     }
+
+
 
     override suspend fun addFavourite(item: FavouriteEntity) {
         return favouritesDao.insertFavourite(item)}
@@ -62,6 +67,7 @@ class WeatherLocalDataSource(context: Context) : LocalDataSource {
     override suspend fun getCachedWeather(lat: Double, lon: Double): FavouriteEntity? {
         return favouritesDao.getFavouriteByLatLon(lat, lon)
     }
+
    override fun getAllAlerts(): Flow<List<AlertEntity>>{
         return alertsDao.getAllAlerts()
 

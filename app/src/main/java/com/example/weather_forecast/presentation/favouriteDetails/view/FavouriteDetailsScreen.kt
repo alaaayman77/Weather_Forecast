@@ -36,7 +36,8 @@ fun FavouriteDetailsScreen(
     uiState: UiState<WeatherState>,
     tempUnit: TempUnit,
     windUnit: WindUnit,
-    language: Language
+    language: Language,
+    isOffline   : Boolean,
 ) {
     Scaffold(
         containerColor = Color.Transparent,
@@ -82,7 +83,8 @@ fun FavouriteDetailsScreen(
             location = null,
             tempUnit = tempUnit,
             windUnit =windUnit,
-            language = language
+            language = language,
+            isOffline = isOffline
         )
     }
 }
