@@ -58,9 +58,6 @@ class FavouriteDetailsViewModel(
                             )
                         )
 
-                        val owmId       = body.current?.weather?.firstOrNull()?.id
-                        val description = body.current?.weather?.firstOrNull()?.description ?: ""
-                        val tempKelvin  = body.current?.temp ?: 0.0
 
 
                     } else {

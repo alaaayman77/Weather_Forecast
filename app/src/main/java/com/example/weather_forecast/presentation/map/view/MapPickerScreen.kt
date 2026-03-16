@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -160,7 +161,7 @@ fun MapPickerScreen(
                         modifier           = Modifier.size(18.dp)
                     )
                     Text(
-                        text      = pickedName.ifEmpty { "Search for a place…" },
+                        text      = pickedName.ifEmpty { stringResource(R.string.search) },
                         style     = MaterialTheme.typography.bodyMedium.copy(
                             color      = if (pickedName.isEmpty()) Muted else MaterialTheme.colorScheme.secondary,
                             fontWeight = if (pickedName.isEmpty()) FontWeight.Normal else FontWeight.SemiBold
@@ -247,7 +248,7 @@ fun MapPickerScreen(
                                     verticalArrangement = Arrangement.spacedBy(3.dp)
                                 ) {
                                     Text(
-                                        text     = pickedName.ifEmpty { "Pinned Location" },
+                                        text     = pickedName.ifEmpty { stringResource(R.string.pinned_location) },
                                         style    = MaterialTheme.typography.titleSmall.copy(
                                             color      = MaterialTheme.colorScheme.secondary,
                                             fontWeight = FontWeight.Bold,
@@ -327,10 +328,10 @@ fun MapPickerScreen(
                                 ) {
                                     Icon(painter = painterResource(R.drawable.close), contentDescription = null, modifier = Modifier.size(14.dp))
                                     Spacer(Modifier.width(6.dp))
-                                    Text("Clear Pin", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 10.sp))
+                                    Text(stringResource(R.string.clear_pin), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 10.sp))
                                 }
 
-                                // ← swap button based on source
+
                                 if (isFromSettings) {
                                     Button(
                                         onClick  = { pickedLatLng?.let { onLocationChosen(it.latitude, it.longitude) } },
@@ -341,7 +342,7 @@ fun MapPickerScreen(
                                     ) {
                                         Icon(imageVector = Icons.Rounded.LocationOn, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.White)
                                         Spacer(Modifier.width(7.dp))
-                                        Text("Choose Location", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp))
+                                        Text(stringResource(R.string.choose_location), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp))
                                     }
                                 } else {
                                     Button(
@@ -360,7 +361,7 @@ fun MapPickerScreen(
                                         } else {
                                             Icon(painter = painterResource(R.drawable.ic_heart), contentDescription = null, modifier = Modifier.size(14.dp), tint = Color.White)
                                             Spacer(Modifier.width(7.dp))
-                                            Text("Add to Favourites", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp))
+                                            Text(stringResource(R.string.add_to_fav), style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 10.sp))
                                         }
                                     }
                                 }

@@ -58,6 +58,12 @@
     <string name="cancel">Cancel</string>
     <string name="notification_subtitle">Silent push alert</string>
     <string name="alert_subtitle">Sound + vibration</string>
+    <string name="search">Search for a place</string>
+    <string name="pinned_location">Pinned Location</string>
+    <string name="clear_pin">Clear Pin</string>
+    <string name="choose_location">Choose Location</string>
+    <string name="add_to_fav">Add to Favourites</string>
+
 
 
 

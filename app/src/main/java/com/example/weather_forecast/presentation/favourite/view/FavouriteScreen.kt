@@ -169,7 +169,7 @@ fun FavouriteHeader(locationCount: Int = 0, language: Language) {
                     Icon(
                         imageVector        = Icons.Rounded.Favorite,
                         contentDescription = null,
-                        tint               = MaterialTheme.colorScheme.primary,
+                        tint               = Color.Red,
                         modifier           = Modifier.size(20.dp)
                     )
                 }

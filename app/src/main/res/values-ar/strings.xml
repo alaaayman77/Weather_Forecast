@@ -59,5 +59,10 @@
     <string name="cancel">الغاء</string>
     <string name="notification_subtitle">تنبيه صامت</string>
     <string name="alert_subtitle">صوت واهتزاز</string>
+    <string name="search">ابحث عن مكان</string>
+    <string name="pinned_location">الموقع المثبّت</string>
+    <string name="clear_pin">إزالة التثبيت</string>
+    <string name="choose_location">اختر الموقع</string>
+    <string name="add_to_fav">إضافة إلى المفضلة</string>
 
 </resources>
