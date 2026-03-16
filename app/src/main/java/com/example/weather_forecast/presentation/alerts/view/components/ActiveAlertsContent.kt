@@ -28,6 +28,7 @@ fun ActiveAlertsContent(
     onRetry           : () -> Unit,
 
 ) {
+
     if (scheduledAlerts.isEmpty()) {
         EmptyStateContent(
             message = stringResource(R.string.no_alerts),

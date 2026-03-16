@@ -181,9 +181,7 @@ class AlertNotificationService : Service() {
             )
             .build()
             .also {
-                it.flags = it.flags or
-                        Notification.FLAG_NO_CLEAR or
-                        Notification.FLAG_ONGOING_EVENT
+                it.flags = it.flags or Notification.FLAG_ONGOING_EVENT
             }
 
         startForegroundCompat(alertId, notification)
