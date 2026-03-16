@@ -78,7 +78,7 @@ fun FavouriteDetailsScreen(
                             Icon(
                                 imageVector        = Icons.Rounded.Favorite,
                                 contentDescription = null,
-                                tint               = Color.Red,
+                                tint               = MaterialTheme.colorScheme.primary,
                                 modifier           = Modifier.size(20.dp)
                             )
                         }

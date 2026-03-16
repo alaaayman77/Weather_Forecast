@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -15,8 +16,8 @@ enum class AlertType(
     val icon    : ImageVector,
     val color   : Color
 ) {
-    NOTIFICATION(R.string.notification, R.string.notification_subtitle, Icons.Default.Home, Color(0xFF42A5F5)),
-    ALERT       (R.string.alert,        R.string.alert_subtitle, Icons.Default.Notifications,   Color(0xFFFF7043))
+    NOTIFICATION(R.string.notification, R.string.notification_subtitle, Icons.Default.Notifications, Color(0xFF42A5F5)),
+    ALERT       (R.string.alert,        R.string.alert_subtitle, Icons.Default.Warning,   Color(0xFFFF7043))
 }
 
  enum class AlertTab(val label: String, val icon: ImageVector) {

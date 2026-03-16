@@ -20,7 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.weather_forecast.R
+
 
 @Composable
 fun OfflineBanner() {
@@ -38,7 +41,7 @@ fun OfflineBanner() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                imageVector        = Icons.Default.Home,
+                painter = painterResource(R.drawable.no_wifi),
                 contentDescription = null,
                 tint               = Color(0xFFFFB74D),
                 modifier           = Modifier.size(16.dp)
