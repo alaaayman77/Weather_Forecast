@@ -20,9 +20,11 @@ import com.example.weather_forecast.data.models.FavouriteEntity
 import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WindUnit
+import com.example.weather_forecast.presentation.weather.view.components.WeatherGifImage
 import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.utils.formatNumber
 import com.example.weather_forecast.utils.formatTemp
+import com.example.weather_forecast.utils.getWeatherGif
 
 @Composable
 fun FavouriteLocationItem(
@@ -118,13 +120,10 @@ fun FavouriteLocationItem(
                     }
 
 
-                    iconUrl?.let { url ->
-                        AsyncImage(
-                            model = url,
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
+                    WeatherGifImage(
+                        gifRes   = getWeatherGif(iconUrl),
+                        modifier = Modifier.size(40.dp)
+                    )
                 }
 
 

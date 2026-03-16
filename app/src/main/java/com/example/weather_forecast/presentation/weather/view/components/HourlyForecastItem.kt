@@ -22,6 +22,7 @@ import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.utils.formatNumber
 import com.example.weather_forecast.utils.formatTemp
+import com.example.weather_forecast.utils.getWeatherGif
 
 
 @Composable
@@ -73,13 +74,10 @@ fun HourlyForecastItem(hourlyItem: HourlyItem, isNow: Boolean = false, tempUnit:
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                hourlyItem.weather.firstOrNull()?.iconUrl()?.let { iconUrl ->
-                    AsyncImage(
-                        model = iconUrl,
-                        contentDescription = "Weather icon",
-                        modifier = Modifier.size(30.dp)
-                    )
-                }
+                WeatherGifImage(
+                    gifRes   = getWeatherGif(hourlyItem.weather.firstOrNull()?.icon),
+                    modifier = Modifier.size(40.dp)
+                )
             }
 
             Text(

@@ -19,6 +19,7 @@ import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
 import com.example.weather_forecast.data.models.WeeklyWeatherForecast
 import com.example.weather_forecast.utils.formatTemp
+import com.example.weather_forecast.utils.getWeatherGif
 
 
 @Composable
@@ -59,17 +60,9 @@ fun WeeklyForecastItem(
                 )
             )
 
-            weeklyWeatherForecast.iconUrl?.let { url ->
-                AsyncImage(
-                    model = url,
-                    contentDescription = null,
-                    modifier = Modifier.size(32.dp)
-                )
-            } ?: Icon(
-                imageVector = weeklyWeatherForecast.icon,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.primary
+            WeatherGifImage(
+                gifRes   = getWeatherGif(weeklyWeatherForecast.iconCode),
+                modifier = Modifier.size(40.dp)
             )
 
 

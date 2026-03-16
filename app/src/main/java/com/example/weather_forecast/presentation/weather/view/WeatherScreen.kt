@@ -41,6 +41,7 @@ import com.example.weather_forecast.data.models.WindUnit
 import com.example.weather_forecast.presentation.UiState
 import com.example.weather_forecast.presentation.WeatherState
 import com.example.weather_forecast.presentation.weather.view.components.LoadingIndicator
+import com.example.weather_forecast.presentation.weather.view.components.WeatherGifImage
 import com.example.weather_forecast.presentation.weather.view.components.WeatherVideoBackground
 
 
@@ -48,6 +49,7 @@ import com.example.weather_forecast.ui.theme.lightGray
 import com.example.weather_forecast.utils.formatNumber
 import com.example.weather_forecast.utils.formatTemp
 import com.example.weather_forecast.utils.formatWind
+import com.example.weather_forecast.utils.getWeatherGif
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -205,7 +207,8 @@ fun WeeklyList(dailyList: List<DailyItem> , tempUnit: TempUnit , language: Langu
                     highTemp = UnitConverter.convertTemp(day.temp.max, tempUnit),
                     condition = day.weather.firstOrNull()?.description
                         ?.replaceFirstChar { it.uppercase() } ?: "",
-                    iconUrl = day.weather.firstOrNull()?.iconUrl()
+
+                    iconCode  = day.weather.firstOrNull()?.icon
                 ),
                 tempUnit = tempUnit,
                 globalMin = globalMin,
@@ -328,13 +331,11 @@ fun WeatherCenterSection(currentWeather: CurrentWeather , centerLocation: String
                 color = MaterialTheme.colorScheme.primary
             )
         )
-        currentWeather.weather.firstOrNull()?.iconUrl()?.let { iconUrl ->
-            AsyncImage(
-                model = iconUrl,
-                contentDescription = "Weather icon",
-                modifier = Modifier.size(100.dp)
-            )
-        }
+        val iconCode = currentWeather.weather.firstOrNull()?.icon
+        WeatherGifImage(
+            gifRes   = getWeatherGif(iconCode),
+            modifier = Modifier.size(140.dp)
+        )
 
         Text(
             text = "${formatTemp(UnitConverter.convertTemp(currentWeather.temp, tempUnit), tempUnit , language)}",

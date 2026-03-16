@@ -14,5 +14,5 @@ data class WeeklyWeatherForecast(
     val lowTemp: Int,
     val highTemp: Int,
     val condition: String = "",
-    val iconUrl: String? = null
+    val iconCode : String?
 )
