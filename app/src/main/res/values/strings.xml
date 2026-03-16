@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Weather_Forecast</string>
+    <string name="app_name">Haze</string>
     <string name="settings">Settings</string>
     <string name="location">Location</string>
     <string name="use_gps">Use GPS</string>

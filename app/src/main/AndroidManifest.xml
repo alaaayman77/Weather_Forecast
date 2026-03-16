@@ -6,11 +6,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- Exact alarms -->
+
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
-    <!-- Required for foreground service + notifications -->
+
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
@@ -20,15 +20,15 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.Weather_Forecast">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCJLsLgqW_MrzD7861dn16hNxVpfxCqxfU" />
+            android:value= "${GOOGLE_API}" />
 
         <activity
             android:name=".MainActivity"
@@ -41,19 +41,12 @@
             </intent-filter>
         </activity>
 
-        <!--
-            BroadcastReceiver fired by AlarmManager at the exact scheduled time.
-            Must be registered here or Android will silently drop the broadcast.
-        -->
+
         <receiver
             android:name=".presentation.alerts.AlertReceiver"
             android:exported="false" />
 
-        <!--
-            Foreground service that plays sound / vibrates / shows notification.
-            foregroundServiceType="specialUse" is required on Android 14+
-            when the service does alarm-style work.
-        -->
+
         <service
             android:name=".presentation.alerts.AlertNotificationService"
             android:exported="false"
