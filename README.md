@@ -1,4 +1,4 @@
-# 🌤️ Weather Forecast App
+# 🌤️ HAZE - Weather Forecast App
 
 A modern Android weather application built with Kotlin and Jetpack Compose, featuring real-time weather data, custom alerts, favorites, and full localization support.
 
