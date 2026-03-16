@@ -10,15 +10,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.weather_forecast.data.models.Language
 import com.example.weather_forecast.data.models.TempUnit
@@ -41,6 +45,7 @@ fun FavouriteDetailsScreen(
     language: Language,
     isOffline   : Boolean,
 ) {
+    val layoutDirection = LocalLayoutDirection.current
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
@@ -48,8 +53,13 @@ fun FavouriteDetailsScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector        = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            imageVector        = if (layoutDirection == LayoutDirection.Rtl)
+                                Icons.Default.ArrowForward
+                            else
+                                Icons.Default.ArrowBack,
+                            contentDescription = null,
+                            tint               = MaterialTheme.colorScheme.primary,
+                            modifier           = Modifier.size(20.dp)
                         )
                     }
                 },

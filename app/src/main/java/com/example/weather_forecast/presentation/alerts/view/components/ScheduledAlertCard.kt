@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
@@ -12,8 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weather_forecast.data.models.AlertEntity
@@ -23,6 +27,7 @@ import com.example.weather_forecast.ui.theme.lightGray
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.weather_forecast.R
 
 @Composable
 fun ScheduledAlertCard(
@@ -30,10 +35,10 @@ fun ScheduledAlertCard(
     onCancel: () -> Unit
 ) {
     val statusText  = when (item.status) {
-        AlertStatus.SCHEDULED -> "Scheduled"
-        AlertStatus.ACTIVE    -> "Active"
-        AlertStatus.DISMISSED -> "Dismissed"
-        AlertStatus.CANCELLED -> "Cancelled"
+        AlertStatus.SCHEDULED -> stringResource(R.string.alert_scheduled)
+        AlertStatus.ACTIVE    -> stringResource(R.string.alert_active)
+        AlertStatus.DISMISSED -> stringResource(R.string.alert_dismissed)
+        AlertStatus.CANCELLED ->  stringResource(R.string.alert_cancelled)
     }
     val statusColor = when (item.status) {
         AlertStatus.SCHEDULED -> Color(0xFF1E88E5)
@@ -41,6 +46,7 @@ fun ScheduledAlertCard(
         AlertStatus.DISMISSED -> Color(0xFFFFA000)
         AlertStatus.CANCELLED -> Color(0xFFE53935)
     }
+    val layoutDirection = LocalLayoutDirection.current
 
     Surface(
         shape           = RoundedCornerShape(20.dp),
@@ -76,7 +82,7 @@ fun ScheduledAlertCard(
                         )
                     )
                     Text(
-                        if (item.mode == AlertMode.CUSTOM) "Condition-based alert"
+                        if (item.mode == AlertMode.CUSTOM)  stringResource(R.string.condition_based_alert)
                         else stringResource( item.type.subtitleRes),
                         style = MaterialTheme.typography.bodySmall.copy(
                             color    = lightGray,
@@ -113,7 +119,7 @@ fun ScheduledAlertCard(
             HorizontalDivider(color = Color(0xFFE3F2FD), thickness = 1.dp)
             Spacer(Modifier.height(12.dp))
 
-            // Custom condition badge
+
             if (item.mode == AlertMode.CUSTOM && item.customCondition != null) {
                 Surface(
                     shape    = RoundedCornerShape(8.dp),
@@ -123,7 +129,7 @@ fun ScheduledAlertCard(
                         .padding(bottom = 10.dp)
                 ) {
                     Text(
-                        text     = "Watching: ${item.customCondition.emoji} ${item.customCondition.label}",
+                        text     = "${stringResource(R.string.watching)} ${item.customCondition.emoji} ${item.customCondition.label}",
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         style    = MaterialTheme.typography.labelSmall.copy(
                             color      = Color(0xFF1565C0),
@@ -140,18 +146,22 @@ fun ScheduledAlertCard(
                 verticalAlignment     = Alignment.CenterVertically
             ) {
                 TimeChip(
-                    label    = if (item.mode == AlertMode.CUSTOM) "From" else "Start",
+                    label    = if (item.mode == AlertMode.CUSTOM) stringResource(R.string.from) else  stringResource(R.string.start),
                     time     = formatMillis(item.startMillis),
                     color    = Color(0xFF1E88E5),
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
-                    Icons.Default.ArrowForward, null,
-                    tint     = lightGray,
-                    modifier = Modifier.size(14.dp)
+                    imageVector        = if (layoutDirection == LayoutDirection.Rtl)
+                        Icons.Default.ArrowBack
+                    else
+                        Icons.Default.ArrowForward,
+                    contentDescription = null,
+                    tint               = lightGray,
+                    modifier           = Modifier.size(14.dp)
                 )
                 TimeChip(
-                    label    = if (item.mode == AlertMode.CUSTOM) "Until" else "End",
+                    label    = if (item.mode == AlertMode.CUSTOM) stringResource(R.string.until) else  stringResource(R.string.end),
                     time     = formatMillis(item.endMillis),
                     color    = Color(0xFF43A047),
                     modifier = Modifier.weight(1f)
@@ -162,7 +172,7 @@ fun ScheduledAlertCard(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            "Duration",
+                            stringResource(R.string.duration),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color    = lightGray,
                                 fontSize = 9.sp

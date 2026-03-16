@@ -64,5 +64,15 @@
     <string name="clear_pin">إزالة التثبيت</string>
     <string name="choose_location">اختر الموقع</string>
     <string name="add_to_fav">إضافة إلى المفضلة</string>
-
+    \<string name="alert_scheduled">تم التحديد</string>
+    <string name="alert_active">نشط</string>
+    <string name="alert_dismissed">تم التجاهل</string>
+    <string name="alert_cancelled">تم الإلغاء</string>
+    <string name="condition_based_alert">تنبيه يعتمد على الحالة</string>
+    <string name="watching">مراقبة</string>
+    <string name="from">من</string>
+    <string name="start">البدء</string>
+    <string name="end">النهاية</string>
+    <string name="duration">المده</string>
+    <string name="until">حتى</string>
 </resources>

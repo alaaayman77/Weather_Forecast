@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.rounded.*
@@ -21,10 +23,12 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.android.gms.maps.model.LatLng
@@ -61,7 +65,7 @@ fun MapPickerScreen(
 
 ) {
     val context = LocalContext.current
-
+    val layoutDirection = LocalLayoutDirection.current
     val placesLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -127,9 +131,12 @@ fun MapPickerScreen(
                     .background(Color.White)
             ) {
                 Icon(
-                    imageVector        = Icons.Rounded.ArrowBack,
-                    contentDescription = "Back",
-                    tint               =MaterialTheme.colorScheme.primary,
+                    imageVector        = if (layoutDirection == LayoutDirection.Rtl)
+                        Icons.Default.ArrowForward
+                    else
+                        Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    tint               = MaterialTheme.colorScheme.primary,
                     modifier           = Modifier.size(20.dp)
                 )
             }
