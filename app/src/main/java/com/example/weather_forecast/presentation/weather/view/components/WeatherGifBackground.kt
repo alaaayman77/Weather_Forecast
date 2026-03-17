@@ -135,9 +135,9 @@ fun getWeatherVideoRes(weatherId: Int?, dt: Long?, timezone: String = ""): Int {
         800         -> if (isNight) R.raw.clear_night  else R.raw.clear_day
         801, 802,
         803, 804    -> if (isNight) R.raw.clear_night else R.raw.cloudy_day
-        in 300..321 -> if (isNight) R.raw.rainy_night  else R.raw.rainy_day
+        in 300..321 -> if (isNight) R.raw.rainy_night  else R.raw.rainy_night
         in 200..232 -> R.raw.thunderstorm
-        in 500..531 -> if (isNight) R.raw.rainy_night  else R.raw.rainy_day
+        in 500..531 -> if (isNight) R.raw.rainy_night  else R.raw.rainy_night
         in 600..622 -> R.raw.snowy
         in 700..781 -> R.raw.haze
         else        -> if (isNight) R.raw.clear_night  else R.raw.clear_day

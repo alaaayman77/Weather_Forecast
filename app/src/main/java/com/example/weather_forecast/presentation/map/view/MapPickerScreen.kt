@@ -69,10 +69,12 @@ fun MapPickerScreen(
     val placesLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        result.data?.let { data ->
-            val place = Autocomplete.getPlaceFromIntent(data)
-            place.latLng?.let { latLng ->
-                onPlacePicked(latLng, place.name ?: "")
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            result.data?.let { data ->
+                val place = Autocomplete.getPlaceFromIntent(data)
+                place.latLng?.let { latLng ->
+                    onPlacePicked(latLng, place.name ?: "")
+                }
             }
         }
     }
