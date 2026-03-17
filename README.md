@@ -4,10 +4,31 @@ A modern Android weather application built with Kotlin and Jetpack Compose, feat
 
 ---
 
-## 📸 Screenshots
+## 📸 App Preview
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4c66e4a4-4ffc-42ea-913e-bc7f706ceb38" width="18%" />
+  <img src="https://github.com/user-attachments/assets/a7a15ebf-dd89-432c-9c2b-746291b5b59c" width="18%" />
+  <img src="https://github.com/user-attachments/assets/c32ad503-632d-4c38-b91b-ae1eb93b91bc" width="18%" />
+  <img src="https://github.com/user-attachments/assets/f4645409-d32c-4a06-9016-b45598c9d5e0" width="18%" />
+  <img src="https://github.com/user-attachments/assets/3f256333-f6e1-4f7f-b889-e6dcf038479d" width="18%" />
 
-> _Add your screenshots here_
+</p>
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/8026df25-b00e-4bfb-b6b0-2d34af3523ad" width="18%" />
+  <img src="https://github.com/user-attachments/assets/bf367ef9-aec9-40e4-9ae9-c143bfd4d316" width="18%" />
+  <img src="https://github.com/user-attachments/assets/d2804b6f-7ef6-42db-b56d-c09bc5df1b0c" width="18%" />
+  <img src="https://github.com/user-attachments/assets/9c26a59a-9e8e-4989-a914-3bf51a8c96f6" width="18%" />
+  <img src="https://github.com/user-attachments/assets/2eb7e9cc-99c4-41a9-adfe-84ad7cfe4796" width="18%" />
+  
+</p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a202a471-c9b7-4810-9e56-9000197b751e" width="18%" />
+  <img src="https://github.com/user-attachments/assets/0cd0666f-9402-49ef-93de-04ffb9e9bf15" width="18%" />
+  <img src="https://github.com/user-attachments/assets/f76d8f72-9fd2-4d9e-be47-7f60450f67c5" width="18%" />
+  <img src="https://github.com/user-attachments/assets/12f65a10-5920-4fcb-b810-54f6720e9e06" width="18%" />
+  
+</p>
 ---
 
 ## ✨ Features
